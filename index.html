@@ -105,7 +105,10 @@ Last updated<br><span style="color:var(--color-neutral-300);">{{ snapshot }}</sp
           <sc-for list="{{ typeOptions }}" as="o" hint-placeholder-count="4"><option value="{{ o }}">{{ o }}</option></sc-for>
         </select>
         <input class="nx-in" type="text" value="{{ fRep }}" onChange="{{ onRep }}" placeholder="Rep name…" style="background:#0a1c3a; border:1px solid var(--color-neutral-800); color:var(--color-text); border-radius:var(--radius-md); padding:6px 8px; font-size:11.5px; font-family:inherit; width:120px; flex:none;">
-        <input class="nx-in" type="text" value="{{ fManager }}" onChange="{{ onManager }}" placeholder="Manager name…" style="background:#0a1c3a; border:1px solid var(--color-neutral-800); color:var(--color-text); border-radius:var(--radius-md); padding:6px 8px; font-size:11.5px; font-family:inherit; width:130px; flex:none;">
+        <select class="nx-in" value="{{ fManager }}" onChange="{{ onManager }}" style="background:#0a1c3a; border:1px solid var(--color-neutral-800); color:var(--color-text); border-radius:var(--radius-md); padding:6px 8px; font-size:11.5px; font-family:inherit; width:150px; flex:none;">
+          <option value="">All managers</option>
+          <sc-for list="{{ managerOptions }}" as="o" hint-placeholder-count="6"><option value="{{ o }}">{{ o }}</option></sc-for>
+        </select>
         <button onClick="{{ onReset }}" style="background:transparent; border:1px solid var(--color-neutral-800); color:var(--color-neutral-400); border-radius:var(--radius-md); padding:6px 12px; font-size:11px; font-family:inherit; cursor:pointer; flex:none; white-space:nowrap;" style-hover="border-color:var(--color-accent-700); color:var(--color-accent-300);">Reset</button>
       </div>
 
@@ -670,7 +673,7 @@ class Component extends DCLogic {
     if (s.channel && channelOf(r.banner) !== s.channel) return false;
     if (s.rtype && r.resourceType !== s.rtype) return false;
     if (applyRep && s.rep && !(r.resourceName || '').toLowerCase().includes(s.rep.toLowerCase())) return false;
-    if (s.manager && !((r.managerName || '')).toLowerCase().includes(s.manager.toLowerCase())) return false;
+    if (s.manager && r.managerName !== s.manager) return false;
     return true;
   }
 
@@ -801,18 +804,19 @@ class Component extends DCLogic {
     const activeFilters = ['region', 'division', 'banner', 'channel', 'rep', 'rtype'].filter((k) => s[k]);
 
     if (!this._opts) {
-      const rs = new Set(), ds = new Set(), bs = new Set(), cs = new Set(), ts = new Set();
+      const rs = new Set(), ds = new Set(), bs = new Set(), cs = new Set(), ms = new Set();
       [...this.repRows, ...this.merchRows].forEach((r) => {
         if (r.region) rs.add(r.region);
         if (r.division) ds.add(r.division);
         if (r.banner) { bs.add(r.banner); cs.add(channelOf(r.banner)); }
+        if (r.managerName) ms.add(r.managerName);
       });
       const typesOf = (rows) => [...new Set(rows.map((r) => r.resourceType).filter(Boolean))].sort();
       this._repTypes = typesOf(this.repRows);
       this._merchTypes = typesOf(this.merchRows);
       this._allTypes = typesOf([...this.repRows, ...this.merchRows]);
       const sorted = (x) => [...x].sort();
-      this._opts = { regionOptions: sorted(rs), divisionOptions: sorted(ds), bannerOptions: sorted(bs), channelOptions: sorted(cs) };
+      this._opts = { regionOptions: sorted(rs), divisionOptions: sorted(ds), bannerOptions: sorted(bs), channelOptions: sorted(cs), managerOptions: sorted(ms) };
     }
 
     const out = Object.assign(base, this._opts, {
