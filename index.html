@@ -60,6 +60,9 @@
     </nav>
     <div style="flex:none; padding:var(--space-4) var(--space-6) var(--space-8); border-top:1px solid var(--color-neutral-800); font-size:10.5px; color:var(--color-neutral-500); line-height:1.5;">
 Last updated<br><span style="color:var(--color-neutral-300);">{{ snapshot }}</span>
+      <button onClick="{{ onLogout }}" style="margin-top:14px; width:100%; display:flex; align-items:center; justify-content:center; gap:8px; background:transparent; border:1px solid var(--color-neutral-800); color:var(--color-neutral-400); border-radius:var(--radius-md); padding:8px 0; font-size:11.5px; font-family:inherit; cursor:pointer;" style-hover="border-color:var(--color-accent-700); color:var(--color-accent-300);">
+        <i class="ph ph-sign-out" style="font-size:14px;"></i> Log out
+      </button>
     </div>
   </aside>
 
@@ -769,6 +772,12 @@ class Component extends DCLogic {
       pageTitle: P.title, pageSub: P.sub,
       snapshot: this.ts ? new Date(this.ts).toLocaleString('en-ZA', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : '—',
       loadError: s.err || false,
+      onLogout: () => {
+        if (isLocalDev()) { window.location.href = 'login.html'; return; }
+        const inst = getMsalInstance();
+        const account = inst.getAllAccounts()[0];
+        inst.logoutRedirect({ account, postLogoutRedirectUri: MSAL_CONFIG.redirectUri });
+      },
       isOverview: s.page === 'overview', isResourcePage: s.page === 'rep' || s.page === 'merch',
       isDivision: s.page === 'division', isBanner: s.page === 'banner', isGaps: s.page === 'gaps',
       fRegion: s.region, fDivision: s.division, fBanner: s.banner, fChannel: s.channel, fRep: s.rep, fType: s.rtype,
