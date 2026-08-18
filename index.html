@@ -49,7 +49,7 @@
       <img src="assets/nexus-logo.png" alt="Meridian Nexus" style="width:38px; height:38px; object-fit:contain;">
       <div style="font-family:var(--font-heading); font-size:19px; font-weight:700; letter-spacing:-0.015em; line-height:1.2;">Meridian <span style="color:var(--color-accent);">Nexus</span></div>
     </div>
-    <div style="padding:0 var(--space-6) var(--space-3); font-size:10.5px; letter-spacing:0.14em; text-transform:uppercase; color:var(--color-neutral-500);">Call cycle master</div>
+    <div style="padding:0 var(--space-6) var(--space-3); font-size:10.5px; letter-spacing:0.14em; text-transform:uppercase; color:var(--color-neutral-500); text-align:center;">Call cycle master</div>
     <nav style="display:flex; flex-direction:column; gap:4px; padding:var(--space-3) var(--space-4); flex:1;">
       <sc-for list="{{ navItems }}" as="n" hint-placeholder-count="6">
         <div class="nx-nav" onClick="{{ n.go }}" style="display:flex; align-items:center; gap:12px; padding:11px 13px; border-radius:var(--radius-md); cursor:pointer; font-size:14px; font-weight:500; border-left:2px solid {{ n.mark }}; background:{{ n.bg }}; color:{{ n.fg }};">
@@ -147,7 +147,7 @@ Last updated<br><span style="color:var(--color-neutral-300);">{{ snapshot }}</sp
           </div>
 
           <div style="display:grid; gap:var(--space-4);">
-            <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(148px,1fr)); gap:var(--space-3);">
+            <div style="display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:var(--space-3);">
               <sc-for list="{{ headlineStats }}" as="s" hint-placeholder-count="5">
                 <div style="background:var(--color-surface); border:1px solid var(--color-neutral-800); border-radius:var(--radius-md); padding:var(--space-4) var(--space-4) var(--space-4);">
                   <div style="display:flex; align-items:center; gap:6px; font-size:9px; letter-spacing:0.09em; text-transform:uppercase; color:var(--color-neutral-500); margin-bottom:6px;">
@@ -272,7 +272,7 @@ Last updated<br><span style="color:var(--color-neutral-300);">{{ snapshot }}</sp
 
       <!-- ══ REP / MERCH ══ -->
       <sc-if value="{{ isResourcePage }}" hint-placeholder-val="{{ false }}">
-        <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(148px,1fr)); gap:var(--space-3); margin-bottom:var(--space-4);">
+        <div style="display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:var(--space-3); margin-bottom:var(--space-4);">
           <sc-for list="{{ resStats }}" as="s" hint-placeholder-count="5">
             <div style="background:var(--color-surface); border:1px solid var(--color-neutral-800); border-radius:var(--radius-md); padding:var(--space-4);">
               <div style="display:flex; align-items:center; gap:6px; font-size:9px; letter-spacing:0.09em; text-transform:uppercase; color:var(--color-neutral-500); margin-bottom:6px;">
@@ -580,7 +580,7 @@ const CHANNEL_MAP = {
   'PICK N PAY CORPORATE':'Grocery','PICK N PAY FAMILY':'Grocery','PICK N PAY HYPERMARKETS':'Grocery','WALMART':'Grocery',
   'PICK N PAY LOCAL':'Grocery','PICK N PAY MINI MARKET':'Grocery','SAVEMOR':'Grocery','SHOPRITE':'Grocery',
   'SHOPRITE MINI':'Grocery','SPAR':'Grocery','SPAR EXPRESS':'Grocery','SUPERSPAR':'Grocery','USAVE':'Grocery',
-  'CHECKERS DARK STORE':'Grocery','MAKRO':'Grocery',"FOOD LOVER'S MARKET":'Grocery','WOOLWORTHS':'Grocery',
+  'CHECKERS DARK STORE':'Grocery','MAKRO':'Grocery','WOOLWORTHS':'Grocery',
   'CLICKS':'Pharmacy / Health & Beauty','DISCHEM':'Pharmacy / Health & Beauty','MEDIRITE':'Pharmacy / Health & Beauty',
   'MEDIRITE PLUS':'Pharmacy / Health & Beauty','SPAR PHARMACY':'Pharmacy / Health & Beauty',
   'BEAUTY WORLD':'Pharmacy / Health & Beauty','BEAUTY ZONE':'Pharmacy / Health & Beauty',
@@ -594,6 +594,12 @@ const CHANNEL_MAP = {
   'IBC':'Wholesale / Cash & Carry','ARROW CASH AND CARRY':'Wholesale / Cash & Carry',
   'CONTINENTAL CASH & CARRY':'Wholesale / Cash & Carry','INDEPENDENT C&C':'Wholesale / Cash & Carry',
   'BP EXPRESS':'Forecourts','ENGEN':'Forecourts',
+  'BEC':'Wholesale / Cash & Carry','CHECKME':'Wholesale / Cash & Carry','CHECKRITE':'Wholesale / Cash & Carry',
+  'HYPERCHECK':'Wholesale / Cash & Carry','CHECKSAVE':'Wholesale / Cash & Carry','CHECKSTAR':'Wholesale / Cash & Carry',
+  'BUILDERS':'Hardware',
+  'VAN SCHAIK':'Stationery','WALTONS':'Stationery','PNA':'Stationery',
+  'YUPPIECHEF':'Specialty','TOYSRUS':'Specialty','HIRSCH':'Specialty',
+  'FOODZONE':'Retail',"FOOD LOVER'S MARKET":'Retail',
 };
 const channelOf = (b) => CHANNEL_MAP[(b || '').toUpperCase()] || 'Other / unclassified';
 const key = (r) => (r.storeCode || '') + '|' + (r.storeName || '');
