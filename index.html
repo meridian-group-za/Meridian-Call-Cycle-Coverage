@@ -104,7 +104,8 @@ Last updated<br><span style="color:var(--color-neutral-300);">{{ snapshot }}</sp
           <option value="">All resource types</option>
           <sc-for list="{{ typeOptions }}" as="o" hint-placeholder-count="4"><option value="{{ o }}">{{ o }}</option></sc-for>
         </select>
-        <input class="nx-in" type="text" value="{{ fRep }}" onChange="{{ onRep }}" placeholder="Resource name…" style="background:#0a1c3a; border:1px solid var(--color-neutral-800); color:var(--color-text); border-radius:var(--radius-md); padding:6px 8px; font-size:11.5px; font-family:inherit; width:130px; flex:none;">
+        <input class="nx-in" type="text" value="{{ fRep }}" onChange="{{ onRep }}" placeholder="Rep name…" style="background:#0a1c3a; border:1px solid var(--color-neutral-800); color:var(--color-text); border-radius:var(--radius-md); padding:6px 8px; font-size:11.5px; font-family:inherit; width:120px; flex:none;">
+        <input class="nx-in" type="text" value="{{ fManager }}" onChange="{{ onManager }}" placeholder="Manager name…" style="background:#0a1c3a; border:1px solid var(--color-neutral-800); color:var(--color-text); border-radius:var(--radius-md); padding:6px 8px; font-size:11.5px; font-family:inherit; width:130px; flex:none;">
         <button onClick="{{ onReset }}" style="background:transparent; border:1px solid var(--color-neutral-800); color:var(--color-neutral-400); border-radius:var(--radius-md); padding:6px 12px; font-size:11px; font-family:inherit; cursor:pointer; flex:none; white-space:nowrap;" style-hover="border-color:var(--color-accent-700); color:var(--color-accent-300);">Reset</button>
       </div>
 
@@ -582,7 +583,7 @@ const CHANNEL_MAP = {
   'PICK N PAY CORPORATE':'Grocery','PICK N PAY FAMILY':'Grocery','PICK N PAY HYPERMARKETS':'Grocery','WALMART':'Grocery',
   'PICK N PAY LOCAL':'Grocery','PICK N PAY MINI MARKET':'Grocery','SAVEMOR':'Grocery','SHOPRITE':'Grocery',
   'SHOPRITE MINI':'Grocery','SPAR':'Grocery','SPAR EXPRESS':'Grocery','SUPERSPAR':'Grocery','USAVE':'Grocery',
-  'CHECKERS DARK STORE':'Grocery','MAKRO':'Grocery','WOOLWORTHS':'Grocery',
+  'CHECKERS DARK STORE':'Grocery','MAKRO':'Grocery','WOOLWORTHS':'Grocery',"FOOD LOVER'S MARKET":'Grocery',
   'CLICKS':'Pharmacy / Health & Beauty','DISCHEM':'Pharmacy / Health & Beauty','MEDIRITE':'Pharmacy / Health & Beauty',
   'MEDIRITE PLUS':'Pharmacy / Health & Beauty','SPAR PHARMACY':'Pharmacy / Health & Beauty',
   'BEAUTY WORLD':'Pharmacy / Health & Beauty','BEAUTY ZONE':'Pharmacy / Health & Beauty',
@@ -601,7 +602,7 @@ const CHANNEL_MAP = {
   'BUILDERS':'Hardware',
   'VAN SCHAIK':'Stationery','WALTONS':'Stationery','PNA':'Stationery',
   'YUPPIECHEF':'Specialty','TOYSRUS':'Specialty','HIRSCH':'Specialty',
-  'FOODZONE':'Retail',"FOOD LOVER'S MARKET":'Retail',
+  'FOODZONE':'Retail',
 };
 const channelOf = (b) => CHANNEL_MAP[(b || '').toUpperCase()] || 'Other / unclassified';
 const key = (r) => (r.storeCode || '') + '|' + (r.storeName || '');
@@ -622,7 +623,7 @@ const PAGES = {
 class Component extends DCLogic {
   state = {
     ready: false, err: '', page: 'overview',
-    region: '', division: '', banner: '', channel: '', rep: '', rtype: '',
+    region: '', division: '', banner: '', channel: '', rep: '', manager: '', rtype: '',
     resQuery: '', bannerQuery: '', gapQuery: '',
     gapTab: 'repOnly', sortKey: 'stores', sortDir: -1,
   };
@@ -669,12 +670,13 @@ class Component extends DCLogic {
     if (s.channel && channelOf(r.banner) !== s.channel) return false;
     if (s.rtype && r.resourceType !== s.rtype) return false;
     if (applyRep && s.rep && !(r.resourceName || '').toLowerCase().includes(s.rep.toLowerCase())) return false;
+    if (s.manager && !((r.managerName || '')).toLowerCase().includes(s.manager.toLowerCase())) return false;
     return true;
   }
 
   model() {
     const s = this.state;
-    const sig = [s.region, s.division, s.banner, s.channel, s.rep, s.rtype].join('§');
+    const sig = [s.region, s.division, s.banner, s.channel, s.rep, s.manager, s.rtype].join('§');
     if (this._sig === sig && this._m) return this._m;
     const rep = this.repRows.filter((r) => this.match(r, true));
     const merch = this.merchRows.filter((r) => this.match(r, false));
@@ -780,12 +782,13 @@ class Component extends DCLogic {
       },
       isOverview: s.page === 'overview', isResourcePage: s.page === 'rep' || s.page === 'merch',
       isDivision: s.page === 'division', isBanner: s.page === 'banner', isGaps: s.page === 'gaps',
-      fRegion: s.region, fDivision: s.division, fBanner: s.banner, fChannel: s.channel, fRep: s.rep, fType: s.rtype,
+      fRegion: s.region, fDivision: s.division, fBanner: s.banner, fChannel: s.channel, fRep: s.rep, fManager: s.manager, fType: s.rtype,
       onRegion: (e) => this.set({ region: e.target.value }), onDivision: (e) => this.set({ division: e.target.value }),
       onBanner: (e) => this.set({ banner: e.target.value }), onChannel: (e) => this.set({ channel: e.target.value }),
       onRep: (e) => this.set({ rep: e.target.value }),
+      onManager: (e) => this.set({ manager: e.target.value }),
       onType: (e) => this.set({ rtype: e.target.value }),
-      onReset: () => this.set({ region: '', division: '', banner: '', channel: '', rep: '', rtype: '' }),
+      onReset: () => this.set({ region: '', division: '', banner: '', channel: '', rep: '', manager: '', rtype: '' }),
       onResQuery: (e) => this.set({ resQuery: e.target.value }),
       onBannerQuery: (e) => this.set({ bannerQuery: e.target.value }),
       onGapQuery: (e) => this.set({ gapQuery: e.target.value }),
