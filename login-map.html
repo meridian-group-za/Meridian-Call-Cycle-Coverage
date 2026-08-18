@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Meridian footprint</title>
+<script src="https://unpkg.com/d3@7.9.0/dist/d3.min.js" integrity="sha384-CjloA8y00+1SDAUkjs099PVfnY2KmDC2BZnws9kh8D/lX1s46w6EPhpXdqMfjK6i" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/topojson-client@3.1.0/dist/topojson-client.min.js" integrity="sha384-Ukv1p/xTma6P4/2bY5KzWBw+ydSpXmhCMtyciIQVDJ1RmOxtCYNMF1uXT9T63H67" crossorigin="anonymous"></script>
+<style>
+  html, body { margin:0; height:100%; background:transparent; overflow:hidden; }
+  #stage { position:relative; width:100%; height:100%; }
+  svg { display:block; width:100%; height:100%; }
+  #veil { position:absolute; inset:0; pointer-events:none;
+    background:linear-gradient(90deg, rgba(0,12,33,0.3) 0%, rgba(0,12,33,0) 40%, rgba(0,12,33,0.12) 100%),
+               linear-gradient(180deg, rgba(0,12,33,0.28) 0%, rgba(0,12,33,0) 45%, rgba(0,12,33,0.32) 100%); }
+  @keyframes ping { 0% { r:5; opacity:0.55; } 100% { r:34; opacity:0; } }
+  @keyframes flow { to { stroke-dashoffset:-260; } }
+</style>
+</head>
+<body>
+<div id="stage">
+  <svg id="map"></svg>
+  <div id="veil"></div>
+</div>
+<script>
+// Major centres — the heat clusters and connection network.
+const HUBS = [
+  { name: 'Johannesburg', lon: 28.04, lat: -26.20, w: 1.00 },
+  { name: 'Pretoria',     lon: 28.19, lat: -25.75, w: 0.72 },
+  { name: 'Durban',       lon: 31.02, lat: -29.86, w: 0.86 },
+  { name: 'Cape Town',    lon: 18.42, lat: -33.92, w: 0.84 },
+  { name: 'Port Elizabeth', lon: 25.60, lat: -33.96, w: 0.58 },
+  { name: 'Bloemfontein', lon: 26.21, lat: -29.12, w: 0.52 },
+];
+const LINKS = [
+  ['Johannesburg', 'Pretoria'], ['Johannesburg', 'Durban'], ['Johannesburg', 'Bloemfontein'],
+  ['Johannesburg', 'Cape Town'], ['Bloemfontein', 'Cape Town'], ['Bloemfontein', 'Port Elizabeth'],
+  ['Durban', 'Port Elizabeth'], ['Cape Town', 'Port Elizabeth'],
+];
+// Secondary store scatter — real town coordinates, no invented geography.
+const TOWNS = [
+  [27.91,-33.02],[22.46,-33.96],[29.45,-23.90],[30.97,-25.47],[25.64,-25.85],[29.12,-26.27],
+  [24.76,-28.74],[26.65,-29.78],[28.39,-28.75],[31.60,-28.53],[30.39,-29.62],[19.45,-34.42],
+  [18.86,-33.93],[20.02,-34.05],[23.36,-33.59],[26.89,-31.89],[27.42,-32.98],[28.24,-26.87],
+  [27.77,-26.71],[29.87,-24.72],[30.47,-23.90],[31.05,-24.98],[26.16,-24.65],[23.87,-27.77],
+  [21.85,-28.45],[17.94,-32.76],[18.42,-32.24],[19.90,-32.38],[24.19,-30.72],[25.13,-33.29],
+];
+const ACCENT = '#ec6d25';
+
+async function main(){
+  const topo = await fetch('https://cdn.jsdelivr.net/npm/world-atlas@2.0.2/countries-110m.json').then((r) => r.json());
+  const all = topojson.feature(topo, topo.objects.countries).features;
+  const sa = all.filter((f) => String(f.id) === '710');
+  const near = all.filter((f) => ['426','516','748','072','716','508','024'].indexOf(String(f.id)) >= 0);
+
+  const svg = d3.select('#map');
+  const W = svg.node().clientWidth || 800, H = svg.node().clientHeight || 800;
+  svg.attr('viewBox', '0 0 ' + W + ' ' + H);
+
+  const projection = d3.geoMercator().fitExtent([[26, 26], [W - 26, H - 26]], { type: 'FeatureCollection', features: sa });
+  const path = d3.geoPath(projection);
+  const at = (name) => { const h = HUBS.find((x) => x.name === name); return projection([h.lon, h.lat]); };
+
+  const defs = svg.append('defs');
+  const heat = defs.append('radialGradient').attr('id', 'heat');
+  heat.append('stop').attr('offset', '0%').attr('stop-color', ACCENT).attr('stop-opacity', 0.42);
+  heat.append('stop').attr('offset', '55%').attr('stop-color', ACCENT).attr('stop-opacity', 0.12);
+  heat.append('stop').attr('offset', '100%').attr('stop-color', ACCENT).attr('stop-opacity', 0);
+
+  const clip = defs.append('clipPath').attr('id', 'saClip');
+  sa.forEach((feat) => clip.append('path').attr('d', path(feat)));
+
+  svg.append('g').attr('opacity', 0.5).selectAll('path').data(near).join('path')
+    .attr('d', path).attr('fill', 'none').attr('stroke', '#12325c').attr('stroke-width', 0.5);
+
+  // dotted halftone landmass — sampled inside the real geometry, never drawn by hand
+  const dots = svg.append('g');
+  const feature = sa[0];
+  const [[x0, y0], [x1, y1]] = path.bounds(feature);
+  const step = Math.max(4.2, Math.min(6.5, (x1 - x0) / 96));
+  for (let y = y0; y <= y1; y += step) {
+    for (let x = x0; x <= x1; x += step) {
+      const geo = projection.invert([x, y]);
+      if (!geo || !d3.geoContains(feature, geo)) continue;
+      dots.append('circle').attr('cx', x).attr('cy', y).attr('r', 1.05)
+        .attr('fill', '#9dc4ec').attr('opacity', 0.72);
+    }
+  }
+  svg.append('g').selectAll('path').data(sa).join('path')
+    .attr('d', path).attr('fill', 'none').attr('stroke', 'rgba(120,172,224,0.28)').attr('stroke-width', 0.9);
+
+  // heat clusters, clipped to the country
+  const heatG = svg.append('g').attr('clip-path', 'url(#saClip)');
+  HUBS.forEach((h) => {
+    const xy = projection([h.lon, h.lat]);
+    heatG.append('circle').attr('cx', xy[0]).attr('cy', xy[1])
+      .attr('r', 34 + h.w * 78).attr('fill', 'url(#heat)');
+  });
+
+  // connection lines between major centres
+  const lines = svg.append('g');
+  LINKS.forEach(([a, b], i) => {
+    const p1 = at(a), p2 = at(b);
+    const mx = (p1[0] + p2[0]) / 2, my = (p1[1] + p2[1]) / 2;
+    const dx = p2[0] - p1[0], dy = p2[1] - p1[1];
+    const curve = 'M' + p1[0] + ',' + p1[1] + 'Q' + (mx - dy * 0.14) + ',' + (my + dx * 0.14) + ' ' + p2[0] + ',' + p2[1];
+    lines.append('path').attr('d', curve).attr('fill', 'none')
+      .attr('stroke', 'rgba(236,109,37,0.22)').attr('stroke-width', 0.7);
+    lines.append('path').attr('d', curve).attr('fill', 'none')
+      .attr('stroke', ACCENT).attr('stroke-width', 0.9).attr('stroke-linecap', 'round')
+      .attr('opacity', 0.6);
+  });
+
+  // secondary stores
+  const towns = svg.append('g');
+  TOWNS.forEach((c) => {
+    const xy = projection(c);
+    towns.append('circle').attr('cx', xy[0]).attr('cy', xy[1]).attr('r', 1.8)
+      .attr('fill', ACCENT).attr('opacity', 0.55);
+  });
+
+  // major nodes with pulse
+  const nodes = svg.append('g');
+  HUBS.forEach((h, i) => {
+    const xy = projection([h.lon, h.lat]);
+    const g = nodes.append('g').attr('transform', 'translate(' + xy[0] + ',' + xy[1] + ')');
+    g.append('circle').attr('r', 5).attr('fill', 'none').attr('stroke', ACCENT).attr('stroke-width', 1.2)
+      .style('animation', 'ping ' + (3.2 + i * 0.4).toFixed(2) + 's ease-out ' + (i * 0.5).toFixed(2) + 's infinite');
+    g.append('circle').attr('r', 2.6 + h.w * 3.6).attr('fill', ACCENT).attr('opacity', 0.95);
+  });
+}
+main().catch(() => {});
+</script>
+</body>
+</html>

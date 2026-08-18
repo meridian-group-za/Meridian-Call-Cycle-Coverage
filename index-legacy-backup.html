@@ -1,0 +1,874 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Call Cycle Coverage — Meridian Nexus</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; background:#081b34; color:#c9d7e6; font-family:'Poppins',system-ui,sans-serif; font-size:13px; }
+  a { color:#ec6d25; text-decoration:none; }
+  a:hover { color:#f2955c; }
+  ::-webkit-scrollbar { width:10px; height:10px; }
+  ::-webkit-scrollbar-thumb { background:rgba(157,196,236,0.2); border-radius:6px; }
+
+  .shell { display:flex; min-height:100vh; }
+
+  /* SIDEBAR */
+  .sidebar { position:relative; width:230px; flex:none; min-height:100vh; display:flex; flex-direction:column;
+    background:rgba(8,22,44,0.82); backdrop-filter:blur(16px); border-right:1px solid rgba(28,63,107,0.9); }
+  .brand { display:flex; align-items:center; gap:12px; padding:22px 20px 20px; }
+  .brand img { width:34px; height:34px; object-fit:contain; }
+  .brand-name { font-size:16px; font-weight:600; letter-spacing:-0.01em; color:#f3f7fc; }
+  .brand-name span { color:#ec6d25; }
+  .nav { flex:1; padding:6px 12px; }
+  .nav-section { font-size:10px; font-weight:700; letter-spacing:.06em; color:#9dc4ec; opacity:.65; padding:16px 14px 6px; }
+  .nx-nav { display:flex; align-items:center; gap:11px; padding:10px 14px; margin-bottom:3px; border-radius:9px;
+    font-size:13px; font-weight:500; color:#c9d7e6; cursor:pointer; border:1px solid transparent; }
+  .nx-nav svg { flex:none; }
+  .nx-nav:hover { background:rgba(157,196,236,0.09); }
+  .nx-nav.active { color:#f3f7fc; font-weight:600; background:rgba(236,109,37,0.14); border-color:rgba(236,109,37,0.4); }
+  .sidebar-foot { padding:14px 18px; border-top:1px solid rgba(28,63,107,0.9); font-size:11px; color:#9dc4ec; }
+
+  /* MAIN */
+  main { flex:1; min-width:0; min-height:100vh; overflow-y:auto; padding:clamp(16px,2.4vw,30px) clamp(24px,5vw,48px) 40px; }
+  .wrap { max-width:1360px; }
+
+  .page-head { display:flex; align-items:center; gap:14px; margin-bottom:4px; }
+  .page-icon { width:44px; height:44px; flex:none; border-radius:11px; display:grid; place-items:center;
+    background:rgba(236,109,37,0.14); border:1px solid rgba(236,109,37,0.32); color:#ec6d25; }
+  .page-head h1 { font-size:21px; font-weight:600; margin:0; color:#f3f7fc; }
+  .page-sub { font-size:12px; color:#9dc4ec; margin-top:2px; }
+  .meta-tag { margin-left:auto; background:rgba(18,58,104,0.42); border:1px solid rgba(28,63,107,0.95); border-radius:8px;
+    padding:5px 11px; font-size:10.5px; color:#c9d7e6; white-space:nowrap; }
+  .divider { height:1px; background:linear-gradient(90deg, rgba(157,196,236,0.22), transparent); margin:12px 0 12px; }
+
+  .filter-row { display:flex; gap:8px; margin-bottom:12px; flex-wrap:wrap; align-items:center; }
+  .filter-row select, .filter-row input[type=text] { background:rgba(8,20,38,0.5); border:1px solid rgba(28,63,107,0.95);
+    color:#eef3f9; border-radius:8px; padding:6px 10px; font-size:12px; font-family:inherit; min-width:140px; }
+  .filter-row input[type=text]::placeholder { color:#7ea1c9; }
+  .filter-reset { background:transparent; border:1px solid rgba(28,63,107,0.95); color:#9dc4ec; font-size:11.5px;
+    font-weight:600; padding:6px 12px; border-radius:8px; cursor:pointer; }
+  .filter-reset:hover { color:#f2955c; border-color:rgba(236,109,37,0.4); }
+
+  .kpi-row { display:grid; grid-template-columns:repeat(auto-fit,minmax(170px,1fr)); gap:10px; margin-bottom:12px; }
+  .kpi-card { display:flex; align-items:center; justify-content:space-between; gap:10px; padding:10px 13px;
+    border-radius:10px; background:rgba(18,58,104,0.42); border:1px solid rgba(28,63,107,0.95); }
+  .kpi-label { font-size:9px; text-transform:uppercase; letter-spacing:.06em; color:#9dc4ec; font-weight:700; margin-bottom:4px; }
+  .kpi-value { font-size:19px; color:#f3f7fc; font-weight:600; line-height:1.1; }
+  .kpi-sub { font-size:10px; color:#9dc4ec; margin-top:2px; }
+  .kpi-icon { width:34px; height:34px; flex:none; border-radius:9px; display:grid; place-items:center; }
+
+  .grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:12px; }
+  .grid-3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; margin-bottom:12px; }
+  @media (max-width:900px){ .grid-2,.grid-3{ grid-template-columns:1fr; } }
+
+  .panel { background:rgba(18,58,104,0.3); border:1px solid rgba(28,63,107,0.95); border-radius:12px; padding:12px 14px; }
+  .panel h3 { margin:0 0 8px; color:#f3f7fc; font-size:12.5px; font-weight:600; }
+  .panel h3 .count { color:#9dc4ec; font-weight:400; font-size:10.5px; }
+  canvas { max-width:100%; }
+
+  table { width:100%; border-collapse:collapse; font-size:11.5px; }
+  th { text-align:left; color:#9dc4ec; font-size:9.5px; text-transform:uppercase; letter-spacing:.05em; padding:5px 7px;
+    border-bottom:1px solid rgba(28,63,107,0.95); }
+  td { padding:5px 7px; border-bottom:1px solid rgba(28,63,107,0.5); color:#c9d7e6; }
+  tr:hover td { background:rgba(236,109,37,0.05); }
+  .pill { display:inline-block; padding:2px 9px; border-radius:20px; font-size:10.5px; font-weight:700; }
+  .pill.good { background:rgba(143,214,168,0.14); color:#8fd6a8; border:1px solid rgba(143,214,168,0.35); }
+  .pill.bad { background:rgba(236,109,37,0.14); color:#f2955c; border:1px solid rgba(236,109,37,0.35); }
+
+  .search-row { display:flex; gap:8px; margin-bottom:8px; flex-wrap:wrap; }
+  input[type=text] { background:rgba(8,20,38,0.5); border:1px solid rgba(28,63,107,0.95); color:#eef3f9; border-radius:9px;
+    padding:7px 12px; font-size:12px; font-family:inherit; flex:1; min-width:200px; }
+  input[type=text]::placeholder { color:#7ea1c9; }
+
+  .toggle-row { display:flex; gap:6px; margin-bottom:8px; }
+  .toggle-btn { background:rgba(18,58,104,0.42); border:1px solid rgba(28,63,107,0.95); color:#9dc4ec; padding:6px 13px;
+    border-radius:8px; font-size:11px; font-weight:600; cursor:pointer; }
+  .toggle-btn.active { color:#f3f7fc; border-color:rgba(236,109,37,0.4); background:rgba(236,109,37,0.14); }
+
+  .tile-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(110px,1fr)); gap:8px; }
+  .tile { background:rgba(8,20,38,0.5); border:1px solid rgba(28,63,107,0.95); border-radius:9px; padding:8px 10px; }
+  .tile-label { font-size:8px; text-transform:uppercase; letter-spacing:.05em; color:#9dc4ec; font-weight:700;
+    margin-bottom:4px; line-height:1.25; }
+  .tile-value { font-size:16px; color:#f3f7fc; font-weight:600; }
+
+  .bar-list-row { display:grid; grid-template-columns:110px 1fr 44px; align-items:center; gap:8px; margin-bottom:6px; font-size:11px; }
+  .bar-list-label { color:#c9d7e6; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .bar-list-track { height:11px; background:rgba(28,63,107,0.35); border-radius:4px; overflow:hidden; }
+  .bar-list-fill { height:100%; border-radius:4px; }
+  .bar-list-value { color:#9dc4ec; text-align:right; font-weight:600; }
+
+  .insight-row { display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:10px; }
+  .insight-card { background:rgba(18,58,104,0.3); border:1px solid rgba(28,63,107,0.95); border-radius:12px;
+    padding:10px 13px; display:flex; gap:10px; align-items:flex-start; }
+  .insight-icon { width:28px; height:28px; flex:none; border-radius:8px; display:grid; place-items:center;
+    background:rgba(236,109,37,0.14); border:1px solid rgba(236,109,37,0.3); color:#ec6d25; }
+  .insight-text { font-size:11.5px; line-height:1.42; color:#c9d7e6; }
+  .insight-text b { color:#f3f7fc; }
+
+  .page-content { display:none; }
+  .page-content.active { display:block; }
+  .muted { color:#9dc4ec; }
+  .table-scroll { max-height:480px; overflow-y:auto; }
+</style>
+</head>
+<body>
+<div class="shell">
+  <aside class="sidebar">
+    <div class="brand">
+      <img src="assets/nexus-logo.png" alt="Meridian Nexus" />
+      <div class="brand-name">Meridian <span>Nexus</span></div>
+    </div>
+    <nav class="nav">
+      <div class="nx-nav active" data-page="overview" onclick="showPage('overview')">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"></rect><rect x="14" y="3" width="7" height="7" rx="1.5"></rect><rect x="3" y="14" width="7" height="7" rx="1.5"></rect><rect x="14" y="14" width="7" height="7" rx="1.5"></rect></svg>
+        <span>Overview</span>
+      </div>
+      <div class="nx-nav" data-page="rep" onclick="showPage('rep')">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 15-6.7L21 8"></path><path d="M21 3v5h-5"></path><path d="M21 12a9 9 0 0 1-15 6.7L3 16"></path><path d="M3 21v-5h5"></path></svg>
+        <span>Rep Coverage</span>
+      </div>
+      <div class="nx-nav" data-page="merch" onclick="showPage('merch')">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 4h-5L8 6H4a1 1 0 0 0-1 1v11a1 1 0 0 0 1 1h16a1 1 0 0 0 1-1V7a1 1 0 0 0-1-1h-4z"></path><circle cx="12" cy="12.5" r="3.2"></circle></svg>
+        <span>Merch Coverage</span>
+      </div>
+      <div class="nx-nav" data-page="division" onclick="showPage('division')">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+        <span>Division</span>
+      </div>
+      <div class="nx-nav" data-page="banner" onclick="showPage('banner')">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7l9-4 9 4-9 4-9-4Z"></path><path d="M3 7v10l9 4 9-4V7"></path><path d="M12 11v10"></path></svg>
+        <span>Banner Deep Dive</span>
+      </div>
+      <div class="nx-nav" data-page="gaps" onclick="showPage('gaps')">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><path d="M12 8v5"></path><path d="M12 16h.01"></path></svg>
+        <span>Coverage Gaps</span>
+      </div>
+    </nav>
+    <div class="sidebar-foot">Master coverage &amp; gap analysis</div>
+  </aside>
+
+  <main>
+    <div class="wrap">
+      <div class="page-head">
+        <div class="page-icon">
+          <svg width="27" height="27" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 15-6.7L21 8"></path><path d="M21 3v5h-5"></path><path d="M21 12a9 9 0 0 1-15 6.7L3 16"></path><path d="M3 21v-5h5"></path></svg>
+        </div>
+        <div>
+          <h1>Call Cycle Coverage</h1>
+          <div class="page-sub">Store-level rep &amp; merchandiser assignment coverage — Call Cycle Master</div>
+        </div>
+        <div class="meta-tag" id="metaTag">Loading…</div>
+      </div>
+      <div class="divider"></div>
+
+      <div class="filter-row">
+        <select id="filterRegion" onchange="onFilterChange()"><option value="">All Regions</option></select>
+        <select id="filterDivision" onchange="onFilterChange()"><option value="">All Divisions</option></select>
+        <select id="filterBanner" onchange="onFilterChange()"><option value="">All Banners</option></select>
+        <select id="filterChannel" onchange="onFilterChange()"><option value="">All Channels</option></select>
+        <input type="text" id="filterRep" list="repList" placeholder="Filter by Rep…" oninput="onFilterChange()" />
+        <datalist id="repList"></datalist>
+        <button class="filter-reset" onclick="resetFilters()">Reset filters</button>
+      </div>
+
+      <!-- OVERVIEW -->
+      <div class="page-content active" id="page-overview">
+        <div style="font-size:10px; font-weight:700; letter-spacing:.06em; color:#9dc4ec; opacity:.75; margin-bottom:6px; text-transform:uppercase;">Resource Count</div>
+        <div class="tile-grid" id="overviewTypeTiles" style="margin-bottom:14px;"></div>
+        <div class="kpi-row" id="overviewKpis"></div>
+        <div class="insight-row" id="overviewInsights" style="margin-bottom:16px;"></div>
+        <div class="grid-2">
+          <div class="panel">
+            <h3>Stores Covered by Region</h3>
+            <div id="overviewRegionBars"></div>
+          </div>
+          <div class="panel">
+            <h3>Stores Covered by Banner (top 12)</h3>
+            <canvas id="overviewBannerChart" height="200"></canvas>
+          </div>
+        </div>
+        <div class="grid-2">
+          <div class="panel">
+            <h3>Stores Covered by Division</h3>
+            <div style="position:relative; height:200px;"><canvas id="overviewDivisionChart"></canvas></div>
+          </div>
+          <div class="panel">
+            <h3>Stores Covered by Channel</h3>
+            <div id="overviewChannelBars"></div>
+          </div>
+        </div>
+        <div class="panel">
+          <h3>Calling Frequency Mix <span class="count">(reps + merchandisers)</span></h3>
+          <div class="tile-grid" id="overviewFreqTiles"></div>
+        </div>
+      </div>
+
+      <!-- REP COVERAGE -->
+      <div class="page-content" id="page-rep">
+        <div class="kpi-row" id="repKpis"></div>
+        <div class="panel" style="margin-bottom:16px;"><h3>By Banner <span class="count" id="repBannerCount"></span></h3>
+          <div class="table-scroll" id="repBannerBars"></div>
+        </div>
+        <div class="grid-2">
+          <div class="panel"><h3>By Frequency</h3><div class="tile-grid" id="repFreqTiles"></div></div>
+          <div class="panel"><h3>By Resource Type</h3><div class="tile-grid" id="repTypeTiles"></div></div>
+        </div>
+        <div class="panel">
+          <h3>Rep Assignments <span class="count" id="repRowCount"></span></h3>
+          <div class="search-row">
+            <input type="text" id="repSearch" placeholder="Search store, resource, banner, region…" oninput="renderRepTable()" />
+          </div>
+          <div class="table-scroll"><table id="repTable"><thead><tr>
+            <th>Store</th><th>Banner</th><th>Region</th><th>Resource</th><th>Type</th><th>Frequency</th>
+          </tr></thead><tbody></tbody></table></div>
+        </div>
+      </div>
+
+      <!-- MERCH COVERAGE -->
+      <div class="page-content" id="page-merch">
+        <div class="kpi-row" id="merchKpis"></div>
+        <div class="panel" style="margin-bottom:16px;"><h3>By Banner <span class="count" id="merchBannerCount"></span></h3>
+          <div class="table-scroll" id="merchBannerBars"></div>
+        </div>
+        <div class="grid-2">
+          <div class="panel"><h3>By Frequency</h3><div class="tile-grid" id="merchFreqTiles"></div></div>
+          <div class="panel"><h3>By Resource Type</h3><div class="tile-grid" id="merchTypeTiles"></div></div>
+        </div>
+        <div class="panel">
+          <h3>Merchandiser Assignments <span class="count" id="merchRowCount"></span></h3>
+          <div class="search-row">
+            <input type="text" id="merchSearch" placeholder="Search store, resource, banner, region…" oninput="renderMerchTable()" />
+          </div>
+          <div class="table-scroll"><table id="merchTable"><thead><tr>
+            <th>Store</th><th>Banner</th><th>Region</th><th>Resource</th><th>Type</th><th>Frequency</th>
+          </tr></thead><tbody></tbody></table></div>
+        </div>
+      </div>
+
+      <!-- DIVISION -->
+      <div class="page-content" id="page-division">
+        <div class="kpi-row" id="divisionKpis"></div>
+        <div class="grid-2">
+          <div class="panel">
+            <h3>Stores Covered by Division</h3>
+            <div id="divisionStoreBars"></div>
+          </div>
+          <div class="panel">
+            <h3>Reps vs Merchandisers by Division</h3>
+            <canvas id="divisionResourceChart" height="220"></canvas>
+          </div>
+        </div>
+        <div class="panel">
+          <h3>Division Breakdown</h3>
+          <div class="table-scroll"><table id="divisionTable"><thead><tr>
+            <th>Division</th><th>Stores</th><th>Reps</th><th>Merchandisers</th><th>Managers</th><th>Banners</th>
+          </tr></thead><tbody></tbody></table></div>
+        </div>
+      </div>
+
+      <!-- BANNER DEEP DIVE -->
+      <div class="page-content" id="page-banner">
+        <div class="kpi-row" id="bannerKpis"></div>
+        <div class="panel">
+          <h3>Banner Coverage <span class="count" id="bannerRowCount"></span></h3>
+          <div class="search-row">
+            <input type="text" id="bannerSearch" placeholder="Search banner…" oninput="renderBannerTable()" />
+          </div>
+          <div class="table-scroll"><table id="bannerTable"><thead><tr>
+            <th onclick="setBannerSort('banner')" style="cursor:pointer;">Banner</th>
+            <th>Channel</th>
+            <th onclick="setBannerSort('stores')" style="cursor:pointer;">Stores</th>
+            <th onclick="setBannerSort('reps')" style="cursor:pointer;">Reps</th>
+            <th onclick="setBannerSort('merch')" style="cursor:pointer;">Merchandisers</th>
+            <th onclick="setBannerSort('managers')" style="cursor:pointer;">Managers</th>
+          </tr></thead><tbody></tbody></table></div>
+        </div>
+      </div>
+
+      <!-- COVERAGE GAPS -->
+      <div class="page-content" id="page-gaps">
+        <div class="toggle-row">
+          <button class="toggle-btn active" data-gap="repOnly" onclick="setGapFilter('repOnly')">Rep only, no Merch</button>
+          <button class="toggle-btn" data-gap="merchOnly" onclick="setGapFilter('merchOnly')">Merch only, no Rep</button>
+          <button class="toggle-btn" data-gap="both" onclick="setGapFilter('both')">Covered by both</button>
+        </div>
+        <div class="panel">
+          <h3 id="gapsTitle">Stores with Rep coverage but no Merchandiser <span class="count" id="gapsCount"></span></h3>
+          <div class="search-row">
+            <input type="text" id="gapSearch" placeholder="Search store, banner, region…" oninput="renderGapsTable()" />
+          </div>
+          <div class="table-scroll"><table id="gapsTable"><thead><tr>
+            <th>Store</th><th>Banner</th><th>Region</th><th>Rep</th><th>Merchandiser</th>
+          </tr></thead><tbody></tbody></table></div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script>
+Chart.defaults.font.family = "'Poppins', system-ui, sans-serif";
+Chart.defaults.color = '#9dc4ec';
+
+let DATA = null;
+let gapFilter = 'repOnly';
+const chartRegistry = {};
+
+const COLORS = ['#ec6d25','#6fb2ff','#8fd6a8','#f2955c','#9b7ede','#b57ee0','#4bbf9a','#9dc4ec'];
+
+// Banner -> channel (Grocery/Pharmacy/Liquor/Wholesale/Forecourts), reused
+// verbatim from the validated BANNER_BUCKET_MAP already built for Sales
+// Insights (sales_queries.py) -- not a fresh guess, matched case-insensitively
+// since this data source's banner casing differs ("Tops" vs "TOPS"). A few
+// banners present here weren't in that map (ENGEN, Woolworths) and were
+// added on the same logic (forecourt / grocery); anything else genuinely
+// unclassified falls into "Other / Unclassified" rather than a guessed bucket
+// -- worth confirming with Carin if those need real classification.
+const CHANNEL_MAP = {
+  'BABY CITY':'Grocery / Supermarkets','BOXER':'Grocery / Supermarkets','CHECKERS':'Grocery / Supermarkets',
+  'CHECKERS HYPER':'Grocery / Supermarkets','CHECKERS LITTLE ME':'Grocery / Supermarkets',
+  'CHECKERS OUTDOOR':'Grocery / Supermarkets','FOODWORLD':'Grocery / Supermarkets','GAME':'Grocery / Supermarkets',
+  'JWAYELANI':'Grocery / Supermarkets','KWIKSPAR':'Grocery / Supermarkets','OK FOODS':'Grocery / Supermarkets',
+  'OK GROCER':'Grocery / Supermarkets','OK MINIMARK':'Grocery / Supermarkets','OK EXPRESS':'Grocery / Supermarkets',
+  'OK URBAN':'Grocery / Supermarkets',
+  'PICK N PAY CORPORATE':'Grocery / Supermarkets','PICK N PAY FAMILY':'Grocery / Supermarkets',
+  'PICK N PAY HYPERMARKETS':'Grocery / Supermarkets','WALMART':'Grocery / Supermarkets',
+  'PICK N PAY LOCAL':'Grocery / Supermarkets','PICK N PAY MINI MARKET':'Grocery / Supermarkets',
+  'SAVEMOR':'Grocery / Supermarkets','SHOPRITE':'Grocery / Supermarkets','SHOPRITE MINI':'Grocery / Supermarkets',
+  'SPAR':'Grocery / Supermarkets','SPAR EXPRESS':'Grocery / Supermarkets','SUPERSPAR':'Grocery / Supermarkets',
+  'USAVE':'Grocery / Supermarkets','CHECKERS DARK STORE':'Grocery / Supermarkets','MAKRO':'Grocery / Supermarkets',
+  "FOOD LOVER'S MARKET":'Grocery / Supermarkets','WOOLWORTHS':'Grocery / Supermarkets',
+  'CLICKS':'Pharmacy / Health & Beauty','DISCHEM':'Pharmacy / Health & Beauty',
+  'MEDIRITE':'Pharmacy / Health & Beauty','MEDIRITE PLUS':'Pharmacy / Health & Beauty','SPAR PHARMACY':'Pharmacy / Health & Beauty',
+  'BEAUTY WORLD':'Pharmacy / Health & Beauty','BEAUTY ZONE':'Pharmacy / Health & Beauty',
+  'COSMETIC CONNECTION':'Pharmacy / Health & Beauty','COSMIX':'Pharmacy / Health & Beauty',
+  'CHECKERS LIQUORSHOP':'Liquor Stores','PRESIDENT LIQUOR':'Liquor Stores','SHOPRITE LIQUORSHOP':'Liquor Stores',
+  'TOPS':'Liquor Stores','PICK N PAY LIQUOR':'Liquor Stores','OK LIQUOR':'Liquor Stores','SAVEMOR LIQUORS':'Liquor Stores',
+  'AFRICA CASH AND CARRY':'Wholesale / Cash & Carry','JUMBO':'Wholesale / Cash & Carry','KIT KAT':'Wholesale / Cash & Carry',
+  'LIQUORSHOP WHOLESALE':'Wholesale / Cash & Carry','SHOPRITE C&C':'Wholesale / Cash & Carry','UMS':'Wholesale / Cash & Carry',
+  'UNITRADE UMS':'Wholesale / Cash & Carry','SHIELD':'Wholesale / Cash & Carry','ELITE STAR':'Wholesale / Cash & Carry',
+  'SUNSHINE':'Wholesale / Cash & Carry','ICC':'Wholesale / Cash & Carry','SHOPRITE CANDC':'Wholesale / Cash & Carry',
+  'IBC':'Wholesale / Cash & Carry','ARROW CASH AND CARRY':'Wholesale / Cash & Carry','CONTINENTAL CASH & CARRY':'Wholesale / Cash & Carry',
+  'INDEPENDENT C&C':'Wholesale / Cash & Carry',
+  'BP EXPRESS':'Forecourts','ENGEN':'Forecourts',
+};
+function channelOf(banner){ return CHANNEL_MAP[(banner||'').toUpperCase()] || 'Other / Unclassified'; }
+
+const filters = { region:'', division:'', banner:'', channel:'', rep:'' };
+
+function fmtN(n){ return (n==null) ? '—' : Number(n).toLocaleString('en-ZA'); }
+function fmtDate(ms){
+  if(!ms) return '—';
+  const d = new Date(ms);
+  return d.toLocaleString('en-ZA', { day:'2-digit', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit' });
+}
+
+function populateFilterOptions(){
+  const regions = new Set(), banners = new Set(), divisions = new Set(), channels = new Set(), reps = new Set();
+  [...DATA.rep.rows, ...DATA.merch.rows].forEach(r => {
+    if(r.region) regions.add(r.region);
+    if(r.division) divisions.add(r.division);
+    if(r.banner){ banners.add(r.banner); channels.add(channelOf(r.banner)); }
+  });
+  DATA.rep.rows.forEach(r => { if(r.resourceName) reps.add(r.resourceName); });
+
+  const fill = (id, values) => {
+    const sel = document.getElementById(id);
+    [...values].sort().forEach(v => {
+      const opt = document.createElement('option');
+      opt.value = v; opt.textContent = v;
+      sel.appendChild(opt);
+    });
+  };
+  fill('filterRegion', regions);
+  fill('filterDivision', divisions);
+  fill('filterBanner', banners);
+  fill('filterChannel', channels);
+  document.getElementById('repList').innerHTML = [...reps].sort().map(r => `<option value="${r}">`).join('');
+}
+
+function onFilterChange(){
+  filters.region = document.getElementById('filterRegion').value;
+  filters.division = document.getElementById('filterDivision').value;
+  filters.banner = document.getElementById('filterBanner').value;
+  filters.channel = document.getElementById('filterChannel').value;
+  filters.rep = document.getElementById('filterRep').value.trim();
+  renderAll();
+}
+
+function resetFilters(){
+  document.getElementById('filterRegion').value = '';
+  document.getElementById('filterDivision').value = '';
+  document.getElementById('filterBanner').value = '';
+  document.getElementById('filterChannel').value = '';
+  document.getElementById('filterRep').value = '';
+  filters.region = filters.division = filters.banner = filters.channel = filters.rep = '';
+  renderAll();
+}
+
+function matchesFilters(r, applyRep){
+  if(filters.region && r.region !== filters.region) return false;
+  if(filters.division && r.division !== filters.division) return false;
+  if(filters.banner && r.banner !== filters.banner) return false;
+  if(filters.channel && channelOf(r.banner) !== filters.channel) return false;
+  if(applyRep && filters.rep && r.resourceName !== filters.rep) return false;
+  return true;
+}
+function filteredRepRows(){ return DATA.rep.rows.filter(r => matchesFilters(r, true)); }
+function filteredMerchRows(){ return DATA.merch.rows.filter(r => matchesFilters(r, false)); }
+
+function countBy(rows, field){
+  const m = new Map();
+  rows.forEach(r => { const v = r[field] || 'Unknown'; m.set(v, (m.get(v)||0)+1); });
+  return [...m.entries()].sort((a,b) => b[1]-a[1]);
+}
+function buildAggFromRows(rows){
+  return {
+    totalRows: rows.length,
+    distinctResources: new Set(rows.map(r => r.resourceId || r.resourceName)).size,
+    distinctManagers: new Set(rows.map(r => r.managerId || r.managerName).filter(Boolean)).size,
+    storeCount: new Set(rows.map(storeKey)).size,
+    regionCounts: countBy(rows, 'region'),
+    divisionCounts: countBy(rows, 'division'),
+    bannerCounts: countBy(rows, 'banner'),
+    freqCounts: countBy(rows, 'frequency'),
+    typeCounts: countBy(rows, 'resourceType'),
+    rows,
+  };
+}
+
+// Source: the real Call Cycle Master (run-latest.json's combinedMaster,
+// 17,905 rows), not the smaller summary snapshot used earlier -- that one
+// had no DIVISION or MANAGER fields at all. Trimmed to mock-data/
+// call-cycle-master.json (see scripts export) since the full file is 69MB.
+async function boot(){
+  const res = await fetch('mock-data/call-cycle-master.json');
+  if(!res.ok) throw new Error('Could not load mock-data/call-cycle-master.json');
+  const raw = await res.json();
+  DATA = { timestamp: raw.timestamp, rep: { rows: raw.rep_rows }, merch: { rows: raw.merch_rows } };
+  document.getElementById('metaTag').textContent = 'Snapshot: ' + fmtDate(DATA.timestamp);
+  populateFilterOptions();
+  renderAll();
+}
+
+function renderAll(){
+  renderOverview();
+  renderRepPage();
+  renderMerchPage();
+  renderDivisionPage();
+  renderBannerPage();
+  renderGapsTable();
+}
+
+function showPage(page){
+  document.querySelectorAll('.nx-nav').forEach(b => b.classList.toggle('active', b.dataset.page === page));
+  document.querySelectorAll('.page-content').forEach(p => p.classList.toggle('active', p.id === 'page-' + page));
+}
+
+function kpiCard(label, value, sub, iconBg, iconColor, iconSvg){
+  return `<div class="kpi-card">
+    <div>
+      <div class="kpi-label">${label}</div>
+      <div class="kpi-value">${value}</div>
+      ${sub ? `<div class="kpi-sub">${sub}</div>` : ''}
+    </div>
+    ${iconSvg ? `<div class="kpi-icon" style="background:${iconBg};border:1px solid ${iconColor}44;color:${iconColor};">${iconSvg}</div>` : ''}
+  </div>`;
+}
+
+const ICONS = {
+  store: '<svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7l9-4 9 4-9 4-9-4Z"></path><path d="M3 7v10l9 4 9-4V7"></path><path d="M12 11v10"></path></svg>',
+  rep: '<svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 15-6.7L21 8"></path><path d="M21 3v5h-5"></path><path d="M21 12a9 9 0 0 1-15 6.7L3 16"></path><path d="M3 21v-5h5"></path></svg>',
+  overlap: '<svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="12" r="6"></circle><circle cx="15" cy="12" r="6"></circle></svg>',
+  gap: '<svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><path d="M12 8v5"></path><path d="M12 16h.01"></path></svg>',
+  conflict: '<svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z"></path></svg>',
+};
+
+// The network Meridian actually covers: the UNION of every store that has
+// either a rep or a merchandiser assignment (or both), deduped by store --
+// not the rep-count or merch-count alone, which double-count stores with
+// both, and not the same as store totals per module (rep.storeCount /
+// merch.storeCount only describe that one module's own reach).
+// The network Meridian actually covers under the current filters: the UNION
+// of every store that has either a rep or a merchandiser assignment (or
+// both), deduped by store -- not the rep-count or merch-count alone, which
+// double-count stores with both.
+function buildStoreUniverse(repRows, merchRows){
+  const byStore = new Map();
+  const add = (r) => {
+    const key = storeKey(r);
+    if(!byStore.has(key)) byStore.set(key, { banner: r.banner, region: r.region, division: r.division });
+  };
+  repRows.forEach(add);
+  merchRows.forEach(add);
+  const stores = [...byStore.values()];
+  const regionCounts = new Map(), bannerCounts = new Map(), divisionCounts = new Map(), channelCounts = new Map();
+  stores.forEach(s => {
+    const region = s.region || 'Unknown';
+    const banner = s.banner || 'Unknown';
+    const division = s.division || 'Unknown';
+    const channel = channelOf(s.banner);
+    regionCounts.set(region, (regionCounts.get(region) || 0) + 1);
+    bannerCounts.set(banner, (bannerCounts.get(banner) || 0) + 1);
+    divisionCounts.set(division, (divisionCounts.get(division) || 0) + 1);
+    channelCounts.set(channel, (channelCounts.get(channel) || 0) + 1);
+  });
+  const toSortedPairs = (m) => [...m.entries()].sort((a, b) => b[1] - a[1]);
+  const bannerPairs = toSortedPairs(bannerCounts);
+  const top5Share = stores.length ? bannerPairs.slice(0, 5).reduce((s, p) => s + p[1], 0) / stores.length : 0;
+  return {
+    totalStores: stores.length,
+    regionCounts: toSortedPairs(regionCounts),
+    bannerCounts: bannerPairs,
+    divisionCounts: toSortedPairs(divisionCounts),
+    channelCounts: toSortedPairs(channelCounts),
+    top5BannerShare: top5Share,
+    topBanner: bannerPairs[0] || null,
+  };
+}
+
+// Combine two [label,count] pair lists (e.g. rep + merch frequency mixes)
+// into one summed, re-sorted list.
+function mergeCounts(pairsA, pairsB){
+  const m = new Map();
+  [...pairsA, ...pairsB].forEach(([label, value]) => m.set(label, (m.get(label) || 0) + value));
+  return [...m.entries()].sort((a, b) => b[1] - a[1]);
+}
+
+function renderOverview(){
+  const repRows = filteredRepRows(), merchRows = filteredMerchRows();
+  const rep = buildAggFromRows(repRows), merch = buildAggFromRows(merchRows);
+  const universe = buildStoreUniverse(repRows, merchRows);
+  const totalManagers = new Set([...repRows, ...merchRows].map(r => r.managerId || r.managerName).filter(Boolean)).size;
+
+  document.getElementById('overviewKpis').innerHTML = [
+    kpiCard('Total Stores Covered', fmtN(universe.totalStores), 'Rep and/or Merchandiser assigned', 'rgba(111,178,255,0.12)', '#6fb2ff', ICONS.store),
+    kpiCard('Banners Covered', fmtN(universe.bannerCounts.length), null, 'rgba(75,191,154,0.12)', '#4bbf9a', ICONS.store),
+    kpiCard('Reps', fmtN(rep.distinctResources), null, 'rgba(236,109,37,0.12)', '#ec6d25', ICONS.rep),
+    kpiCard('Merchandisers', fmtN(merch.distinctResources), null, 'rgba(75,191,154,0.12)', '#4bbf9a', ICONS.rep),
+    kpiCard('Managers', fmtN(totalManagers), null, 'rgba(181,126,224,0.12)', '#b57ee0', ICONS.conflict),
+  ].join('');
+
+  barListHTML('overviewRegionBars', universe.regionCounts, COLORS[1]);
+  barChart('overviewBannerChart', universe.bannerCounts.slice(0, 12), COLORS[0], true);
+  donutWithPct('overviewDivisionChart', universe.divisionCounts);
+  barListHTML('overviewChannelBars', universe.channelCounts, COLORS[2]);
+  tileGrid('overviewTypeTiles', mergeCounts(rep.typeCounts, merch.typeCounts));
+  tileGrid('overviewFreqTiles', mergeCounts(rep.freqCounts, merch.freqCounts));
+
+  renderOverviewInsights(universe, rep, merch, totalManagers);
+}
+
+function renderOverviewInsights(universe, rep, merch, totalManagers){
+  const cards = [];
+  if(universe.topBanner){
+    cards.push({ icon: ICONS.store, html: `<b>${universe.topBanner[0]}</b> is the largest banner by store count, with <b>${fmtN(universe.topBanner[1])}</b> stores covered.` });
+  }
+  cards.push({ icon: ICONS.overlap, html: `Top 5 banners account for <b>${(universe.top5BannerShare*100).toFixed(1)}%</b> of all covered stores — the rest of the network is a long tail across ${fmtN(universe.bannerCounts.length - 5)} smaller banners.` });
+  const repRatio = merch.distinctResources ? (rep.distinctResources / merch.distinctResources) : null;
+  cards.push({ icon: ICONS.rep, html: repRatio
+    ? `<b>${fmtN(merch.distinctResources)}</b> merchandisers to <b>${fmtN(rep.distinctResources)}</b> reps — roughly <b>${repRatio.toFixed(1)}</b> reps per merchandiser in the field.`
+    : `${fmtN(rep.distinctResources)} reps and ${fmtN(merch.distinctResources)} merchandisers currently active.` });
+  const totalResources = rep.distinctResources + merch.distinctResources;
+  const avgSpan = totalManagers ? (totalResources / totalManagers) : null;
+  if(avgSpan != null){
+    cards.push({ icon: ICONS.conflict, html: `<b>${fmtN(totalManagers)}</b> managers oversee <b>${fmtN(totalResources)}</b> field resources — an average span of <b>${avgSpan.toFixed(1)}</b> people per manager.` });
+  }
+
+  document.getElementById('overviewInsights').innerHTML = cards.map(c => `
+    <div class="insight-card"><div class="insight-icon">${c.icon}</div><div class="insight-text">${c.html}</div></div>
+  `).join('');
+}
+
+function axisScales(){
+  return {
+    x: { ticks: { font: { size: 10 } }, grid: { color: 'rgba(28,63,107,0.5)' } },
+    y: { ticks: { font: { size: 10 } }, grid: { color: 'rgba(28,63,107,0.5)' } }
+  };
+}
+
+// Destroy-then-recreate on the same canvas id, since renderAll() re-runs on
+// every filter change -- Chart.js throws "Canvas is already in use" without
+// this, and Chart.defaults.font.family (set once at the top) keeps every
+// chart on Poppins instead of Chart.js's own default font.
+function chartUpsert(canvasId, type, data, options){
+  if(chartRegistry[canvasId]) chartRegistry[canvasId].destroy();
+  chartRegistry[canvasId] = new Chart(document.getElementById(canvasId), { type, data, options: options || {} });
+}
+
+function barChart(canvasId, pairs, color, horizontal){
+  const top = pairs.slice(0, 10);
+  chartUpsert(canvasId, 'bar',
+    { labels: top.map(p => p[0]), datasets: [{ data: top.map(p => p[1]), backgroundColor: color, borderRadius: 5 }] },
+    { indexAxis: horizontal ? 'y' : 'x', plugins: { legend: { display: false } }, scales: axisScales() });
+}
+
+// Stat-tile grid for categorical breakdowns (frequency, resource type) --
+// borrowed from the existing per-client P&G coverage report's layout
+// (label pill + big number, in a dense grid) rather than a pie, which reads
+// worse once there are more than 4-5 slices.
+// Doughnut with each legend entry showing both the raw count and its % share
+// -- plain Chart.js legends only show the label, so this overrides
+// generateLabels to append "count (pct%)" for a quick composition read.
+function donutWithPct(canvasId, pairs){
+  const total = pairs.reduce((s, p) => s + p[1], 0);
+  if(chartRegistry[canvasId]) chartRegistry[canvasId].destroy();
+  chartRegistry[canvasId] = new Chart(document.getElementById(canvasId), {
+    type: 'doughnut',
+    data: { labels: pairs.map(p => p[0]), datasets: [{ data: pairs.map(p => p[1]), backgroundColor: COLORS, borderWidth: 0 }] },
+    options: {
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          position: 'right',
+          labels: {
+            font: { size: 11 }, boxWidth: 10, padding: 10,
+            generateLabels(chart){
+              return chart.data.labels.map((label, i) => {
+                const value = chart.data.datasets[0].data[i];
+                const pct = total ? (value / total * 100).toFixed(1) : '0.0';
+                return {
+                  text: `${label}: ${fmtN(value)} (${pct}%)`,
+                  fillStyle: chart.data.datasets[0].backgroundColor[i],
+                  strokeStyle: chart.data.datasets[0].backgroundColor[i],
+                  index: i,
+                };
+              });
+            },
+          },
+        },
+      },
+    },
+  });
+}
+
+function tileGrid(containerId, pairs){
+  document.getElementById(containerId).innerHTML = pairs.map(([label, value]) => `
+    <div class="tile"><div class="tile-label">${label}</div><div class="tile-value">${fmtN(value)}</div></div>
+  `).join('') || '<div class="muted">No data.</div>';
+}
+
+// Labeled horizontal bar list (label - bar - value) -- also borrowed from
+// that same reference report's region breakdown, which is easier to scan
+// than a Chart.js axis since every value is printed, not just on hover.
+function barListHTML(containerId, pairs, color, max){
+  const top = pairs.slice(0, max || pairs.length);
+  const peak = top.length ? top[0][1] : 1;
+  document.getElementById(containerId).innerHTML = top.map(([label, value]) => `
+    <div class="bar-list-row">
+      <div class="bar-list-label" title="${label}">${label}</div>
+      <div class="bar-list-track"><div class="bar-list-fill" style="width:${peak ? (value/peak*100) : 0}%;background:${color};"></div></div>
+      <div class="bar-list-value">${fmtN(value)}</div>
+    </div>
+  `).join('') || '<div class="muted">No data.</div>';
+}
+
+function renderRepPage(){
+  const rep = buildAggFromRows(filteredRepRows());
+  document.getElementById('repKpis').innerHTML = [
+    kpiCard('Total Assignments', fmtN(rep.totalRows), null, 'rgba(236,109,37,0.12)', '#ec6d25', ICONS.rep),
+    kpiCard('Distinct Reps', fmtN(rep.distinctResources)),
+    kpiCard('Managers', fmtN(rep.distinctManagers)),
+    kpiCard('Stores Covered', fmtN(rep.storeCount)),
+    kpiCard('Banners', fmtN(rep.bannerCounts.length)),
+  ].join('');
+  barListHTML('repBannerBars', rep.bannerCounts, COLORS[0]);
+  document.getElementById('repBannerCount').textContent = `(${fmtN(rep.bannerCounts.length)})`;
+  tileGrid('repFreqTiles', rep.freqCounts);
+  tileGrid('repTypeTiles', rep.typeCounts);
+  document.getElementById('repRowCount').textContent = `(${fmtN(rep.rows.length)})`;
+  renderRepTable();
+}
+
+function renderMerchPage(){
+  const merch = buildAggFromRows(filteredMerchRows());
+  document.getElementById('merchKpis').innerHTML = [
+    kpiCard('Total Assignments', fmtN(merch.totalRows), null, 'rgba(75,191,154,0.12)', '#4bbf9a', ICONS.rep),
+    kpiCard('Distinct Merchandisers', fmtN(merch.distinctResources)),
+    kpiCard('Managers', fmtN(merch.distinctManagers)),
+    kpiCard('Stores Covered', fmtN(merch.storeCount)),
+    kpiCard('Banners', fmtN(merch.bannerCounts.length)),
+  ].join('');
+  barListHTML('merchBannerBars', merch.bannerCounts, COLORS[1]);
+  document.getElementById('merchBannerCount').textContent = `(${fmtN(merch.bannerCounts.length)})`;
+  tileGrid('merchFreqTiles', merch.freqCounts);
+  tileGrid('merchTypeTiles', merch.typeCounts);
+  document.getElementById('merchRowCount').textContent = `(${fmtN(merch.rows.length)})`;
+  renderMerchTable();
+}
+
+function renderDivisionPage(){
+  const repRows = filteredRepRows(), merchRows = filteredMerchRows();
+  const universe = buildStoreUniverse(repRows, merchRows);
+  const divisions = universe.divisionCounts.map(p => p[0]);
+
+  const repByDivision = new Map(), merchByDivision = new Map(), managersByDivision = new Map(), bannersByDivision = new Map();
+  const tally = (rows, resMap, mgrMap, bnrMap) => {
+    rows.forEach(r => {
+      const d = r.division || 'Unknown';
+      if(!resMap.has(d)) resMap.set(d, new Set());
+      resMap.get(d).add(r.resourceId || r.resourceName);
+      if(!mgrMap.has(d)) mgrMap.set(d, new Set());
+      if(r.managerId || r.managerName) mgrMap.get(d).add(r.managerId || r.managerName);
+      if(!bnrMap.has(d)) bnrMap.set(d, new Set());
+      if(r.banner) bnrMap.get(d).add(r.banner);
+    });
+  };
+  tally(repRows, repByDivision, managersByDivision, bannersByDivision);
+  tally(merchRows, merchByDivision, managersByDivision, bannersByDivision);
+
+  document.getElementById('divisionKpis').innerHTML = [
+    kpiCard('Divisions', fmtN(divisions.length), null, 'rgba(155,126,222,0.12)', '#9b7ede', ICONS.overlap),
+    kpiCard('Total Stores Covered', fmtN(universe.totalStores)),
+    kpiCard('Largest Division', divisions[0] || '—', universe.divisionCounts[0] ? fmtN(universe.divisionCounts[0][1]) + ' stores' : ''),
+  ].join('');
+
+  barListHTML('divisionStoreBars', universe.divisionCounts, COLORS[4]);
+
+  chartUpsert('divisionResourceChart', 'bar', {
+    labels: divisions,
+    datasets: [
+      { label: 'Reps', data: divisions.map(d => (repByDivision.get(d)||new Set()).size), backgroundColor: COLORS[0], borderRadius: 5 },
+      { label: 'Merchandisers', data: divisions.map(d => (merchByDivision.get(d)||new Set()).size), backgroundColor: COLORS[1], borderRadius: 5 },
+    ],
+  }, { plugins: { legend: { position: 'bottom', labels: { font: { size: 11 } } } }, scales: axisScales() });
+
+  const rows = universe.divisionCounts.map(([division, storeCount]) => ({
+    division, storeCount,
+    reps: (repByDivision.get(division)||new Set()).size,
+    merch: (merchByDivision.get(division)||new Set()).size,
+    managers: (managersByDivision.get(division)||new Set()).size,
+    banners: (bannersByDivision.get(division)||new Set()).size,
+  }));
+  document.querySelector('#divisionTable tbody').innerHTML = rows.map(r => `
+    <tr><td>${r.division}</td><td>${fmtN(r.storeCount)}</td><td>${fmtN(r.reps)}</td>
+        <td>${fmtN(r.merch)}</td><td>${fmtN(r.managers)}</td><td>${fmtN(r.banners)}</td></tr>
+  `).join('') || '<tr><td colspan="6" class="muted">No data.</td></tr>';
+}
+
+let bannerSortKey = 'stores', bannerSortDir = -1;
+function setBannerSort(key){
+  if(bannerSortKey === key) bannerSortDir *= -1; else { bannerSortKey = key; bannerSortDir = -1; }
+  renderBannerTable();
+}
+
+function buildBannerAgg(){
+  const repRows = filteredRepRows(), merchRows = filteredMerchRows();
+  const byBanner = new Map();
+  const ensure = (b) => {
+    if(!byBanner.has(b)) byBanner.set(b, { banner: b, stores: new Set(), reps: new Set(), merch: new Set(), managers: new Set() });
+    return byBanner.get(b);
+  };
+  repRows.forEach(r => {
+    const e = ensure(r.banner || 'Unknown');
+    e.stores.add(storeKey(r)); e.reps.add(r.resourceId || r.resourceName);
+    if(r.managerId || r.managerName) e.managers.add(r.managerId || r.managerName);
+  });
+  merchRows.forEach(r => {
+    const e = ensure(r.banner || 'Unknown');
+    e.stores.add(storeKey(r)); e.merch.add(r.resourceId || r.resourceName);
+    if(r.managerId || r.managerName) e.managers.add(r.managerId || r.managerName);
+  });
+  return [...byBanner.values()].map(e => ({
+    banner: e.banner, channel: channelOf(e.banner),
+    stores: e.stores.size, reps: e.reps.size, merch: e.merch.size, managers: e.managers.size,
+  }));
+}
+
+function renderBannerPage(){
+  const data = buildBannerAgg();
+  document.getElementById('bannerKpis').innerHTML = [
+    kpiCard('Banners Tracked', fmtN(data.length), null, 'rgba(75,191,154,0.12)', '#4bbf9a', ICONS.store),
+    kpiCard('Total Stores', fmtN(data.reduce((s,r)=>s+r.stores,0)), null, 'rgba(111,178,255,0.12)', '#6fb2ff', ICONS.store),
+    kpiCard('Total Reps Assigned', fmtN(data.reduce((s,r)=>s+r.reps,0)), null, 'rgba(236,109,37,0.12)', '#ec6d25', ICONS.rep),
+    kpiCard('Total Merchandisers Assigned', fmtN(data.reduce((s,r)=>s+r.merch,0)), null, 'rgba(75,191,154,0.12)', '#4bbf9a', ICONS.rep),
+  ].join('');
+  document.getElementById('bannerRowCount').textContent = `(${fmtN(data.length)})`;
+  renderBannerTable();
+}
+
+function renderBannerTable(){
+  const term = document.getElementById('bannerSearch').value.toLowerCase();
+  let rows = buildBannerAgg();
+  if(term) rows = rows.filter(r => r.banner.toLowerCase().includes(term) || r.channel.toLowerCase().includes(term));
+  rows.sort((a, b) => (a[bannerSortKey] > b[bannerSortKey] ? 1 : a[bannerSortKey] < b[bannerSortKey] ? -1 : 0) * bannerSortDir);
+  document.querySelector('#bannerTable tbody').innerHTML = rows.map(r => `
+    <tr><td>${r.banner}</td><td>${r.channel}</td><td>${fmtN(r.stores)}</td>
+        <td>${fmtN(r.reps)}</td><td>${fmtN(r.merch)}</td><td>${fmtN(r.managers)}</td></tr>
+  `).join('') || '<tr><td colspan="6" class="muted">No matches.</td></tr>';
+}
+
+function filterRows(rows, term){
+  if(!term) return rows;
+  const t = term.toLowerCase();
+  return rows.filter(r => (r.storeName||'').toLowerCase().includes(t) || (r.banner||'').toLowerCase().includes(t)
+    || (r.region||'').toLowerCase().includes(t) || (r.resourceName||'').toLowerCase().includes(t));
+}
+
+function renderRepTable(){
+  const term = document.getElementById('repSearch').value;
+  const rows = filterRows(filteredRepRows(), term).slice(0, 500);
+  document.querySelector('#repTable tbody').innerHTML = rows.map(r => `
+    <tr><td>${r.storeName||'—'}</td><td>${r.banner||'—'}</td><td>${r.region||'—'}</td>
+        <td>${r.resourceName||'—'}</td><td>${r.resourceType||'—'}</td><td>${r.frequency||'—'}</td></tr>
+  `).join('') || '<tr><td colspan="6" class="muted">No matches.</td></tr>';
+}
+
+function renderMerchTable(){
+  const term = document.getElementById('merchSearch').value;
+  const rows = filterRows(filteredMerchRows(), term).slice(0, 500);
+  document.querySelector('#merchTable tbody').innerHTML = rows.map(r => `
+    <tr><td>${r.storeName||'—'}</td><td>${r.banner||'—'}</td><td>${r.region||'—'}</td>
+        <td>${r.resourceName||'—'}</td><td>${r.resourceType||'—'}</td><td>${r.frequency||'—'}</td></tr>
+  `).join('') || '<tr><td colspan="6" class="muted">No matches.</td></tr>';
+}
+
+function storeKey(r){ return (r.storeCode || '') + '|' + (r.storeName||''); }
+
+function buildGapSets(){
+  const repByStore = new Map(), merchByStore = new Map();
+  filteredRepRows().forEach(r => repByStore.set(storeKey(r), r));
+  filteredMerchRows().forEach(r => merchByStore.set(storeKey(r), r));
+  const repOnly = [], merchOnly = [], both = [];
+  repByStore.forEach((r, key) => {
+    if(merchByStore.has(key)) both.push({ ...r, merchResourceName: merchByStore.get(key).resourceName });
+    else repOnly.push(r);
+  });
+  merchByStore.forEach((r, key) => { if(!repByStore.has(key)) merchOnly.push(r); });
+  return { repOnly, merchOnly, both };
+}
+
+function setGapFilter(f){
+  gapFilter = f;
+  document.querySelectorAll('[data-gap]').forEach(b => b.classList.toggle('active', b.dataset.gap === f));
+  const titles = {
+    repOnly: 'Stores with Rep coverage but no Merchandiser',
+    merchOnly: 'Stores with Merchandiser coverage but no Rep',
+    both: 'Stores covered by both Rep and Merchandiser',
+  };
+  document.getElementById('gapsTitle').innerHTML = titles[f] + ' <span class="count" id="gapsCount"></span>';
+  renderGapsTable();
+}
+
+function renderGapsTable(){
+  const sets = buildGapSets();
+  const term = document.getElementById('gapSearch').value;
+  const rows = filterRows(sets[gapFilter], term);
+  document.getElementById('gapsCount').textContent = `(${fmtN(rows.length)})`;
+  document.querySelector('#gapsTable tbody').innerHTML = rows.slice(0, 500).map(r => `
+    <tr><td>${r.storeName||'—'}</td><td>${r.banner||'—'}</td><td>${r.region||'—'}</td>
+        <td>${gapFilter === 'merchOnly' ? '<span class="pill bad">None</span>' : (r.resourceName||'—')}</td>
+        <td>${gapFilter === 'repOnly' ? '<span class="pill bad">None</span>' : (r.merchResourceName || r.resourceName || '—')}</td></tr>
+  `).join('') || '<tr><td colspan="5" class="muted">No matches.</td></tr>';
+}
+
+boot().catch(e => { console.error(e); document.getElementById('metaTag').textContent = 'Error: ' + e.message; });
+</script>
+</body>
+</html>
