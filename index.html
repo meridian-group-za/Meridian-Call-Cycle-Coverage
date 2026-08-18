@@ -4,6 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <script src="./support.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@azure/msal-browser@2.38.3/lib/msal-browser.min.js"></script>
+<script src="./msal-auth.js"></script>
 </head>
 <body>
 <x-dc>
@@ -618,26 +620,37 @@ class Component extends DCLogic {
   };
 
   componentDidMount() {
-    // Live server (scripts/live_data_server.py) reads run-latest.json fresh
-    // from its real OneDrive location on every request -- so whatever is
-    // currently synced there is what shows up here, no manual re-export
-    // step. Falls back to the static mock-data/ snapshot if that server
-    // isn't running, so the dashboard still works standalone.
     const applyPayload = (raw) => {
       this.repRows = raw.rep_rows || [];
       this.merchRows = raw.merch_rows || [];
       this.ts = raw.timestamp;
       this.setState({ ready: true });
     };
-    fetch('http://127.0.0.1:8794/')
-      .then((r) => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
-      .then(applyPayload)
-      .catch(() => {
-        fetch('mock-data/call-cycle-master.json')
-          .then((r) => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
-          .then(applyPayload)
-          .catch((e) => this.setState({ err: 'Could not load live data or mock-data/call-cycle-master.json — ' + e.message }));
-      });
+
+    if (isLocalDev()) {
+      // Local dev: live_data_server.py (scripts/) reads run-latest.json
+      // fresh from its real OneDrive location on every request -- no
+      // manual re-export step. Falls back to the static mock-data/
+      // snapshot if that server isn't running, so it still works standalone.
+      fetch('http://127.0.0.1:8794/')
+        .then((r) => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+        .then(applyPayload)
+        .catch(() => {
+          fetch('mock-data/call-cycle-master.json')
+            .then((r) => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+            .then(applyPayload)
+            .catch((e) => this.setState({ err: 'Could not load live data or mock-data/call-cycle-master.json — ' + e.message }));
+        });
+      return;
+    }
+
+    // Deployed (GitHub Pages): requires a real Microsoft sign-in, then reads
+    // run-latest.json straight from SharePoint via Graph -- see msal-auth.js.
+    const inst = getMsalInstance();
+    if (!inst.getAllAccounts().length) { window.location.href = 'login.html'; return; }
+    fetchCallCycleMasterFromGraph()
+      .then((payload) => { if (payload) applyPayload(payload); })
+      .catch((e) => this.setState({ err: 'Could not load the Call Cycle Master from SharePoint — ' + e.message }));
   }
 
   match(r, applyRep) {

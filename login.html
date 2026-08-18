@@ -4,6 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <script src="./support.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@azure/msal-browser@2.38.3/lib/msal-browser.min.js"></script>
+<script src="./msal-auth.js"></script>
 </head>
 <body>
 <x-dc>
@@ -91,18 +93,27 @@
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{}">
 class Component extends DCLogic {
-  state = { busy: false };
+  state = { busy: false, err: '' };
+
+  componentDidMount() {
+    // Local dev: skip real auth, go straight to the dashboard (which itself
+    // falls back to live_data_server.py / mock-data when not signed in).
+    if (isLocalDev()) return;
+    const inst = getMsalInstance();
+    inst.handleRedirectPromise()
+      .then((result) => {
+        if (result || inst.getAllAccounts().length) window.location.href = 'index.html';
+      })
+      .catch((e) => this.setState({ err: 'Sign-in failed: ' + e.message }));
+  }
 
   renderVals() {
     return {
-      microsoftLabel: this.state.busy ? 'Opening Microsoft…' : 'Sign in with Microsoft',
+      microsoftLabel: this.state.err ? this.state.err : (this.state.busy ? 'Opening Microsoft…' : 'Sign in with Microsoft'),
       onMicrosoft: () => {
-        // MOCK_MODE stand-in: no real MSAL wired up yet, so this just simulates
-        // the sign-in delay and hands off to the dashboard. Swap this for a
-        // real MSAL loginRedirect() once Entra ID app registration is ready --
-        // same pattern as the Sales Insights / Stock Fix dashboards.
+        if (isLocalDev()) { window.location.href = 'index.html'; return; }
         this.setState({ busy: true });
-        setTimeout(() => { window.location.href = 'index.html'; }, 900);
+        getMsalInstance().loginRedirect({ scopes: GRAPH_SCOPES });
       },
     };
   }
