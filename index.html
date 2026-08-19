@@ -877,8 +877,8 @@ class Component extends DCLogic {
       out.headlineStats = [
         { icon: 'ph ph-user-focus', label: 'Reps', value: n(m.repCount), sub: (m.repCount ? (m.rep.length / m.repCount).toFixed(1) : '—') + ' calls each' },
         { icon: 'ph ph-shopping-bag-open', label: 'Merchandisers', value: n(m.merchCount), sub: (m.merchCount ? (m.merch.length / m.merchCount).toFixed(1) : '—') + ' calls each' },
-        { icon: 'ph ph-user-focus', label: 'Rep Managers', value: n(m.repMgrCount), sub: n(m.mgrCount) + ' managers total' },
-        { icon: 'ph ph-shopping-bag-open', label: 'Merch Managers', value: n(m.merchMgrCount), sub: n(m.mgrCount) + ' managers total' },
+        { icon: 'ph ph-user-focus', label: 'Rep Mgrs', value: n(m.repMgrCount), sub: (m.repMgrCount ? (m.repCount / m.repMgrCount).toFixed(1) : '—') + ' reps each' },
+        { icon: 'ph ph-shopping-bag-open', label: 'Merch Mgrs', value: n(m.merchMgrCount), sub: (m.merchMgrCount ? (m.merchCount / m.merchMgrCount).toFixed(1) : '—') + ' merch each' },
         { icon: 'ph ph-storefront', label: 'Banners', value: n(m.byBanner.length), sub: m.byChannel.length + ' channels' },
         { icon: 'ph ph-map-trifold', label: 'Regions', value: n(m.byRegion.length), sub: m.byDivision.length + ' divisions' },
       ];
