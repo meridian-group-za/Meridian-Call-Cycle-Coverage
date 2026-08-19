@@ -570,6 +570,48 @@ Last updated<br><span style="color:var(--color-neutral-300);">{{ snapshot }}</sp
         </div>
       </sc-if>
 
+      <!-- ══ STORE LEVEL DEEP DIVE ══ -->
+      <sc-if value="{{ isStoreLevel }}" hint-placeholder-val="{{ false }}">
+        <div style="background:var(--color-surface); border:1px solid var(--color-neutral-800); border-radius:var(--radius-lg); padding:var(--space-6);">
+          <div style="display:flex; align-items:center; gap:var(--space-2); margin-bottom:var(--space-4); flex-wrap:wrap;">
+            <sc-for list="{{ slTabs }}" as="t" hint-placeholder-count="4">
+              <button onClick="{{ t.go }}" style="background:{{ t.bg }}; border:1px solid {{ t.bd }}; color:{{ t.fg }}; padding:6px 13px; border-radius:var(--radius-md); font-size:11.5px; font-family:inherit; cursor:pointer;">{{ t.label }}</button>
+            </sc-for>
+            <input type="text" value="{{ slQuery }}" onChange="{{ onSlQuery }}" placeholder="Search store, banner, region…" style="margin-left:auto; background:#0a1c3a; border:1px solid var(--color-neutral-800); color:var(--color-text); border-radius:var(--radius-md); padding:6px 10px; font-size:12px; font-family:inherit; min-width:250px;">
+            <button onClick="{{ exportSl }}" style="display:flex; align-items:center; gap:7px; background:transparent; border:1px solid rgba(236,109,37,0.45); color:var(--color-accent-300); border-radius:var(--radius-md); padding:6px 13px; font-size:11.5px; font-weight:600; font-family:inherit; cursor:pointer;" style-hover="background:rgba(236,109,37,0.14); color:#f8c3a1;"><i class="ph ph-download-simple" style="font-size:14px;"></i>{{ exportSlLabel }}</button>
+          </div>
+          <div style="display:flex; align-items:baseline; gap:8px; margin-bottom:var(--space-3);">
+            <h5 style="margin:0; font-size:14px;">{{ slTitle }}</h5><span style="font-size:10.5px; color:var(--color-neutral-500);">{{ slCount }}</span>
+          </div>
+          <div style="max-height:640px; overflow:auto;">
+            <table style="width:100%; border-collapse:collapse; font-size:11.5px;">
+              <thead><tr>
+                <th style="position:sticky; top:0; background:var(--color-surface); text-align:left; padding:6px 8px; font-size:9px; letter-spacing:0.07em; text-transform:uppercase; color:var(--color-neutral-500); border-bottom:1px solid var(--color-neutral-800);">Store</th>
+                <th style="position:sticky; top:0; background:var(--color-surface); text-align:left; padding:6px 8px; font-size:9px; letter-spacing:0.07em; text-transform:uppercase; color:var(--color-neutral-500); border-bottom:1px solid var(--color-neutral-800);">Banner</th>
+                <th style="position:sticky; top:0; background:var(--color-surface); text-align:left; padding:6px 8px; font-size:9px; letter-spacing:0.07em; text-transform:uppercase; color:var(--color-neutral-500); border-bottom:1px solid var(--color-neutral-800);">Channel</th>
+                <th style="position:sticky; top:0; background:var(--color-surface); text-align:left; padding:6px 8px; font-size:9px; letter-spacing:0.07em; text-transform:uppercase; color:var(--color-neutral-500); border-bottom:1px solid var(--color-neutral-800);">Region</th>
+                <th style="position:sticky; top:0; background:var(--color-surface); text-align:left; padding:6px 8px; font-size:9px; letter-spacing:0.07em; text-transform:uppercase; color:var(--color-neutral-500); border-bottom:1px solid var(--color-neutral-800);">Division</th>
+                <th style="position:sticky; top:0; background:var(--color-surface); text-align:left; padding:6px 8px; font-size:9px; letter-spacing:0.07em; text-transform:uppercase; color:var(--color-neutral-500); border-bottom:1px solid var(--color-neutral-800);">Rep</th>
+                <th style="position:sticky; top:0; background:var(--color-surface); text-align:left; padding:6px 8px; font-size:9px; letter-spacing:0.07em; text-transform:uppercase; color:var(--color-neutral-500); border-bottom:1px solid var(--color-neutral-800);">Merchandiser</th>
+              </tr></thead>
+              <tbody>
+                <sc-for list="{{ slRows }}" as="r" hint-placeholder-count="10">
+                  <tr class="nx-row">
+                    <td style="padding:6px 8px; border-bottom:1px solid #1c3f6b; color:var(--color-text);">{{ r.storeName }}</td>
+                    <td style="padding:6px 8px; border-bottom:1px solid #1c3f6b; color:var(--color-neutral-400);">{{ r.banner }}</td>
+                    <td style="padding:6px 8px; border-bottom:1px solid #1c3f6b; color:var(--color-neutral-400);">{{ r.channel }}</td>
+                    <td style="padding:6px 8px; border-bottom:1px solid #1c3f6b; color:var(--color-neutral-400);">{{ r.region }}</td>
+                    <td style="padding:6px 8px; border-bottom:1px solid #1c3f6b; color:var(--color-neutral-400);">{{ r.division }}</td>
+                    <td style="padding:6px 8px; border-bottom:1px solid #1c3f6b; color:{{ r.repColor }};">{{ r.rep }}</td>
+                    <td style="padding:6px 8px; border-bottom:1px solid #1c3f6b; color:{{ r.merchColor }};">{{ r.merch }}</td>
+                  </tr>
+                </sc-for>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </sc-if>
+
     </div>
   </main>
 </div>
@@ -618,14 +660,15 @@ const PAGES = {
   division: { label: 'Divisional coverage', icon: 'ph ph-map-trifold', title: 'Divisional coverage', sub: 'Stores, resources and dual-coverage rate per division' },
   banner: { label: 'Banner deep dive', icon: 'ph ph-storefront', title: 'Banner deep dive', sub: 'Every banner ranked by network size and coverage quality' },
   gaps: { label: 'Coverage gaps', icon: 'ph ph-warning-diamond', title: 'Coverage gaps', sub: 'Stores served by only one discipline' },
+  storelevel: { label: 'Store level deep dive', icon: 'ph ph-table', title: 'Store level deep dive', sub: 'Every store, rep and merchandiser assignment across the network — export-ready' },
 };
 
 class Component extends DCLogic {
   state = {
     ready: false, err: '', page: 'overview',
     region: '', division: '', banner: '', channel: '', rep: '', manager: '', rtype: '',
-    resQuery: '', bannerQuery: '', gapQuery: '',
-    gapTab: 'repOnly', sortKey: 'stores', sortDir: -1,
+    resQuery: '', bannerQuery: '', gapQuery: '', slQuery: '',
+    gapTab: 'repOnly', slTab: 'all', sortKey: 'stores', sortDir: -1,
   };
 
   componentDidMount() {
@@ -784,6 +827,7 @@ class Component extends DCLogic {
       },
       isOverview: s.page === 'overview', isResourcePage: s.page === 'rep' || s.page === 'merch',
       isDivision: s.page === 'division', isBanner: s.page === 'banner', isGaps: s.page === 'gaps',
+      isStoreLevel: s.page === 'storelevel',
       fRegion: s.region, fDivision: s.division, fBanner: s.banner, fChannel: s.channel, fRep: s.rep, fManager: s.manager, fType: s.rtype,
       onRegion: (e) => this.set({ region: e.target.value }), onDivision: (e) => this.set({ division: e.target.value }),
       onBanner: (e) => this.set({ banner: e.target.value }), onChannel: (e) => this.set({ channel: e.target.value }),
@@ -794,6 +838,7 @@ class Component extends DCLogic {
       onResQuery: (e) => this.set({ resQuery: e.target.value }),
       onBannerQuery: (e) => this.set({ bannerQuery: e.target.value }),
       onGapQuery: (e) => this.set({ gapQuery: e.target.value }),
+      onSlQuery: (e) => this.set({ slQuery: e.target.value }),
       resQuery: s.resQuery, bannerQuery: s.bannerQuery, gapQuery: s.gapQuery,
     };
     if (!s.ready) return Object.assign(base, { storesInView: '—', assignmentsInView: '—', filterSummary: s.err ? '' : 'Loading call cycle master…' });
@@ -1111,6 +1156,35 @@ class Component extends DCLogic {
       out.exportGapLabel = 'Export ' + n(list.length) + ' stores';
       out.gapRows = list.slice(0, 250).map((e) => ({
         storeName: e.storeName || '—', banner: e.banner, region: e.region, division: e.division,
+        rep: e.rep || 'None assigned', merch: e.merch || 'None assigned',
+        repColor: e.rep ? 'var(--color-neutral-200)' : 'var(--color-neutral-600)',
+        merchColor: e.merch ? 'var(--color-neutral-200)' : 'var(--color-neutral-600)',
+      }));
+    }
+
+    if (out.isStoreLevel) {
+      const slSets = { all: m.all, repOnly: m.repOnly, merchOnly: m.merchOnly, both: m.both };
+      const slTitles = { all: 'All covered stores', repOnly: 'Rep coverage, no merchandiser', merchOnly: 'Merchandiser coverage, no rep', both: 'Covered by both disciplines' };
+      out.slTabs = ['all', 'repOnly', 'merchOnly', 'both'].map((k) => ({
+        label: k === 'all' ? 'All (' + n(m.all.length) + ')' : k === 'repOnly' ? 'Rep only (' + n(m.repOnly.length) + ')' : k === 'merchOnly' ? 'Merch only (' + n(m.merchOnly.length) + ')' : 'Both (' + n(m.both.length) + ')',
+        go: () => this.set({ slTab: k }),
+        bg: s.slTab === k ? 'color-mix(in srgb, var(--color-accent) 14%, transparent)' : 'transparent',
+        bd: s.slTab === k ? 'var(--color-accent-600)' : 'var(--color-neutral-800)',
+        fg: s.slTab === k ? 'var(--color-text)' : 'var(--color-neutral-400)',
+      }));
+      const slq = s.slQuery.trim().toLowerCase();
+      let slList = slSets[s.slTab] || [];
+      if (slq) slList = slList.filter((e) => ((e.storeName || '') + e.banner + e.region + e.division + e.channel).toLowerCase().includes(slq));
+      out.slTitle = slTitles[s.slTab];
+      out.slCount = n(slList.length) + ' stores' + (slList.length > 250 ? ' — showing first 250' : '');
+      out.exportSl = () => this.exportCsv('store-level-' + s.slTab + '-' + new Date().toISOString().slice(0, 10),
+        [{ key: 'storeName', label: 'Store' }, { key: 'banner', label: 'Banner' }, { key: 'channel', label: 'Channel' },
+         { key: 'region', label: 'Region' }, { key: 'division', label: 'Division' },
+         { key: 'rep', label: 'Rep' }, { key: 'merch', label: 'Merchandiser' }],
+        slList.map((e) => ({ storeName: e.storeName || '', banner: e.banner, channel: e.channel, region: e.region, division: e.division, rep: e.rep || 'None assigned', merch: e.merch || 'None assigned' })));
+      out.exportSlLabel = 'Export ' + n(slList.length) + ' stores';
+      out.slRows = slList.slice(0, 250).map((e) => ({
+        storeName: e.storeName || '—', banner: e.banner, channel: e.channel, region: e.region, division: e.division,
         rep: e.rep || 'None assigned', merch: e.merch || 'None assigned',
         repColor: e.rep ? 'var(--color-neutral-200)' : 'var(--color-neutral-600)',
         merchColor: e.merch ? 'var(--color-neutral-200)' : 'var(--color-neutral-600)',
