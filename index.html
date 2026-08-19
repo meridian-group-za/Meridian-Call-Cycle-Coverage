@@ -240,20 +240,17 @@ Last updated<br><span style="color:var(--color-neutral-300);">{{ snapshot }}</sp
 
           <div style="background:var(--color-surface); border:1px solid var(--color-neutral-800); border-radius:var(--radius-lg); padding:var(--space-6);">
             <div style="display:flex; align-items:baseline; gap:8px; margin-bottom:var(--space-4);"><h5 style="margin:0; font-size:14px;">Channel mix</h5><span style="font-size:10.5px; color:var(--color-neutral-500);">stores covered</span></div>
-            <div style="display:flex; align-items:flex-end; gap:var(--space-3); height:264px; padding-top:var(--space-2);">
-              <sc-for list="{{ channelCols }}" as="c" hint-placeholder-count="6">
-                <div style="flex:1; min-width:0; display:flex; flex-direction:column; justify-content:flex-end; height:100%;">
-                  <div style="font-family:var(--font-heading); font-size:12.5px; text-align:center; margin-bottom:4px;">{{ c.value }}</div>
-                  <div style="height:{{ c.h }}; display:flex; flex-direction:column; justify-content:flex-end; border-radius:3px 3px 0 0; overflow:hidden; background:#3d5f85;">
-                    <div style="height:{{ c.bothH }}; background:var(--color-accent);"></div>
-                  </div>
-                  <div style="border-top:1px solid var(--color-neutral-800); padding-top:6px; margin-top:0; text-align:center;">
-                    <div style="font-size:9.5px; line-height:1.3; color:var(--color-neutral-300); min-height:26px;">{{ c.label }}</div>
-                    <div style="font-size:10px; color:var(--color-neutral-500);">{{ c.bothPct }}</div>
-                  </div>
+            <sc-for list="{{ channelRows }}" as="r" hint-placeholder-count="6">
+              <div style="display:grid; grid-template-columns:150px 1fr 50px 44px; align-items:center; gap:10px; margin-bottom:7px; font-size:11.5px;">
+                <div style="color:var(--color-neutral-300); overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">{{ r.label }}</div>
+                <div style="height:10px; background:#1c3f6b; border-radius:3px; overflow:hidden; display:flex;">
+                  <div style="width:{{ r.bothW }}; background:var(--color-accent);"></div>
+                  <div style="width:{{ r.restW }}; background:#3d5f85;"></div>
                 </div>
-              </sc-for>
-            </div>
+                <div style="text-align:right; font-family:var(--font-heading);">{{ r.value }}</div>
+                <div style="text-align:right; color:var(--color-neutral-500);">{{ r.bothPct }}</div>
+              </div>
+            </sc-for>
           </div>
         </div>
 
@@ -444,7 +441,7 @@ Last updated<br><span style="color:var(--color-neutral-300);">{{ snapshot }}</sp
               <th style="position:sticky; top:0; background:var(--color-surface); text-align:right; padding:7px 8px; font-size:9px; letter-spacing:0.07em; text-transform:uppercase; color:var(--color-neutral-500); border-bottom:1px solid var(--color-neutral-800);">Stores</th>
               <th style="position:sticky; top:0; background:var(--color-surface); text-align:right; padding:7px 8px; font-size:9px; letter-spacing:0.07em; text-transform:uppercase; color:var(--color-neutral-500); border-bottom:1px solid var(--color-neutral-800);">Reps</th>
               <th style="position:sticky; top:0; background:var(--color-surface); text-align:right; padding:7px 8px; font-size:9px; letter-spacing:0.07em; text-transform:uppercase; color:var(--color-neutral-500); border-bottom:1px solid var(--color-neutral-800);">Merch</th>
-              <th style="position:sticky; top:0; background:var(--color-surface); text-align:right; padding:7px 8px; font-size:9px; letter-spacing:0.07em; text-transform:uppercase; color:var(--color-neutral-500); border-bottom:1px solid var(--color-neutral-800);">Managers</th>
+              <th style="position:sticky; top:0; background:var(--color-surface); text-align:right; padding:7px 8px; font-size:9px; letter-spacing:0.07em; text-transform:uppercase; color:var(--color-neutral-500); border-bottom:1px solid var(--color-neutral-800);">Rep Managers</th>
               <th style="position:sticky; top:0; background:var(--color-surface); text-align:right; padding:7px 8px; font-size:9px; letter-spacing:0.07em; text-transform:uppercase; color:var(--color-neutral-500); border-bottom:1px solid var(--color-neutral-800);">Stores / rep</th>
               <th style="position:sticky; top:0; background:var(--color-surface); text-align:right; padding:7px 8px; font-size:9px; letter-spacing:0.07em; text-transform:uppercase; color:var(--color-neutral-500); border-bottom:1px solid var(--color-neutral-800);">Merch gap</th>
               <th style="position:sticky; top:0; background:var(--color-surface); text-align:left; padding:7px 8px; font-size:9px; letter-spacing:0.07em; text-transform:uppercase; color:var(--color-neutral-500); border-bottom:1px solid var(--color-neutral-800); width:180px;">Dual coverage</th>
@@ -951,10 +948,10 @@ class Component extends DCLogic {
       const agg = new Map();
       const ensure = (d) => {
         let e = agg.get(d);
-        if (!e) { e = { division: d, reps: new Set(), merch: new Set(), managers: new Set(), banners: new Set() }; agg.set(d, e); }
+        if (!e) { e = { division: d, reps: new Set(), merch: new Set(), managers: new Set(), repManagers: new Set(), banners: new Set() }; agg.set(d, e); }
         return e;
       };
-      m.rep.forEach((r) => { const e = ensure(r.division || 'Unknown'); e.reps.add(r.resourceId || r.resourceName); e.calls = (e.calls || 0) + 1; if (r.managerId || r.managerName) e.managers.add(r.managerId || r.managerName); if (r.banner) e.banners.add(r.banner); });
+      m.rep.forEach((r) => { const e = ensure(r.division || 'Unknown'); e.reps.add(r.resourceId || r.resourceName); e.calls = (e.calls || 0) + 1; if (r.managerId || r.managerName) { e.managers.add(r.managerId || r.managerName); e.repManagers.add(r.managerId || r.managerName); } if (r.banner) e.banners.add(r.banner); });
       m.merch.forEach((r) => { const e = ensure(r.division || 'Unknown'); e.merch.add(r.resourceId || r.resourceName); e.calls = (e.calls || 0) + 1; if (r.managerId || r.managerName) e.managers.add(r.managerId || r.managerName); if (r.banner) e.banners.add(r.banner); });
       const mix = new Map();
       m.all.forEach((e) => {
@@ -967,7 +964,7 @@ class Component extends DCLogic {
       const bestRate = Math.max.apply(null, dualRates.concat([0]));
       const worstRate = Math.min.apply(null, dualRates.concat([100]));
       out.divCards = m.byDivision.map((g) => {
-        const e = agg.get(g.label) || { reps: new Set(), merch: new Set(), managers: new Set(), banners: new Set() };
+        const e = agg.get(g.label) || { reps: new Set(), merch: new Set(), managers: new Set(), repManagers: new Set(), banners: new Set() };
         const x = mix.get(g.label) || { both: 0, repOnly: 0, merchOnly: 0, regions: new Map() };
         const dual = pct(g.both, g.value);
         const isHigh = dual >= bestRate - 0.01;
@@ -985,12 +982,12 @@ class Component extends DCLogic {
           metrics: [
             { label: 'Reps', value: n(e.reps.size) },
             { label: 'Merchandisers', value: n(e.merch.size) },
-            { label: 'Managers', value: n(e.managers.size) },
+            { label: 'Rep Managers', value: n(e.repManagers.size) },
             { label: 'Banners', value: n(e.banners.size) },
             { label: 'Stores / rep', value: e.reps.size ? (g.value / e.reps.size).toFixed(1) : '—' },
             { label: 'Stores / merch', value: e.merch.size ? (g.value / e.merch.size).toFixed(1) : '—' },
             { label: 'Calls per cycle', value: n(e.calls || 0) },
-            { label: 'Managers span', value: e.managers.size ? ((e.reps.size + e.merch.size) / e.managers.size).toFixed(1) : '—' },
+            { label: 'Rep managers span', value: e.repManagers.size ? (e.reps.size / e.repManagers.size).toFixed(1) : '—' },
           ],
           topRegions: [...x.regions.entries()].sort((a, b) => b[1] - a[1]).slice(0, 4).map(([label, v]) => ({ label, value: n(v), w: w(pct(v, g.value)) })),
         };
@@ -999,10 +996,10 @@ class Component extends DCLogic {
       const regAgg = new Map();
       const ensureR = (r) => {
         let e = regAgg.get(r);
-        if (!e) { e = { reps: new Set(), merch: new Set(), managers: new Set() }; regAgg.set(r, e); }
+        if (!e) { e = { reps: new Set(), merch: new Set(), managers: new Set(), repManagers: new Set() }; regAgg.set(r, e); }
         return e;
       };
-      m.rep.forEach((r) => { const e = ensureR(r.region || 'Unknown'); e.reps.add(r.resourceId || r.resourceName); if (r.managerId || r.managerName) e.managers.add(r.managerId || r.managerName); });
+      m.rep.forEach((r) => { const e = ensureR(r.region || 'Unknown'); e.reps.add(r.resourceId || r.resourceName); if (r.managerId || r.managerName) { e.managers.add(r.managerId || r.managerName); e.repManagers.add(r.managerId || r.managerName); } });
       m.merch.forEach((r) => { const e = ensureR(r.region || 'Unknown'); e.merch.add(r.resourceId || r.resourceName); if (r.managerId || r.managerName) e.managers.add(r.managerId || r.managerName); });
       const divOfRegion = new Map();
       m.all.forEach((e) => { if (!divOfRegion.has(e.region)) divOfRegion.set(e.region, e.division); });
@@ -1014,11 +1011,11 @@ class Component extends DCLogic {
         gap: n(m.repOnly.length), dualPct: p1(pct(m.both.length, m.all.length)),
       };
       out.regionScorecard = m.byRegion.map((g) => {
-        const e = regAgg.get(g.label) || { reps: new Set(), merch: new Set(), managers: new Set() };
+        const e = regAgg.get(g.label) || { reps: new Set(), merch: new Set(), managers: new Set(), repManagers: new Set() };
         const dual = pct(g.both, g.value);
         return {
           region: g.label, division: divOfRegion.get(g.label) || '—', stores: n(g.value),
-          reps: n(e.reps.size), merch: n(e.merch.size), managers: n(e.managers.size),
+          reps: n(e.reps.size), merch: n(e.merch.size), managers: n(e.repManagers.size),
           load: e.reps.size ? (g.value / e.reps.size).toFixed(1) : '—',
           gap: n(gapByRegion.get(g.label) || 0),
           dualPct: p1(dual), dualW: w(dual),
@@ -1027,7 +1024,7 @@ class Component extends DCLogic {
       });
       out.exportRegions = () => this.exportCsv('region-scorecard-' + new Date().toISOString().slice(0, 10),
         [{ key: 'region', label: 'Region' }, { key: 'division', label: 'Division' }, { key: 'stores', label: 'Stores' },
-         { key: 'reps', label: 'Reps' }, { key: 'merch', label: 'Merchandisers' }, { key: 'managers', label: 'Managers' },
+         { key: 'reps', label: 'Reps' }, { key: 'merch', label: 'Merchandisers' }, { key: 'managers', label: 'Rep Managers' },
          { key: 'load', label: 'Stores per rep' }, { key: 'gap', label: 'Rep-only stores' }, { key: 'dualPct', label: 'Dual coverage' }],
         out.regionScorecard);
     }
