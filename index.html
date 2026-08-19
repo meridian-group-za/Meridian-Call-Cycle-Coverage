@@ -153,8 +153,8 @@ Last updated<br><span style="color:var(--color-neutral-300);">{{ snapshot }}</sp
           </div>
 
           <div style="display:grid; gap:var(--space-4);">
-            <div style="display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:var(--space-3);">
-              <sc-for list="{{ headlineStats }}" as="s" hint-placeholder-count="5">
+            <div style="display:grid; grid-template-columns:repeat(6,minmax(0,1fr)); gap:var(--space-3);">
+              <sc-for list="{{ headlineStats }}" as="s" hint-placeholder-count="6">
                 <div style="background:var(--color-surface); border:1px solid var(--color-neutral-800); border-radius:var(--radius-md); padding:var(--space-4) var(--space-4) var(--space-4);">
                   <div style="display:flex; align-items:center; gap:6px; font-size:9px; letter-spacing:0.09em; text-transform:uppercase; color:var(--color-neutral-500); margin-bottom:6px;">
                     <i class="{{ s.icon }}" style="font-size:13px; color:var(--color-accent-400);"></i><span>{{ s.label }}</span>
@@ -659,8 +659,8 @@ const PAGES = {
   merch: { label: 'Merch coverage', icon: 'ph ph-shopping-bag-open', title: 'Merchandiser coverage', sub: 'Merchandiser assignments, workload and calling frequency' },
   division: { label: 'Divisional coverage', icon: 'ph ph-map-trifold', title: 'Divisional coverage', sub: 'Stores, resources and dual-coverage rate per division' },
   banner: { label: 'Banner deep dive', icon: 'ph ph-storefront', title: 'Banner deep dive', sub: 'Every banner ranked by network size and coverage quality' },
-  gaps: { label: 'Coverage gaps', icon: 'ph ph-warning-diamond', title: 'Coverage gaps', sub: 'Stores served by only one discipline' },
   storelevel: { label: 'Store level deep dive', icon: 'ph ph-table', title: 'Store level deep dive', sub: 'Every store, rep and merchandiser assignment across the network — export-ready' },
+  gaps: { label: 'Coverage gaps', icon: 'ph ph-warning-diamond', title: 'Coverage gaps', sub: 'Stores served by only one discipline' },
 };
 
 class Component extends DCLogic {
@@ -881,7 +881,8 @@ class Component extends DCLogic {
       out.headlineStats = [
         { icon: 'ph ph-user-focus', label: 'Reps', value: n(m.repCount), sub: (m.repCount ? (m.rep.length / m.repCount).toFixed(1) : '—') + ' calls each' },
         { icon: 'ph ph-shopping-bag-open', label: 'Merchandisers', value: n(m.merchCount), sub: (m.merchCount ? (m.merch.length / m.merchCount).toFixed(1) : '—') + ' calls each' },
-        { icon: 'ph ph-users-three', label: 'Total Managers', value: n(m.mgrCount), sub: n(m.repMgrCount) + ' rep · ' + n(m.merchMgrCount) + ' merch managers' },
+        { icon: 'ph ph-user-focus', label: 'Rep Managers', value: n(m.repMgrCount), sub: n(m.mgrCount) + ' managers total' },
+        { icon: 'ph ph-shopping-bag-open', label: 'Merch Managers', value: n(m.merchMgrCount), sub: n(m.mgrCount) + ' managers total' },
         { icon: 'ph ph-storefront', label: 'Banners', value: n(m.byBanner.length), sub: m.byChannel.length + ' channels' },
         { icon: 'ph ph-map-trifold', label: 'Regions', value: n(m.byRegion.length), sub: m.byDivision.length + ' divisions' },
       ];
