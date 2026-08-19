@@ -382,19 +382,15 @@ Last updated<br><span style="color:var(--color-neutral-300);">{{ snapshot }}</sp
               <div style="display:flex; align-items:flex-start; gap:var(--space-3); margin-bottom:var(--space-4);">
                 <div style="flex:1; min-width:0;">
                   <h5 style="margin:0 0 2px; font-size:17px;">{{ d.division }}</h5>
-                  <div style="font-size:10.5px; color:var(--color-neutral-500);">{{ d.share }}</div>
+                  <div style="font-size:10.5px; color:var(--color-neutral-500);">{{ d.stores }} stores</div>
                 </div>
                 <span style="flex:none; padding:2px 9px; border-radius:20px; font-size:10px; font-weight:600; color:{{ d.badgeFg }}; background:{{ d.badgeBg }}; border:1px solid {{ d.badgeBd }};">{{ d.badge }}</span>
               </div>
 
               <div style="display:flex; align-items:baseline; gap:var(--space-6); margin-bottom:var(--space-4);">
                 <div>
-                  <div style="font-family:var(--font-heading); font-size:34px; line-height:1.05;">{{ d.stores }}</div>
-                  <div style="font-size:9.5px; letter-spacing:0.09em; text-transform:uppercase; color:var(--color-neutral-500);">stores covered</div>
-                </div>
-                <div style="margin-left:auto; text-align:right;">
-                  <div style="font-family:var(--font-heading); font-size:24px; line-height:1.05; color:var(--color-accent-400);">{{ d.dualPct }}</div>
-                  <div style="font-size:9.5px; letter-spacing:0.09em; text-transform:uppercase; color:var(--color-neutral-500);">dual coverage</div>
+                  <div style="font-family:var(--font-heading); font-size:34px; line-height:1.05;">{{ d.networkPct }}</div>
+                  <div style="font-size:9.5px; letter-spacing:0.09em; text-transform:uppercase; color:var(--color-neutral-500);">of network</div>
                 </div>
               </div>
 
@@ -1018,6 +1014,7 @@ class Component extends DCLogic {
         return {
           division: g.label, stores: n(g.value),
           share: p1(pct(g.value, m.all.length)) + ' of network',
+          networkPct: p1(pct(g.value, m.all.length)),
           dualPct: p1(dual), dualW: w(dual),
           bothW: w(pct(x.both, g.value)), repW: w(pct(x.repOnly, g.value)), merchW: w(pct(x.merchOnly, g.value)),
           gapStores: n(x.repOnly), gapPct: p1(pct(x.repOnly, g.value)),
