@@ -58,7 +58,7 @@
         </div>
       </sc-for>
     </nav>
-    <div style="flex:none; padding:var(--space-4) var(--space-6) var(--space-8); border-top:1px solid var(--color-neutral-800); font-size:10.5px; color:var(--color-neutral-500); line-height:1.5;">
+    <div style="flex:none; padding:var(--space-4) var(--space-6) var(--space-8); border-top:1px solid var(--color-neutral-800); font-size:10.5px; color:var(--color-neutral-500); line-height:1.5; text-align:center;">
 Last updated<br><span style="color:var(--color-neutral-300);">{{ snapshot }}</span>
       <button onClick="{{ onLogout }}" style="margin-top:14px; width:100%; display:flex; align-items:center; justify-content:center; gap:8px; background:transparent; border:1px solid var(--color-neutral-800); color:var(--color-neutral-400); border-radius:var(--radius-md); padding:8px 0; font-size:11.5px; font-family:inherit; cursor:pointer;" style-hover="border-color:var(--color-accent-700); color:var(--color-accent-300);">
         <i class="ph ph-sign-out" style="font-size:14px;"></i> Log out
@@ -104,7 +104,14 @@ Last updated<br><span style="color:var(--color-neutral-300);">{{ snapshot }}</sp
           <option value="">All resource types</option>
           <sc-for list="{{ typeOptions }}" as="o" hint-placeholder-count="4"><option value="{{ o }}">{{ o }}</option></sc-for>
         </select>
-        <input class="nx-in" type="text" value="{{ fRep }}" onChange="{{ onRep }}" placeholder="Rep name…" style="background:#0a1c3a; border:1px solid var(--color-neutral-800); color:var(--color-text); border-radius:var(--radius-md); padding:6px 8px; font-size:11.5px; font-family:inherit; width:120px; flex:none;">
+        <select class="nx-in" value="{{ fRep }}" onChange="{{ onRep }}" style="background:#0a1c3a; border:1px solid var(--color-neutral-800); color:var(--color-text); border-radius:var(--radius-md); padding:6px 8px; font-size:11.5px; font-family:inherit; width:150px; flex:none;">
+          <option value="">All reps</option>
+          <sc-for list="{{ repOptions }}" as="o" hint-placeholder-count="6"><option value="{{ o }}">{{ o }}</option></sc-for>
+        </select>
+        <select class="nx-in" value="{{ fMerchName }}" onChange="{{ onMerchName }}" style="background:#0a1c3a; border:1px solid var(--color-neutral-800); color:var(--color-text); border-radius:var(--radius-md); padding:6px 8px; font-size:11.5px; font-family:inherit; width:150px; flex:none;">
+          <option value="">All merchandisers</option>
+          <sc-for list="{{ merchOptions }}" as="o" hint-placeholder-count="6"><option value="{{ o }}">{{ o }}</option></sc-for>
+        </select>
         <select class="nx-in" value="{{ fManager }}" onChange="{{ onManager }}" style="background:#0a1c3a; border:1px solid var(--color-neutral-800); color:var(--color-text); border-radius:var(--radius-md); padding:6px 8px; font-size:11.5px; font-family:inherit; width:150px; flex:none;">
           <option value="">All managers</option>
           <sc-for list="{{ managerOptions }}" as="o" hint-placeholder-count="6"><option value="{{ o }}">{{ o }}</option></sc-for>
@@ -227,7 +234,7 @@ Last updated<br><span style="color:var(--color-neutral-300);">{{ snapshot }}</sp
             <div style="display:flex; align-items:baseline; gap:8px; margin-bottom:var(--space-4);"><h5 style="margin:0; font-size:14px;">Coverage depth by region</h5><span style="font-size:10.5px; color:var(--color-neutral-500);">stores, both-covered share</span></div>
             <sc-for list="{{ regionRows }}" as="r" hint-placeholder-count="6">
               <div style="display:grid; grid-template-columns:104px 1fr 50px 44px; align-items:center; gap:10px; margin-bottom:7px; font-size:11.5px;">
-                <div style="color:var(--color-neutral-300); overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">{{ r.label }}</div>
+                <div onClick="{{ r.go }}" style="color:var(--color-accent-300); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; cursor:pointer;">{{ r.label }}</div>
                 <div style="height:10px; background:#1c3f6b; border-radius:3px; overflow:hidden; display:flex;">
                   <div style="width:{{ r.bothW }}; background:var(--color-accent);"></div>
                   <div style="width:{{ r.restW }}; background:#3d5f85;"></div>
@@ -239,10 +246,10 @@ Last updated<br><span style="color:var(--color-neutral-300);">{{ snapshot }}</sp
           </div>
 
           <div style="background:var(--color-surface); border:1px solid var(--color-neutral-800); border-radius:var(--radius-lg); padding:var(--space-6);">
-            <div style="display:flex; align-items:baseline; gap:8px; margin-bottom:var(--space-4);"><h5 style="margin:0; font-size:14px;">Channel mix</h5><span style="font-size:10.5px; color:var(--color-neutral-500);">stores covered</span></div>
+            <div style="display:flex; align-items:baseline; gap:8px; margin-bottom:var(--space-4);"><h5 style="margin:0; font-size:14px;">Channel coverage</h5><span style="font-size:10.5px; color:var(--color-neutral-500);">stores covered</span></div>
             <sc-for list="{{ channelRows }}" as="r" hint-placeholder-count="6">
               <div style="display:grid; grid-template-columns:150px 1fr 50px 44px; align-items:center; gap:10px; margin-bottom:7px; font-size:11.5px;">
-                <div style="color:var(--color-neutral-300); overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">{{ r.label }}</div>
+                <div onClick="{{ r.go }}" style="color:var(--color-accent-300); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; cursor:pointer;">{{ r.label }}</div>
                 <div style="height:10px; background:#1c3f6b; border-radius:3px; overflow:hidden; display:flex;">
                   <div style="width:{{ r.bothW }}; background:var(--color-accent);"></div>
                   <div style="width:{{ r.restW }}; background:#3d5f85;"></div>
@@ -259,7 +266,7 @@ Last updated<br><span style="color:var(--color-neutral-300);">{{ snapshot }}</sp
           <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(400px,1fr)); gap:0 var(--space-8);">
             <sc-for list="{{ bannerRows }}" as="r" hint-placeholder-count="12">
               <div style="display:grid; grid-template-columns:150px 1fr 52px 46px; align-items:center; gap:10px; margin-bottom:7px; font-size:11.5px;">
-                <div style="color:var(--color-neutral-300); overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">{{ r.label }}</div>
+                <div onClick="{{ r.go }}" style="color:var(--color-accent-300); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; cursor:pointer;">{{ r.label }}</div>
                 <div style="height:10px; background:#1c3f6b; border-radius:3px; overflow:hidden; display:flex;">
                   <div style="width:{{ r.bothW }}; background:var(--color-accent);"></div>
                   <div style="width:{{ r.restW }}; background:#3d5f85;"></div>
@@ -303,7 +310,7 @@ Last updated<br><span style="color:var(--color-neutral-300);">{{ snapshot }}</sp
             <div style="display:flex; align-items:baseline; gap:8px; margin-bottom:var(--space-4);"><h5 style="margin:0; font-size:14px;">Workload by banner</h5><span style="font-size:10.5px; color:var(--color-neutral-500);">top 14 by assignments</span></div>
             <sc-for list="{{ resBannerRows }}" as="r" hint-placeholder-count="8">
               <div style="display:grid; grid-template-columns:170px 1fr 56px; align-items:center; gap:10px; margin-bottom:7px; font-size:11.5px;">
-                <div style="color:var(--color-neutral-300); overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">{{ r.label }}</div>
+                <div onClick="{{ r.go }}" style="color:var(--color-accent-300); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; cursor:pointer;">{{ r.label }}</div>
                 <div style="height:10px; background:#1c3f6b; border-radius:3px; overflow:hidden;"><div style="height:100%; width:{{ r.w }}; background:var(--color-accent);"></div></div>
                 <div style="text-align:right; font-family:var(--font-heading);">{{ r.value }}</div>
               </div>
@@ -413,7 +420,7 @@ Last updated<br><span style="color:var(--color-neutral-300);">{{ snapshot }}</sp
               <div style="font-size:9.5px; letter-spacing:0.09em; text-transform:uppercase; color:var(--color-neutral-500); margin-bottom:var(--space-2);">Largest regions</div>
               <sc-for list="{{ d.topRegions }}" as="r" hint-placeholder-count="4">
                 <div style="display:grid; grid-template-columns:1fr 62px 42px; align-items:center; gap:8px; margin-bottom:5px; font-size:11px;">
-                  <div style="color:var(--color-neutral-300); overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">{{ r.label }}</div>
+                  <div onClick="{{ r.go }}" style="color:var(--color-accent-300); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; cursor:pointer;">{{ r.label }}</div>
                   <div style="height:6px; background:#1c3f6b; border-radius:3px; overflow:hidden;"><div style="height:100%; width:{{ r.w }}; background:#6fb2ff;"></div></div>
                   <div style="text-align:right; color:var(--color-neutral-400);">{{ r.value }}</div>
                 </div>
@@ -445,8 +452,8 @@ Last updated<br><span style="color:var(--color-neutral-300);">{{ snapshot }}</sp
             <tbody>
               <sc-for list="{{ regionScorecard }}" as="r" hint-placeholder-count="10">
                 <tr class="nx-row">
-                  <td style="padding:7px 8px; border-bottom:1px solid #1c3f6b; color:var(--color-text);">{{ r.region }}</td>
-                  <td style="padding:7px 8px; border-bottom:1px solid #1c3f6b; color:var(--color-neutral-400);">{{ r.division }}</td>
+                  <td onClick="{{ r.goRegion }}" style="padding:7px 8px; border-bottom:1px solid #1c3f6b; color:var(--color-accent-300); cursor:pointer;">{{ r.region }}</td>
+                  <td onClick="{{ r.goDivision }}" style="padding:7px 8px; border-bottom:1px solid #1c3f6b; color:var(--color-neutral-400); cursor:pointer;">{{ r.division }}</td>
                   <td style="padding:7px 8px; border-bottom:1px solid #1c3f6b; text-align:right; font-family:var(--font-heading);">{{ r.stores }}</td>
                   <td style="padding:7px 8px; border-bottom:1px solid #1c3f6b; text-align:right; color:var(--color-neutral-300);">{{ r.reps }}</td>
                   <td style="padding:7px 8px; border-bottom:1px solid #1c3f6b; text-align:right; color:var(--color-neutral-300);">{{ r.merch }}</td>
@@ -508,7 +515,7 @@ Last updated<br><span style="color:var(--color-neutral-300);">{{ snapshot }}</sp
             <div style="display:flex; align-items:baseline; gap:8px; margin-bottom:var(--space-4);"><h5 style="margin:0; font-size:14px;">Rep-only stores by banner</h5><span style="font-size:10.5px; color:var(--color-neutral-500);">rep-only stores, top banners</span></div>
             <sc-for list="{{ gapBannerRows }}" as="r" hint-placeholder-count="8">
               <div style="display:grid; grid-template-columns:170px 1fr 52px 46px; align-items:center; gap:10px; margin-bottom:7px; font-size:11.5px;">
-                <div style="color:var(--color-neutral-300); overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">{{ r.label }}</div>
+                <div onClick="{{ r.go }}" style="color:var(--color-accent-300); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; cursor:pointer;">{{ r.label }}</div>
                 <div style="height:10px; background:#1c3f6b; border-radius:3px; overflow:hidden;"><div style="height:100%; width:{{ r.w }}; background:var(--color-accent);"></div></div>
                 <div style="text-align:right; font-family:var(--font-heading);">{{ r.value }}</div>
                 <div style="text-align:right; color:var(--color-neutral-500);">{{ r.pct }}</div>
@@ -519,7 +526,7 @@ Last updated<br><span style="color:var(--color-neutral-300);">{{ snapshot }}</sp
             <div style="display:flex; align-items:baseline; gap:8px; margin-bottom:var(--space-4);"><h5 style="margin:0; font-size:14px;">Rep-only stores by region</h5><span style="font-size:10.5px; color:var(--color-neutral-500);">share of covered stores with no merch</span></div>
             <sc-for list="{{ gapRegionRows }}" as="r" hint-placeholder-count="6">
               <div style="display:grid; grid-template-columns:130px 1fr 52px 46px; align-items:center; gap:10px; margin-bottom:7px; font-size:11.5px;">
-                <div style="color:var(--color-neutral-300); overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">{{ r.label }}</div>
+                <div onClick="{{ r.go }}" style="color:var(--color-accent-300); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; cursor:pointer;">{{ r.label }}</div>
                 <div style="height:10px; background:#1c3f6b; border-radius:3px; overflow:hidden;"><div style="height:100%; width:{{ r.w }}; background:var(--color-accent);"></div></div>
                 <div style="text-align:right; font-family:var(--font-heading);">{{ r.value }}</div>
                 <div style="text-align:right; color:var(--color-neutral-500);">{{ r.pct }}</div>
@@ -651,18 +658,18 @@ const w = (v) => v.toFixed(2) + '%';
 
 const PAGES = {
   overview: { label: 'Overview', icon: 'ph ph-squares-four', title: 'Coverage overview', sub: 'The network Meridian services, and how deeply it is covered' },
-  rep: { label: 'Rep coverage', icon: 'ph ph-user-focus', title: 'Rep coverage', sub: 'Sales-rep assignments, workload and calling frequency' },
-  merch: { label: 'Merch coverage', icon: 'ph ph-shopping-bag-open', title: 'Merchandiser coverage', sub: 'Merchandiser assignments, workload and calling frequency' },
   division: { label: 'Divisional coverage', icon: 'ph ph-map-trifold', title: 'Divisional coverage', sub: 'Stores, resources and dual-coverage rate per division' },
-  banner: { label: 'Banner deep dive', icon: 'ph ph-storefront', title: 'Banner deep dive', sub: 'Every banner ranked by network size and coverage quality' },
-  storelevel: { label: 'Store level deep dive', icon: 'ph ph-table', title: 'Store level deep dive', sub: 'Every store, rep and merchandiser assignment across the network — export-ready' },
+  merch: { label: 'Merch coverage', icon: 'ph ph-shopping-bag-open', title: 'Merchandiser coverage', sub: 'Merchandiser assignments, workload and calling frequency' },
+  rep: { label: 'Rep coverage', icon: 'ph ph-user-focus', title: 'Rep coverage', sub: 'Sales-rep assignments, workload and calling frequency' },
+  banner: { label: 'Banner Insights', icon: 'ph ph-storefront', title: 'Banner Insights', sub: 'Every banner ranked by network size and coverage quality' },
+  storelevel: { label: 'Store Level', icon: 'ph ph-table', title: 'Store Level', sub: 'Every store, rep and merchandiser assignment across the network — export-ready' },
   gaps: { label: 'Coverage gaps', icon: 'ph ph-warning-diamond', title: 'Coverage gaps', sub: 'Stores served by only one discipline' },
 };
 
 class Component extends DCLogic {
   state = {
     ready: false, err: '', page: 'overview',
-    region: '', division: '', banner: '', channel: '', rep: '', manager: '', rtype: '',
+    region: '', division: '', banner: '', channel: '', rep: '', merchName: '', manager: '', rtype: '',
     resQuery: '', bannerQuery: '', gapQuery: '', slQuery: '',
     gapTab: 'repOnly', slTab: 'all', sortKey: 'stores', sortDir: -1,
   };
@@ -708,14 +715,15 @@ class Component extends DCLogic {
     if (s.banner && r.banner !== s.banner) return false;
     if (s.channel && channelOf(r.banner) !== s.channel) return false;
     if (s.rtype && r.resourceType !== s.rtype) return false;
-    if (applyRep && s.rep && !(r.resourceName || '').toLowerCase().includes(s.rep.toLowerCase())) return false;
+    if (applyRep && s.rep && r.resourceName !== s.rep) return false;
+    if (!applyRep && s.merchName && r.resourceName !== s.merchName) return false;
     if (s.manager && r.managerName !== s.manager) return false;
     return true;
   }
 
   model() {
     const s = this.state;
-    const sig = [s.region, s.division, s.banner, s.channel, s.rep, s.manager, s.rtype].join('§');
+    const sig = [s.region, s.division, s.banner, s.channel, s.rep, s.merchName, s.manager, s.rtype].join('§');
     if (this._sig === sig && this._m) return this._m;
     const rep = this.repRows.filter((r) => this.match(r, true));
     const merch = this.merchRows.filter((r) => this.match(r, false));
@@ -789,17 +797,21 @@ class Component extends DCLogic {
     setTimeout(() => URL.revokeObjectURL(url), 2000);
   }
 
-  depthRows(groups, limit) {
+  depthRows(groups, limit, field) {
     const peak = groups.length ? groups[0].value : 1;
     return groups.slice(0, limit).map((g) => ({
       label: g.label, value: n(g.value), bothPct: p1(pct(g.both, g.value)),
       bothW: w(pct(g.both, peak)), restW: w(pct(g.value - g.both, peak)),
+      go: field ? () => this.set({ [field]: this.state[field] === g.label ? '' : g.label }) : undefined,
     }));
   }
 
-  plainRows(pairs, limit) {
+  plainRows(pairs, limit, field) {
     const peak = pairs.length ? pairs[0][1] : 1;
-    return pairs.slice(0, limit).map(([label, value]) => ({ label, value: n(value), w: w(pct(value, peak)) }));
+    return pairs.slice(0, limit).map(([label, value]) => ({
+      label, value: n(value), w: w(pct(value, peak)),
+      go: field ? () => this.set({ [field]: this.state[field] === label ? '' : label }) : undefined,
+    }));
   }
 
   renderVals() {
@@ -824,13 +836,14 @@ class Component extends DCLogic {
       isOverview: s.page === 'overview', isResourcePage: s.page === 'rep' || s.page === 'merch',
       isDivision: s.page === 'division', isBanner: s.page === 'banner', isGaps: s.page === 'gaps',
       isStoreLevel: s.page === 'storelevel',
-      fRegion: s.region, fDivision: s.division, fBanner: s.banner, fChannel: s.channel, fRep: s.rep, fManager: s.manager, fType: s.rtype,
+      fRegion: s.region, fDivision: s.division, fBanner: s.banner, fChannel: s.channel, fRep: s.rep, fMerchName: s.merchName, fManager: s.manager, fType: s.rtype,
       onRegion: (e) => this.set({ region: e.target.value }), onDivision: (e) => this.set({ division: e.target.value }),
       onBanner: (e) => this.set({ banner: e.target.value }), onChannel: (e) => this.set({ channel: e.target.value }),
       onRep: (e) => this.set({ rep: e.target.value }),
+      onMerchName: (e) => this.set({ merchName: e.target.value }),
       onManager: (e) => this.set({ manager: e.target.value }),
       onType: (e) => this.set({ rtype: e.target.value }),
-      onReset: () => this.set({ region: '', division: '', banner: '', channel: '', rep: '', manager: '', rtype: '' }),
+      onReset: () => this.set({ region: '', division: '', banner: '', channel: '', rep: '', merchName: '', manager: '', rtype: '' }),
       onResQuery: (e) => this.set({ resQuery: e.target.value }),
       onBannerQuery: (e) => this.set({ bannerQuery: e.target.value }),
       onGapQuery: (e) => this.set({ gapQuery: e.target.value }),
@@ -841,22 +854,24 @@ class Component extends DCLogic {
 
     const m = this.model();
     const total = m.all.length;
-    const activeFilters = ['region', 'division', 'banner', 'channel', 'rep', 'rtype'].filter((k) => s[k]);
+    const activeFilters = ['region', 'division', 'banner', 'channel', 'rep', 'merchName', 'manager', 'rtype'].filter((k) => s[k]);
 
     if (!this._opts) {
-      const rs = new Set(), ds = new Set(), bs = new Set(), cs = new Set(), ms = new Set();
+      const rs = new Set(), ds = new Set(), bs = new Set(), cs = new Set(), ms = new Set(), rns = new Set(), mns = new Set();
       [...this.repRows, ...this.merchRows].forEach((r) => {
         if (r.region) rs.add(r.region);
         if (r.division) ds.add(r.division);
         if (r.banner) { bs.add(r.banner); cs.add(channelOf(r.banner)); }
         if (r.managerName) ms.add(r.managerName);
       });
+      this.repRows.forEach((r) => { if (r.resourceName) rns.add(r.resourceName); });
+      this.merchRows.forEach((r) => { if (r.resourceName) mns.add(r.resourceName); });
       const typesOf = (rows) => [...new Set(rows.map((r) => r.resourceType).filter(Boolean))].sort();
       this._repTypes = typesOf(this.repRows);
       this._merchTypes = typesOf(this.merchRows);
       this._allTypes = typesOf([...this.repRows, ...this.merchRows]);
       const sorted = (x) => [...x].sort();
-      this._opts = { regionOptions: sorted(rs), divisionOptions: sorted(ds), bannerOptions: sorted(bs), channelOptions: sorted(cs), managerOptions: sorted(ms) };
+      this._opts = { regionOptions: sorted(rs), divisionOptions: sorted(ds), bannerOptions: sorted(bs), channelOptions: sorted(cs), managerOptions: sorted(ms), repOptions: sorted(rns), merchOptions: sorted(mns) };
     }
 
     const out = Object.assign(base, this._opts, {
@@ -873,6 +888,11 @@ class Component extends DCLogic {
         bothPct: p1(pct(m.both.length, total)), repPct: p1(pct(m.repOnly.length, total)), merchPct: p1(pct(m.merchOnly.length, total)),
         bothW: w(pct(m.both.length, total)), repW: w(pct(m.repOnly.length, total)), merchW: w(pct(m.merchOnly.length, total)),
       };
+      const gapByRegionOv = new Map();
+      m.repOnly.forEach((e) => gapByRegionOv.set(e.region, (gapByRegionOv.get(e.region) || 0) + 1));
+      const gapRegionsSorted = [...gapByRegionOv.entries()].sort((a, b) => b[1] - a[1]).slice(0, 3);
+      const gapPeak = gapRegionsSorted.length ? gapRegionsSorted[0][1] : 1;
+      out.topGapRegions = gapRegionsSorted.map(([label, value]) => ({ label, value: n(value), w: w(pct(value, gapPeak)) }));
       const resources = m.repCount + m.merchCount;
       out.headlineStats = [
         { icon: 'ph ph-user-focus', label: 'Reps', value: n(m.repCount), sub: (m.repCount ? (m.rep.length / m.repCount).toFixed(1) : '—') + ' calls each' },
@@ -901,7 +921,7 @@ class Component extends DCLogic {
       if (highRegion && lowRegion) ins.push({ icon: 'ph ph-chart-bar', lead: 'Dual-coverage rate ranges from ' + lowRegion.label + ' at ' + p1(pct(lowRegion.both, lowRegion.value)) + ' to ' + highRegion.label + ' at ', value: p1(pct(highRegion.both, highRegion.value)), tail: ' across regions with more than 50 stores.' });
       ins.push({ icon: 'ph ph-users-three', lead: n(m.repCount) + ' reps report to ' + n(m.repMgrCount) + ' rep managers; ' + n(m.merchCount) + ' merchandisers report to ' + n(m.merchMgrCount) + ' merch managers — ', value: n(m.mgrCount) + ' managers total', tail: ' (some oversee both disciplines), and ' + (m.repCount ? (m.merchCount / m.repCount).toFixed(1) : '—') + ' merchandisers per rep.' });
 
-      out.divisionRows = this.depthRows(m.byDivision, 6);
+      out.divisionRows = this.depthRows(m.byDivision, 6, 'division');
       const dColors = ['#ec6d25', '#6fb2ff', '#3d5f85', '#f2955c', '#9dc4ec', '#1c3f6b'];
       const DC = 2 * Math.PI * 54;
       let dAcc = 0;
@@ -913,15 +933,15 @@ class Component extends DCLogic {
         return seg;
       });
       out.donutTotal = n(total);
-      out.regionRows = this.depthRows(m.byRegion, 10);
-      out.channelRows = this.depthRows(m.byChannel, 8);
+      out.regionRows = this.depthRows(m.byRegion, 10, 'region');
+      out.channelRows = this.depthRows(m.byChannel, 8, 'channel');
       const chPeak = m.byChannel.length ? m.byChannel[0].value : 1;
       out.channelCols = m.byChannel.slice(0, 8).map((g) => ({
         label: g.label, value: n(g.value), bothPct: p1(pct(g.both, g.value)),
         h: w(pct(g.value, chPeak)),
         bothH: w(pct(g.both, g.value)), restH: w(pct(g.value - g.both, g.value)),
       }));
-      out.bannerRows = this.depthRows(m.byBanner, 24);
+      out.bannerRows = this.depthRows(m.byBanner, 24, 'banner');
       const freq = new Map();
       [...m.repFreq, ...m.merchFreq].forEach(([k, v]) => freq.set(k, (freq.get(k) || 0) + v));
       const freqPairs = [...freq.entries()].sort((a, b) => b[1] - a[1]);
@@ -942,7 +962,7 @@ class Component extends DCLogic {
         { icon: 'ph ph-users-three', label: 'Managers', value: n(new Set(rows.map((r) => r.managerId || r.managerName).filter(Boolean)).size), sub: 'reporting lines' },
         { icon: 'ph ph-tag', label: 'Banners', value: n((isRep ? m.repBanner : m.merchBanner).length), sub: 'served' },
       ];
-      out.resBannerRows = this.plainRows(isRep ? m.repBanner : m.merchBanner, 14);
+      out.resBannerRows = this.plainRows(isRep ? m.repBanner : m.merchBanner, 14, 'banner');
       out.resFreqTiles = (isRep ? m.repFreq : m.merchFreq).slice(0, 8).map(([label, value]) => ({ label, value: n(value) }));
       out.resTypeTiles = (isRep ? m.repType : m.merchType).slice(0, 8).map(([label, value]) => ({ label, value: n(value) }));
       const peopleByType = new Map();
@@ -1032,7 +1052,10 @@ class Component extends DCLogic {
             { label: 'Calls per cycle', value: n(e.calls || 0) },
             { label: 'Rep managers span', value: e.repManagers.size ? (e.reps.size / e.repManagers.size).toFixed(1) : '—' },
           ],
-          topRegions: [...x.regions.entries()].sort((a, b) => b[1] - a[1]).slice(0, 4).map(([label, v]) => ({ label, value: n(v), w: w(pct(v, g.value)) })),
+          topRegions: [...x.regions.entries()].sort((a, b) => b[1] - a[1]).slice(0, 4).map(([label, v]) => ({
+            label, value: n(v), w: w(pct(v, g.value)),
+            go: () => this.set({ region: this.state.region === label ? '' : label }),
+          })),
         };
       });
 
@@ -1056,13 +1079,16 @@ class Component extends DCLogic {
       out.regionScorecard = m.byRegion.map((g) => {
         const e = regAgg.get(g.label) || { reps: new Set(), merch: new Set(), managers: new Set(), repManagers: new Set() };
         const dual = pct(g.both, g.value);
+        const divLabel = divOfRegion.get(g.label) || '—';
         return {
-          region: g.label, division: divOfRegion.get(g.label) || '—', stores: n(g.value),
+          region: g.label, division: divLabel, stores: n(g.value),
           reps: n(e.reps.size), merch: n(e.merch.size), managers: n(e.repManagers.size),
           load: e.reps.size ? (g.value / e.reps.size).toFixed(1) : '—',
           gap: n(gapByRegion.get(g.label) || 0),
           dualPct: p1(dual), dualW: w(dual),
           dualColor: dual >= 50 ? 'var(--color-accent)' : dual >= 35 ? '#ee7f3c' : '#6fb2ff',
+          goRegion: () => this.set({ region: this.state.region === g.label ? '' : g.label }),
+          goDivision: divLabel !== '—' ? () => this.set({ division: this.state.division === divLabel ? '' : divLabel }) : undefined,
         };
       });
       out.exportRegions = () => this.exportCsv('region-scorecard-' + new Date().toISOString().slice(0, 10),
@@ -1125,13 +1151,16 @@ class Component extends DCLogic {
       });
       const bannerTotals = new Map(m.byBanner.map((g) => [g.label, g.value]));
       const regionTotals = new Map(m.byRegion.map((g) => [g.label, g.value]));
-      const gapRows = (map, totals, limit) => {
+      const gapRows = (map, totals, limit, field) => {
         const arr = [...map.entries()].sort((a, b) => b[1] - a[1]).slice(0, limit);
         const peak = arr.length ? arr[0][1] : 1;
-        return arr.map(([label, value]) => ({ label, value: n(value), w: w(pct(value, peak)), pct: p1(pct(value, totals.get(label) || value)) }));
+        return arr.map(([label, value]) => ({
+          label, value: n(value), w: w(pct(value, peak)), pct: p1(pct(value, totals.get(label) || value)),
+          go: field ? () => this.set({ [field]: this.state[field] === label ? '' : label }) : undefined,
+        }));
       };
-      out.gapBannerRows = gapRows(gapBanner, bannerTotals, 10);
-      out.gapRegionRows = gapRows(gapRegion, regionTotals, 9);
+      out.gapBannerRows = gapRows(gapBanner, bannerTotals, 10, 'banner');
+      out.gapRegionRows = gapRows(gapRegion, regionTotals, 9, 'region');
       const sets = { repOnly: m.repOnly, merchOnly: m.merchOnly, both: m.both };
       const titles = { repOnly: 'Rep coverage, no merchandiser', merchOnly: 'Merchandiser coverage, no rep', both: 'Covered by both disciplines' };
       out.gapTabs = ['repOnly', 'merchOnly', 'both'].map((k) => ({
