@@ -157,19 +157,6 @@ Last updated<br><span style="color:var(--color-neutral-300);">{{ snapshot }}</sp
                 <span style="color:var(--color-neutral-500); width:44px; text-align:right;">{{ mix.merchPct }}</span>
               </div>
             </div>
-
-            <div style="margin-top:var(--space-6); padding-top:var(--space-4); border-top:1px solid var(--color-neutral-800);">
-              <div style="font-size:9.5px; letter-spacing:0.09em; text-transform:uppercase; color:var(--color-neutral-500); margin-bottom:10px;">Where the gap is worst — rep only, no merch</div>
-              <sc-for list="{{ topGapRegions }}" as="r" hint-placeholder-count="3">
-                <div style="display:grid; grid-template-columns:1fr 60px; align-items:center; gap:10px; margin-bottom:8px; font-size:11.5px;">
-                  <div>
-                    <div onClick="{{ r.go }}" style="color:var(--color-accent-300); margin-bottom:4px; cursor:pointer;">{{ r.label }}</div>
-                    <div style="height:6px; background:#1c3f6b; border-radius:3px; overflow:hidden;"><div style="height:100%; width:{{ r.w }}; background:#6fb2ff;"></div></div>
-                  </div>
-                  <div style="text-align:right; font-family:var(--font-heading);">{{ r.value }}</div>
-                </div>
-              </sc-for>
-            </div>
           </div>
 
           <div style="display:grid; gap:var(--space-4);">
@@ -901,14 +888,6 @@ class Component extends DCLogic {
         bothPct: p1(pct(m.both.length, total)), repPct: p1(pct(m.repOnly.length, total)), merchPct: p1(pct(m.merchOnly.length, total)),
         bothW: w(pct(m.both.length, total)), repW: w(pct(m.repOnly.length, total)), merchW: w(pct(m.merchOnly.length, total)),
       };
-      const gapByRegionOv = new Map();
-      m.repOnly.forEach((e) => gapByRegionOv.set(e.region, (gapByRegionOv.get(e.region) || 0) + 1));
-      const gapRegionsSorted = [...gapByRegionOv.entries()].sort((a, b) => b[1] - a[1]).slice(0, 3);
-      const gapPeak = gapRegionsSorted.length ? gapRegionsSorted[0][1] : 1;
-      out.topGapRegions = gapRegionsSorted.map(([label, value]) => ({
-        label, value: n(value), w: w(pct(value, gapPeak)),
-        go: () => this.set({ region: this.state.region === label ? '' : label }),
-      }));
       const resources = m.repCount + m.merchCount;
       out.headlineStats = [
         { icon: 'ph ph-user-focus', label: 'Reps', value: n(m.repCount), sub: (m.repCount ? (m.rep.length / m.repCount).toFixed(1) : '—') + ' calls each' },
