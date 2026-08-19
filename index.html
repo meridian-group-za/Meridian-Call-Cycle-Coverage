@@ -722,6 +722,8 @@ class Component extends DCLogic {
       repCount: uniq(rep, (r) => r.resourceId || r.resourceName),
       merchCount: uniq(merch, (r) => r.resourceId || r.resourceName),
       mgrCount: uniq([...rep, ...merch], (r) => r.managerId || r.managerName),
+      repMgrCount: uniq(rep, (r) => r.managerId || r.managerName),
+      merchMgrCount: uniq(merch, (r) => r.managerId || r.managerName),
       repFreq: count(rep, 'frequency'), merchFreq: count(merch, 'frequency'),
       repType: count(rep, 'resourceType'), merchType: count(merch, 'resourceType'),
       repBanner: count(rep, 'banner'), merchBanner: count(merch, 'banner'),
@@ -837,7 +839,7 @@ class Component extends DCLogic {
       out.headlineStats = [
         { icon: 'ph ph-user-focus', label: 'Reps', value: n(m.repCount), sub: (m.repCount ? (m.rep.length / m.repCount).toFixed(1) : '—') + ' calls each' },
         { icon: 'ph ph-shopping-bag-open', label: 'Merchandisers', value: n(m.merchCount), sub: (m.merchCount ? (m.merch.length / m.merchCount).toFixed(1) : '—') + ' calls each' },
-        { icon: 'ph ph-users-three', label: 'Managers', value: n(m.mgrCount), sub: (m.mgrCount ? (resources / m.mgrCount).toFixed(1) : '—') + ' span of control' },
+        { icon: 'ph ph-users-three', label: 'Total Managers', value: n(m.mgrCount), sub: n(m.repMgrCount) + ' rep · ' + n(m.merchMgrCount) + ' merch managers' },
         { icon: 'ph ph-storefront', label: 'Banners', value: n(m.byBanner.length), sub: m.byChannel.length + ' channels' },
         { icon: 'ph ph-map-trifold', label: 'Regions', value: n(m.byRegion.length), sub: m.byDivision.length + ' divisions' },
       ];
@@ -858,7 +860,7 @@ class Component extends DCLogic {
       if (topBanner) ins.push({ icon: 'ph ph-storefront', lead: topBanner.label + ' is the largest banner with ', value: n(topBanner.value) + ' stores', tail: '; the top five banners account for ' + p1(m.top5Share) + ' of covered stores across ' + n(m.byBanner.length) + ' banners.' });
       if (m.byRegion[0]) ins.push({ icon: 'ph ph-map-trifold', lead: m.byRegion[0].label + ' is the largest region with ', value: n(m.byRegion[0].value) + ' stores', tail: (topMerchRegion ? '; ' + topMerchRegion[0] + ' has the most merchandisers (' + n(topMerchRegion[1]) + ').' : '.') });
       if (highRegion && lowRegion) ins.push({ icon: 'ph ph-chart-bar', lead: 'Dual-coverage rate ranges from ' + lowRegion.label + ' at ' + p1(pct(lowRegion.both, lowRegion.value)) + ' to ' + highRegion.label + ' at ', value: p1(pct(highRegion.both, highRegion.value)), tail: ' across regions with more than 50 stores.' });
-      ins.push({ icon: 'ph ph-users-three', lead: n(m.repCount) + ' reps and ' + n(m.merchCount) + ' merchandisers report to ' + n(m.mgrCount) + ' managers — ', value: (m.mgrCount ? (resources / m.mgrCount).toFixed(1) : '—') + ' field resources', tail: ' per manager, and ' + (m.repCount ? (m.merchCount / m.repCount).toFixed(1) : '—') + ' merchandisers per rep.' });
+      ins.push({ icon: 'ph ph-users-three', lead: n(m.repCount) + ' reps report to ' + n(m.repMgrCount) + ' rep managers; ' + n(m.merchCount) + ' merchandisers report to ' + n(m.merchMgrCount) + ' merch managers — ', value: n(m.mgrCount) + ' managers total', tail: ' (some oversee both disciplines), and ' + (m.repCount ? (m.merchCount / m.repCount).toFixed(1) : '—') + ' merchandisers per rep.' });
 
       out.divisionRows = this.depthRows(m.byDivision, 6);
       const dColors = ['#ec6d25', '#6fb2ff', '#3d5f85', '#f2955c', '#9dc4ec', '#1c3f6b'];
