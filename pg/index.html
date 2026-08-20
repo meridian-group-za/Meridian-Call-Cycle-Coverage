@@ -270,11 +270,11 @@
         </sc-for>
       </div>
 
-    <div style="background: #061530; border: 1px solid #1c3f6b; border-radius: 16px; padding: 22px">
-      <div style="display: flex; align-items: baseline; gap: 8px; margin-bottom: 14px"><h5 style="margin: 0; font-size: 14px; font-weight: 600">Stores by rep type</h5></div>
-      <div style="display: flex; justify-content: center; margin: 8px 0 22px">
-        <div style="position: relative; width: 176px; height: 176px">
-          <svg viewBox="0 0 140 140" style="width: 176px; height: 176px; transform: rotate(-90deg)">
+    <div style="background: #061530; border: 1px solid #1c3f6b; border-radius: 16px; padding: 14px 16px">
+      <div style="display: flex; align-items: baseline; gap: 8px; margin-bottom: 8px"><h5 style="margin: 0; font-size: 13px; font-weight: 600">Stores by rep type</h5></div>
+      <div style="display: flex; justify-content: center; margin: 4px 0 12px">
+        <div style="position: relative; width: 140px; height: 140px">
+          <svg viewBox="0 0 140 140" style="width: 140px; height: 140px; transform: rotate(-90deg)">
             <circle cx="70" cy="70" r="54" fill="none" stroke="#0a1c3a" stroke-width="17"></circle>
             <sc-for list="{{ repTypeRows }}" as="t" hint-placeholder-count="4">
               <circle cx="70" cy="70" r="54" fill="none" stroke="{{ t.color }}" stroke-width="17" stroke-dasharray="{{ t.dash }}" stroke-dashoffset="{{ t.offset }}"></circle>
