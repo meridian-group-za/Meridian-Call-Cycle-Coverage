@@ -156,32 +156,32 @@
       </sc-for>
     </div>
 
-    <div style="margin-top: 14px; padding: 16px 18px; background: rgba(11,33,69,0.78); border: 1px solid rgba(243,247,252,0.08); border-radius: 10px">
-      <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 14px">
-        <div style="font-size: 10.5px; letter-spacing: 0.12em; text-transform: uppercase; color: #f3f7fc">Filters</div>
+    <div style="margin-top: 10px; padding: 10px 14px; background: rgba(11,33,69,0.78); border: 1px solid rgba(243,247,252,0.08); border-radius: 10px">
+      <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px">
+        <div style="font-size: 9.5px; letter-spacing: 0.12em; text-transform: uppercase; color: #f3f7fc">Filters</div>
         <div style="flex: 1; height: 1px; background: linear-gradient(to right, rgba(243,247,252,0.12), transparent)"></div>
-        <div style="font-size: 11.5px; color: #5f80a6">{{ filterSummary }}</div>
-        <button onClick="{{ resetFilters }}" style="padding: 5px 12px; font: inherit; font-size: 11.5px; color: #ec6d25; background: transparent; border: 1px solid rgba(236,109,37,0.45); border-radius: 6px; cursor: pointer" style-hover="background: rgba(236,109,37,0.14)">Reset</button>
+        <div style="font-size: 10.5px; color: #5f80a6">{{ filterSummary }}</div>
+        <button onClick="{{ resetFilters }}" style="padding: 3px 10px; font: inherit; font-size: 10.5px; color: #ec6d25; background: transparent; border: 1px solid rgba(236,109,37,0.45); border-radius: 6px; cursor: pointer" style-hover="background: rgba(236,109,37,0.14)">Reset</button>
       </div>
-      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(112px, 1fr)); gap: 10px">
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(112px, 1fr)); gap: 8px">
         <sc-for list="{{ selects }}" as="s" hint-placeholder-count="8">
-          <label style="display: flex; flex-direction: column; gap: 5px">
-            <span style="font-size: 10px; letter-spacing: 0.10em; text-transform: uppercase; color: #f3f7fc">{{ s.label }}</span>
-            <select value="{{ s.value }}" data-key="{{ s.key }}" onChange="{{ onSelect }}" style="padding: 7px 9px; font: inherit; font-size: 12.5px; color: #f3f7fc; background: #12305c; border: 1px solid rgba(243,247,252,0.16); border-radius: 6px; cursor: pointer">
+          <label style="display: flex; flex-direction: column; gap: 3px">
+            <span style="font-size: 9px; letter-spacing: 0.10em; text-transform: uppercase; color: #f3f7fc">{{ s.label }}</span>
+            <select value="{{ s.value }}" data-key="{{ s.key }}" onChange="{{ onSelect }}" style="padding: 5px 8px; font: inherit; font-size: 11.5px; color: #f3f7fc; background: #12305c; border: 1px solid rgba(243,247,252,0.16); border-radius: 6px; cursor: pointer">
               <sc-for list="{{ s.options }}" as="o" hint-placeholder-count="3">
                 <option value="{{ o }}" style="background: #12305c; color: #f3f7fc">{{ o }}</option>
               </sc-for>
             </select>
           </label>
         </sc-for>
-        <label style="display: flex; flex-direction: column; gap: 5px">
-          <span style="font-size: 10px; letter-spacing: 0.10em; text-transform: uppercase; color: #f3f7fc">Search store or rep</span>
-          <input value="{{ query }}" onInput="{{ onQuery }}" placeholder="Store name, code, rep…" style="padding: 7px 9px; font: inherit; font-size: 12.5px; color: #f3f7fc; background: #12305c; border: 1px solid rgba(243,247,252,0.16); border-radius: 6px">
+        <label style="display: flex; flex-direction: column; gap: 3px">
+          <span style="font-size: 9px; letter-spacing: 0.10em; text-transform: uppercase; color: #f3f7fc">Search store or rep</span>
+          <input value="{{ query }}" onInput="{{ onQuery }}" placeholder="Store name, code, rep…" style="padding: 5px 8px; font: inherit; font-size: 11.5px; color: #f3f7fc; background: #12305c; border: 1px solid rgba(243,247,252,0.16); border-radius: 6px">
         </label>
       </div>
-      <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px">
+      <div style="display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px">
         <sc-for list="{{ toggles }}" as="t" hint-placeholder-count="3">
-          <button onClick="{{ t.onClick }}" style="padding: 5px 12px; font: inherit; font-size: 11.5px; border-radius: 999px; cursor: pointer; background: {{ t.bg }}; color: {{ t.fg }}; border: 1px solid {{ t.bd }}">{{ t.label }}</button>
+          <button onClick="{{ t.onClick }}" style="padding: 3px 10px; font: inherit; font-size: 10.5px; border-radius: 999px; cursor: pointer; background: {{ t.bg }}; color: {{ t.fg }}; border: 1px solid {{ t.bd }}">{{ t.label }}</button>
         </sc-for>
       </div>
     </div>
