@@ -1,0 +1,1182 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="_ds/nocturne-70a65e7a-5b99-48b7-a280-915a2464fb8b/styles.css">
+<script src="_ds/nocturne-70a65e7a-5b99-48b7-a280-915a2464fb8b/_ds_bundle.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap">
+<style>
+  :root {
+    --color-bg: #000C21; --color-surface: #061530; --color-text: #f3f7fc;
+    --color-accent: #ec6d25; --color-accent-2: #ec6d25;
+    --color-accent-100: #fde7d8; --color-accent-200: #ec6d25; --color-accent-300: #ec6d25;
+    --color-accent-400: #ee7f3c; --color-accent-500: #ec6d25; --color-accent-600: #cf5a18;
+    --color-accent-700: #a94711; --color-accent-800: #2a4568; --color-accent-900: #132b47;
+    --color-neutral-100: #f3f7fc; --color-neutral-200: #e2ebf5; --color-neutral-300: #c9d7e6;
+    --color-neutral-400: #9dc4ec; --color-neutral-500: #5f80a6; --color-neutral-600: #4f6c8e;
+    --color-neutral-700: #3d5f85; --color-neutral-800: #1c3f6b; --color-neutral-900: #122d4f;
+    --font-heading: 'Poppins', system-ui, sans-serif; --font-body: 'Poppins', system-ui, sans-serif;
+    --radius-md: 10px; --radius-lg: 16px;
+  }
+  body { margin: 0; background: var(--color-bg); color: var(--color-text); font-family: var(--font-body); }
+  a { color: var(--color-accent-300); }
+  a:hover { color: var(--color-accent-200); }
+  :focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; }
+  select, input, button { font-family: 'Poppins', system-ui, sans-serif; }
+  a { color: var(--color-accent); text-decoration: none; }
+  a:hover { color: var(--color-accent-400); }
+  ::-webkit-scrollbar { width: 10px; height: 10px; }
+  ::-webkit-scrollbar-thumb { background: #1c3f6b; border-radius: 5px; }
+  a { text-decoration: none; }
+  ::-webkit-scrollbar-track { background: transparent; }
+</style>
+</helmet>
+
+<sc-if value="{{ showLogin }}" hint-placeholder-val="{{ true }}">
+<div style="position: relative; overflow: hidden; min-height: 100vh; padding: 48px clamp(24px, 4vw, 64px); box-sizing: border-box; display: flex; align-items: center; font-family: 'Poppins', system-ui, sans-serif; color: #f3f7fc; background: #04122b">
+  <div style="position: absolute; inset: 0; background-image: url(assets/login-bg.png); background-size: cover; background-position: center"></div>
+  <div style="position: absolute; inset: 0; background: linear-gradient(90deg, rgba(4,18,43,0.86) 0%, rgba(4,18,43,0.52) 46%, rgba(4,18,43,0.30) 100%)"></div>
+  <div style="position: relative; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr)); gap: 48px 64px; align-items: center; width: 100%; max-width: 1500px; margin: 0 auto">
+
+    <div>
+      <div style="display: flex; align-items: center; gap: 24px; margin-top: -26px">
+        <img src="assets/meridian.png" alt="Meridian Group" style="width: 246px; height: auto; display: block">
+        <span style="width: 1px; height: 58px; background: rgba(243,247,252,0.20)"></span>
+        <img src="assets/pg.png" alt="P&amp;G" style="width: 74px; height: 74px; display: block">
+      </div>
+      <div style="margin-top: 42px; font-size: clamp(32px, 3.9vw, 58px); font-weight: 700; letter-spacing: -0.035em; line-height: 1.06">Dedicated Call Cycle <span style="color: #ec6d25">Coverage</span></div>
+      <div style="margin-top: 14px; font-size: clamp(19px, 2vw, 27px); font-weight: 600; letter-spacing: -0.02em; color: #9dc4ec">Field Coverage Intelligence</div>
+      <div style="margin-top: 22px; font-size: 16px; line-height: 1.6; color: #c9d7e6; max-width: 46ch; text-wrap: pretty">Rep coverage and calling frequency for every store, banner and region — straight from the live Smart Sell call cycle master.</div>
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 24px 0; margin-top: 46px; max-width: 720px">
+        <sc-for list="{{ loginFeatures }}" as="l" hint-placeholder-count="3">
+          <div style="padding: 0 16px; text-align: center; border-left: 1px solid rgba(243,247,252,0.12)">
+            <div style="width: 54px; height: 54px; margin: 0 auto; display: grid; place-items: center; border: 1px solid rgba(236,109,37,0.55); border-radius: 50%">
+              <i class="{{ l.icon }}" style="font-size: 22px; color: #ec6d25"></i>
+            </div>
+            <div style="margin-top: 16px; font-size: 14px; font-weight: 600">{{ l.title }}</div>
+            <div style="margin-top: 8px; font-size: 12.5px; line-height: 1.55; color: #9dc4ec">{{ l.body }}</div>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+
+    <div style="width: 100%; max-width: 400px; justify-self: center; box-sizing: border-box; padding: 38px 34px 30px; text-align: center; background: rgba(9,28,58,0.78); border: 1px solid rgba(157,196,236,0.22); border-radius: 18px; box-shadow: 0 30px 70px rgba(0,0,0,0.45); backdrop-filter: blur(8px)">
+      <i class="ph ph-arrows-clockwise" style="font-size: 34px; color: #ec6d25"></i>
+      <div style="margin-top: 18px; font-size: 11px; font-weight: 500; letter-spacing: 0.20em; text-transform: uppercase; color: #ec6d25">Dedicated call cycle coverage</div>
+      <div style="margin-top: 12px; font-size: 28px; font-weight: 700; letter-spacing: -0.02em">Welcome back</div>
+      <div style="margin-top: 12px; font-size: 13.5px; line-height: 1.55; color: #9dc4ec">Sign in with your Meridian Microsoft account to view live coverage.</div>
+      <button onClick="{{ onLogin }}" style="display: flex; align-items: center; justify-content: center; gap: 11px; width: 100%; margin-top: 26px; padding: 15px 18px; font: inherit; font-size: 14.5px; font-weight: 600; color: #f3f7fc; background: linear-gradient(180deg, #f07a33 0%, #e35f14 100%); border: none; border-radius: 12px; cursor: pointer; box-shadow: 0 10px 26px rgba(236,109,37,0.32)" style-hover="background: linear-gradient(180deg, #f5893f 0%, #ec6d25 100%)" style-active="background: linear-gradient(180deg, #cf5a18 0%, #a94711 100%)">
+        <span style="display: grid; grid-template-columns: 8px 8px; grid-template-rows: 8px 8px; gap: 2px">
+          <span style="background: #f3f7fc"></span><span style="background: #f3f7fc"></span>
+          <span style="background: #f3f7fc"></span><span style="background: #f3f7fc"></span>
+        </span>
+        Sign in with Microsoft
+      </button>
+      <div style="height: 1px; margin-top: 26px; background: linear-gradient(to right, transparent, rgba(157,196,236,0.28), transparent)"></div>
+      <div style="display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 16px; font-size: 12px; color: #9dc4ec">
+        <span style="width: 7px; height: 7px; border-radius: 50%; background: #35c47a"></span>Secure access · Microsoft 365
+      </div>
+    </div>
+  </div>
+</div>
+</sc-if>
+
+<sc-if value="{{ showApp }}">
+<div style="display: flex; min-height: 100vh; background: radial-gradient(130% 85% at 6% 0%, #173a6b 0%, #0a1c3a 46%, #061530 100%); font-family: 'Poppins', system-ui, sans-serif; color: #f3f7fc">
+
+  <aside style="width: 246px; flex: none; position: sticky; top: 0; align-self: flex-start; height: 100vh; display: flex; flex-direction: column; background: rgba(6,21,48,0.82); border-right: 1px solid rgba(243,247,252,0.10)">
+    <div style="display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 24px 20px 14px; text-align: center; cursor: pointer" onClick="{{ goHome }}">
+      <img src="assets/pg.png" alt="P&amp;G" style="width: 76px; height: 76px; display: block">
+      <div>
+        <div style="font-size: 19px; font-weight: 600; letter-spacing: -0.015em; line-height: 1.2">Call Cycle</div>
+        <div style="margin-top: 3px; font-size: 12px; color: #9dc4ec">Smart Sell Master</div>
+      </div>
+    </div>
+    <div style="padding: 20px 20px 8px; font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: #4f6c8e">Pages</div>
+    <nav style="display: flex; flex-direction: column; gap: 3px; padding: 0 12px">
+      <sc-for list="{{ navItems }}" as="n" hint-placeholder-count="4">
+        <button onClick="{{ n.onClick }}" style="display: flex; align-items: center; gap: 10px; width: 100%; padding: 9px 12px; font: inherit; font-size: 12.5px; text-align: left; border: 1px solid {{ n.bd }}; border-radius: 10px; cursor: pointer; background: {{ n.bg }}; color: {{ n.fg }}">
+          <i class="{{ n.icon }}" style="font-size: 17px; flex: none; color: {{ n.dot }}"></i>
+          <span style="flex: 1">{{ n.label }}</span>
+          <span style="font-size: 11px; color: #4f6c8e; font-variant-numeric: tabular-nums">{{ n.count }}</span>
+        </button>
+      </sc-for>
+    </nav>
+    <sc-if value="{{ crumb }}">
+      <div style="margin: 18px 12px 0; padding: 12px; background: rgba(236,109,37,0.10); border: 1px solid rgba(236,109,37,0.32); border-radius: 10px">
+        <div style="font-size: 9.5px; letter-spacing: 0.12em; text-transform: uppercase; color: #ec6d25">{{ crumbKind }}</div>
+        <div style="margin-top: 5px; font-size: 12px; color: #f3f7fc; line-height: 1.35">{{ crumb }}</div>
+        <button onClick="{{ goHome }}" style="margin-top: 10px; padding: 4px 10px; font: inherit; font-size: 11px; color: #ec6d25; background: transparent; border: 1px solid rgba(236,109,37,0.45); border-radius: 8px; cursor: pointer" style-hover="background: rgba(236,109,37,0.16)">Close</button>
+      </div>
+    </sc-if>
+    <div style="flex: 1"></div>
+    <div style="padding: 18px 20px 22px; border-top: 1px solid rgba(243,247,252,0.10); font-size: 10.5px; color: #4f6c8e; line-height: 1.6; text-align: center">
+      <img src="assets/meridian.png" alt="Meridian Group" style="display: block; width: 138px; height: auto; margin: 0 auto 12px">
+      Data as at 17 Aug 2026<br>
+      {{ rowNote }}
+      <button onClick="{{ onLogout }}" style="display: flex; align-items: center; justify-content: center; gap: 7px; width: 100%; margin-top: 14px; padding: 8px 12px; font: inherit; font-size: 11.5px; color: #9dc4ec; background: transparent; border: 1px solid rgba(243,247,252,0.16); border-radius: 10px; cursor: pointer" style-hover="background: rgba(236,109,37,0.12)"><i class="ph ph-sign-out" style="font-size: 14px"></i>Log out</button>
+    </div>
+  </aside>
+
+  <div style="flex: 1; min-width: 0; padding-bottom: 64px">
+  <div style="position: sticky; top: 0; z-index: 20; display: flex; align-items: center; gap: 16px; padding: 15px 32px; background: rgba(6,21,48,0.94); backdrop-filter: blur(12px); border-bottom: 1px solid rgba(243,247,252,0.10)">
+    <div>
+      <div style="font-size: 16px; font-weight: 600; letter-spacing: -0.01em">{{ pageTitle }}</div>
+      <div style="margin-top: 2px; font-size: 11.5px; color: #5f80a6">{{ pageSub }}</div>
+    </div>
+    <div style="flex: 1"></div>
+    <div style="text-align: right">
+      <div style="font-size: 9.5px; letter-spacing: 0.12em; text-transform: uppercase; color: #4f6c8e; white-space: nowrap">Stores in view</div>
+      <div style="font-size: 22px; font-weight: 600; line-height: 1.15">{{ storesInView }}</div>
+    </div>
+  </div>
+
+  <sc-if value="{{ showDash }}" hint-placeholder-val="{{ true }}">
+  <div style="padding: 20px 32px 0">
+
+    <sc-if value="{{ pOverview }}" hint-placeholder-val="{{ true }}">
+    <div style="display: grid; grid-auto-flow: column; grid-auto-columns: minmax(134px, 1fr); gap: 10px; overflow-x: auto; overflow-y: hidden; padding-bottom: 4px">
+      <sc-for list="{{ kpis }}" as="k" hint-placeholder-count="9">
+        <div style="min-width: 0; padding: 13px 13px 14px; background: linear-gradient(155deg, #12325e 0%, #071834 62%, #061530 100%); border: 1px solid rgba(236,109,37,0.28); border-top: 2px solid #ec6d25; border-radius: 10px; box-shadow: var(--shadow-sm)">
+          <div style="font-size: 9px; letter-spacing: 0.10em; text-transform: uppercase; color: #f3f7fc; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{ k.label }}</div>
+          <div style="margin-top: 8px; font-size: 24px; font-weight: 600; letter-spacing: -0.02em; line-height: 1; white-space: nowrap">{{ k.value }}</div>
+          <div style="margin-top: 6px; font-size: 10px; color: #ec6d25; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{ k.sub }}</div>
+        </div>
+      </sc-for>
+    </div>
+
+
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 14px; align-items: start">
+      <div style="padding: 16px 20px 18px; background: #0b2145; border: 1px solid rgba(243,247,252,0.12); border-radius: 10px">
+        <div style="display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap">
+          <div style="font-size: 12.5px; font-weight: 600; color: #f3f7fc">Division split</div>
+          <div style="font-size: 11px; color: #4f6c8e">Inland · Central · Coastal, grouped from region</div>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin-top: 12px">
+          <sc-for list="{{ divisionCards }}" as="d" hint-placeholder-count="3">
+            <div style="min-width: 0; padding: 12px 13px 13px; background: rgba(23,58,107,0.55); border: 1px solid rgba(236,109,37,0.30); border-radius: 10px">
+              <div style="display: flex; align-items: baseline; gap: 8px">
+                <span style="font-size: 10px; letter-spacing: 0.10em; text-transform: uppercase; color: #f3f7fc">{{ d.label }}</span>
+                <span style="font-size: 10px; color: #ec6d25">{{ d.pct }}%</span>
+              </div>
+              <div style="margin-top: 8px; font-size: 22px; font-weight: 600; line-height: 1.1">{{ d.stores }}</div>
+              <div style="margin-top: 4px; font-size: 10.5px; color: #5f80a6">{{ d.reps }}</div>
+              <div style="margin-top: 4px; font-size: 10px; color: #9dc4ec">{{ d.calls }}</div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+      <div style="padding: 16px 20px 18px; background: #0b2145; border: 1px solid rgba(243,247,252,0.12); border-radius: 10px">
+        <div style="display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap">
+          <div style="font-size: 12.5px; font-weight: 600; color: #f3f7fc">Managers by team type</div>
+          <div style="font-size: 11px; color: #4f6c8e">counted against the rep type they mostly oversee</div>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin-top: 12px">
+          <sc-for list="{{ managerTypeRows }}" as="m" hint-placeholder-count="3">
+            <div style="min-width: 0; padding: 12px 13px 13px; background: rgba(23,58,107,0.55); border: 1px solid rgba(243,247,252,0.10); border-radius: 10px">
+              <div style="font-size: 9.5px; letter-spacing: 0.08em; text-transform: uppercase; color: #9dc4ec; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{ m.label }}</div>
+              <div style="margin-top: 8px; font-size: 22px; font-weight: 600; line-height: 1.1">{{ m.mgrs }}</div>
+              <div style="margin-top: 4px; font-size: 10.5px; color: #5f80a6">{{ m.stores }} stores</div>
+              <div style="margin-top: 4px; font-size: 10px; color: #ec6d25">{{ m.span }}</div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+
+    </sc-if>
+
+    <div style="margin-top: 26px; padding: 16px 18px; background: rgba(11,33,69,0.78); border: 1px solid rgba(243,247,252,0.08); border-radius: 10px">
+      <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 14px">
+        <div style="font-size: 10.5px; letter-spacing: 0.12em; text-transform: uppercase; color: #f3f7fc">Filters</div>
+        <div style="flex: 1; height: 1px; background: linear-gradient(to right, rgba(243,247,252,0.12), transparent)"></div>
+        <div style="font-size: 11.5px; color: #5f80a6">{{ filterSummary }}</div>
+        <button onClick="{{ resetFilters }}" style="padding: 5px 12px; font: inherit; font-size: 11.5px; color: #ec6d25; background: transparent; border: 1px solid rgba(236,109,37,0.45); border-radius: 6px; cursor: pointer" style-hover="background: rgba(236,109,37,0.14)">Reset</button>
+      </div>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(112px, 1fr)); gap: 10px">
+        <sc-for list="{{ selects }}" as="s" hint-placeholder-count="8">
+          <label style="display: flex; flex-direction: column; gap: 5px">
+            <span style="font-size: 10px; letter-spacing: 0.10em; text-transform: uppercase; color: #f3f7fc">{{ s.label }}</span>
+            <select value="{{ s.value }}" data-key="{{ s.key }}" onChange="{{ onSelect }}" style="padding: 7px 9px; font: inherit; font-size: 12.5px; color: #f3f7fc; background: #12305c; border: 1px solid rgba(243,247,252,0.16); border-radius: 6px; cursor: pointer">
+              <sc-for list="{{ s.options }}" as="o" hint-placeholder-count="3">
+                <option value="{{ o }}" style="background: #12305c; color: #f3f7fc">{{ o }}</option>
+              </sc-for>
+            </select>
+          </label>
+        </sc-for>
+        <label style="display: flex; flex-direction: column; gap: 5px">
+          <span style="font-size: 10px; letter-spacing: 0.10em; text-transform: uppercase; color: #f3f7fc">Search store or rep</span>
+          <input value="{{ query }}" onInput="{{ onQuery }}" placeholder="Store name, code, rep…" style="padding: 7px 9px; font: inherit; font-size: 12.5px; color: #f3f7fc; background: #12305c; border: 1px solid rgba(243,247,252,0.16); border-radius: 6px">
+        </label>
+      </div>
+      <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px">
+        <sc-for list="{{ toggles }}" as="t" hint-placeholder-count="3">
+          <button onClick="{{ t.onClick }}" style="padding: 5px 12px; font: inherit; font-size: 11.5px; border-radius: 999px; cursor: pointer; background: {{ t.bg }}; color: {{ t.fg }}; border: 1px solid {{ t.bd }}">{{ t.label }}</button>
+        </sc-for>
+      </div>
+    </div>
+
+    <sc-if value="{{ pOverview }}">
+    <div style="display: grid; grid-template-columns: 1.55fr 1fr; gap: 14px; margin-top: 14px; align-items: stretch">
+    <div style="padding: 16px 20px 16px; background: #0b2145; border: 1px solid rgba(243,247,252,0.12); border-radius: 10px">
+      <div style="display: flex; align-items: baseline; gap: 16px; flex-wrap: wrap">
+        <div>
+          <div style="font-size: 12.5px; font-weight: 600; color: #f3f7fc">Stores covered by region</div>
+          <div style="margin-top: 3px; font-size: 11px; color: #4f6c8e">Each bar split by calling frequency</div>
+        </div>
+        <div style="flex: 1"></div>
+        <div style="display: flex; flex-wrap: wrap; gap: 10px 14px">
+          <sc-for list="{{ freqLegend }}" as="l" hint-placeholder-count="7">
+            <span style="display: flex; align-items: center; gap: 6px; font-size: 10.5px; color: #9dc4ec; white-space: nowrap">
+              <span style="width: 8px; height: 8px; border-radius: 2px; background: {{ l.color }}"></span>{{ l.label }}
+            </span>
+          </sc-for>
+        </div>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 5px; margin-top: 12px">
+        <sc-for list="{{ regionBars }}" as="b" hint-placeholder-count="10">
+          <div style="display: grid; grid-template-columns: 108px 1fr 48px 70px; align-items: center; gap: 10px">
+            <span style="font-size: 11px; color: #f3f7fc; letter-spacing: 0.02em">{{ b.label }}</span>
+            <span style="height: 9px; background: rgba(236,109,37,0.10); border-radius: 5px; overflow: hidden; display: block">
+              <span style="display: flex; height: 9px; border-radius: 5px; overflow: hidden; width: {{ b.pct }}%">
+                <sc-for list="{{ b.segs }}" as="s" hint-placeholder-count="3">
+                  <span title="{{ s.title }}" style="display: block; height: 9px; background: {{ s.color }}; width: {{ s.w }}%"></span>
+                </sc-for>
+              </span>
+            </span>
+            <span style="font-size: 12px; color: #f3f7fc; text-align: right; font-variant-numeric: tabular-nums">{{ b.value }}</span>
+            <span style="font-size: 10.5px; color: #5f80a6; text-align: right; font-variant-numeric: tabular-nums">{{ b.calls }}</span>
+          </div>
+        </sc-for>
+      </div>
+
+    </div>
+
+    <div style="padding: 18px 20px 20px; background: #0b2145; border: 1px solid rgba(243,247,252,0.12); border-radius: 10px">
+      <div>
+        <div style="font-size: 12.5px; font-weight: 600; color: #f3f7fc">Resourcing by rep type</div>
+        <div style="margin-top: 3px; font-size: 11px; color: #4f6c8e">Distinct reps and line managers behind each store base</div>
+        <table style="width: 100%; border-collapse: collapse; margin-top: 14px">
+          <thead>
+            <tr>
+              <th style="padding: 7px 8px; text-align: left; font-size: 9.5px; font-weight: 500; letter-spacing: 0.10em; text-transform: uppercase; color: #4f6c8e; border-bottom: 1px solid rgba(243,247,252,0.14)">Rep type</th>
+              <th style="padding: 7px 8px; text-align: right; font-size: 9.5px; font-weight: 500; letter-spacing: 0.10em; text-transform: uppercase; color: #4f6c8e; border-bottom: 1px solid rgba(243,247,252,0.14)">Reps</th>
+              <th style="padding: 7px 8px; text-align: right; font-size: 9.5px; font-weight: 500; letter-spacing: 0.10em; text-transform: uppercase; color: #4f6c8e; border-bottom: 1px solid rgba(243,247,252,0.14)">Managers</th>
+              <th style="padding: 7px 8px; text-align: right; font-size: 9.5px; font-weight: 500; letter-spacing: 0.10em; text-transform: uppercase; color: #4f6c8e; border-bottom: 1px solid rgba(243,247,252,0.14)">Stores</th>
+              <th style="padding: 7px 8px; font-size: 9.5px; font-weight: 500; letter-spacing: 0.10em; text-transform: uppercase; color: #4f6c8e; border-bottom: 1px solid rgba(243,247,252,0.14); width: 110px">Share</th>
+            </tr>
+          </thead>
+          <tbody>
+            <sc-for list="{{ repTypeRows }}" as="t" hint-placeholder-count="4">
+              <tr style="border-bottom: 1px solid rgba(243,247,252,0.06)">
+                <td style="padding: 9px 8px; font-size: 12px; color: #f3f7fc">{{ t.label }}</td>
+                <td style="padding: 9px 8px; font-size: 12px; color: #c9d7e6; text-align: right; font-variant-numeric: tabular-nums">{{ t.reps }}</td>
+                <td style="padding: 9px 8px; font-size: 12px; color: #c9d7e6; text-align: right; font-variant-numeric: tabular-nums">{{ t.mgrs }}</td>
+                <td style="padding: 9px 8px; font-size: 12px; color: #ec6d25; text-align: right; font-variant-numeric: tabular-nums">{{ t.stores }}</td>
+                <td style="padding: 9px 8px">
+                  <span style="display: block; height: 6px; background: rgba(236,109,37,0.10); border-radius: 3px; overflow: hidden">
+                    <span style="display: block; height: 6px; border-radius: 3px; background: #ec6d25; width: {{ t.pct }}%"></span>
+                  </span>
+                </td>
+              </tr>
+            </sc-for>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 14px; align-items: stretch">
+      <div style="padding: 18px 20px 20px; background: #0b2145; border: 1px solid rgba(243,247,252,0.12); border-radius: 10px">
+        <div style="font-size: 12.5px; font-weight: 600; color: #f3f7fc">Stores covered by banner</div>
+        <div style="margin-top: 3px; font-size: 11px; color: #4f6c8e">Top 10 banners by store count</div>
+        <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 16px">
+          <sc-for list="{{ bannerBars }}" as="b" hint-placeholder-count="8">
+            <div>
+              <div style="display: flex; justify-content: space-between; font-size: 11px; color: #9dc4ec; margin-bottom: 4px">
+                <span>{{ b.label }}</span>
+                <span style="color: #5f80a6; font-variant-numeric: tabular-nums">{{ b.value }}</span>
+              </div>
+              <span style="display: block; height: 6px; background: rgba(236,109,37,0.10); border-radius: 3px; overflow: hidden">
+                <span style="display: block; height: 6px; border-radius: 3px; background: #ec6d25; width: {{ b.pct }}%"></span>
+              </span>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+      <div style="padding: 18px 20px 20px; background: #0b2145; border: 1px solid rgba(243,247,252,0.12); border-radius: 10px">
+        <div style="font-size: 12.5px; font-weight: 600; color: #f3f7fc">Stores covered by channel</div>
+        <div style="margin-top: 3px; font-size: 11px; color: #4f6c8e">Store count per channel</div>
+        <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 16px">
+          <sc-for list="{{ channelBars }}" as="b" hint-placeholder-count="5">
+            <div>
+              <div style="display: flex; justify-content: space-between; font-size: 11px; color: #9dc4ec; margin-bottom: 4px">
+                <span>{{ b.label }}</span>
+                <span style="color: #5f80a6; font-variant-numeric: tabular-nums">{{ b.value }}</span>
+              </div>
+              <span style="display: block; height: 6px; background: rgba(236,109,37,0.10); border-radius: 3px; overflow: hidden">
+                <span style="display: block; height: 6px; border-radius: 3px; background: #ec6d25; width: {{ b.pct }}%"></span>
+              </span>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+    </sc-if>
+
+    <sc-if value="{{ pOverview }}">
+    <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin-top: 14px; align-items: stretch">
+
+      <div style="padding: 18px 20px 20px; background: #0b2145; border: 1px solid rgba(243,247,252,0.12); border-radius: 10px">
+        <div style="font-size: 12.5px; font-weight: 600">Calls by day of week</div>
+        <div style="margin-top: 3px; font-size: 11px; color: #4f6c8e">Planned visits per month</div>
+        <div style="display: flex; flex-direction: column; gap: 11px; margin-top: 18px">
+          <sc-for list="{{ dayBars }}" as="b" hint-placeholder-count="7">
+            <div style="display: grid; grid-template-columns: 34px 1fr 54px; align-items: center; gap: 10px">
+              <span style="font-size: 11px; color: #5f80a6; letter-spacing: 0.06em">{{ b.label }}</span>
+              <span style="height: 8px; background: rgba(243,247,252,0.07); border-radius: 4px; overflow: hidden; display: block">
+                <span style="display: block; height: 8px; border-radius: 4px; background: linear-gradient(to right, #ec6d25, #ec6d25); width: {{ b.pct }}%"></span>
+              </span>
+              <span style="font-size: 11.5px; color: #c9d7e6; text-align: right; font-variant-numeric: tabular-nums">{{ b.value }}</span>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+
+      <div style="padding: 18px 20px 20px; background: #0b2145; border: 1px solid rgba(243,247,252,0.12); border-radius: 10px">
+        <div style="font-size: 12.5px; font-weight: 600">Calling frequency mix</div>
+        <div style="margin-top: 3px; font-size: 11px; color: #4f6c8e">Share of stores</div>
+        <div style="display: flex; flex-direction: column; gap: 9px; margin-top: 18px">
+          <sc-for list="{{ freqBars }}" as="b" hint-placeholder-count="6">
+            <div>
+              <div style="display: flex; justify-content: space-between; font-size: 11px; color: #9dc4ec; margin-bottom: 4px">
+                <span>{{ b.label }}</span>
+                <span style="color: #5f80a6; font-variant-numeric: tabular-nums">{{ b.value }}</span>
+              </div>
+              <span style="display: block; height: 6px; background: rgba(236,109,37,0.10); border-radius: 3px; overflow: hidden">
+                <span style="display: block; height: 6px; border-radius: 3px; background: #ec6d25; width: {{ b.pct }}%"></span>
+              </span>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+
+    </sc-if>
+
+    <sc-if value="{{ pDivisions }}">
+    <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; margin-top: 20px; align-items: stretch">
+      <sc-for list="{{ divisionPanels }}" as="p" hint-placeholder-count="3">
+        <div style="padding: 20px 22px 22px; background: #0b2145; border: 1px solid rgba(243,247,252,0.12); border-radius: 10px">
+          <div style="display: flex; align-items: flex-start; gap: 12px">
+            <div>
+              <div style="font-size: 20px; font-weight: 600; letter-spacing: -0.01em; color: #f3f7fc">{{ p.label }}</div>
+              <div style="margin-top: 3px; font-size: 11.5px; color: #5f80a6">{{ p.storesFmt }} stores</div>
+            </div>
+            <div style="flex: 1"></div>
+            <span style="padding: 4px 10px; font-size: 10px; border-radius: 999px; white-space: nowrap; color: {{ p.badgeFg }}; background: {{ p.badgeBg }}; border: 1px solid {{ p.badgeBd }}">{{ p.badge }}</span>
+          </div>
+          <div style="margin-top: 16px; font-size: 38px; font-weight: 600; letter-spacing: -0.02em; line-height: 1">{{ p.pct }}%</div>
+          <div style="margin-top: 5px; font-size: 9.5px; letter-spacing: 0.12em; text-transform: uppercase; color: #4f6c8e">of stores in view</div>
+          <span style="display: block; height: 8px; margin-top: 12px; background: rgba(243,247,252,0.07); border-radius: 4px; overflow: hidden">
+            <span style="display: block; height: 8px; border-radius: 4px; background: linear-gradient(to right, #ec6d25, #ec6d25); width: {{ p.pctNum }}%"></span>
+          </span>
+          <div style="margin-top: 10px; font-size: 11.5px; color: #9dc4ec">{{ p.perStore }} planned calls per store</div>
+
+          <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin-top: 18px">
+            <sc-for list="{{ p.stats }}" as="s" hint-placeholder-count="8">
+              <div style="padding: 9px 11px 10px; background: rgba(23,58,107,0.55); border: 1px solid rgba(243,247,252,0.10); border-radius: 10px">
+                <div style="font-size: 9px; letter-spacing: 0.10em; text-transform: uppercase; color: #4f6c8e; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{ s.label }}</div>
+                <div style="margin-top: 6px; font-size: 17px; font-weight: 600; line-height: 1.1">{{ s.value }}</div>
+              </div>
+            </sc-for>
+          </div>
+
+          <div style="margin-top: 18px; font-size: 9.5px; letter-spacing: 0.12em; text-transform: uppercase; color: #4f6c8e">Regions</div>
+          <div style="display: flex; flex-direction: column; gap: 7px; margin-top: 10px">
+            <sc-for list="{{ p.regions }}" as="r" hint-placeholder-count="4">
+              <div style="display: grid; grid-template-columns: 1fr 72px 42px; align-items: center; gap: 10px">
+                <span style="font-size: 11.5px; color: #ec6d25">{{ r.label }}</span>
+                <span style="height: 6px; background: rgba(236,109,37,0.10); border-radius: 3px; overflow: hidden; display: block">
+                  <span style="display: block; height: 6px; border-radius: 3px; background: #6fb2ff; width: {{ r.pct }}%"></span>
+                </span>
+                <span style="font-size: 11.5px; color: #c9d7e6; text-align: right; font-variant-numeric: tabular-nums">{{ r.value }}</span>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+
+    <div style="margin-top: 14px; padding: 20px 22px 22px; background: #0b2145; border: 1px solid rgba(243,247,252,0.12); border-radius: 10px">
+      <div style="font-size: 13.5px; font-weight: 600; color: #f3f7fc">Region scorecard</div>
+      <div style="margin-top: 3px; font-size: 11px; color: #4f6c8e">Stores, resources and call load by region</div>
+      <table style="width: 100%; border-collapse: collapse; margin-top: 16px">
+        <thead>
+          <tr>
+            <th style="padding: 8px 10px; text-align: left; font-size: 10px; font-weight: 500; letter-spacing: 0.10em; text-transform: uppercase; color: #4f6c8e; border-bottom: 1px solid rgba(243,247,252,0.14)">Region</th>
+            <th style="padding: 8px 10px; text-align: left; font-size: 10px; font-weight: 500; letter-spacing: 0.10em; text-transform: uppercase; color: #4f6c8e; border-bottom: 1px solid rgba(243,247,252,0.14)">Division</th>
+            <th style="padding: 8px 10px; text-align: right; font-size: 10px; font-weight: 500; letter-spacing: 0.10em; text-transform: uppercase; color: #4f6c8e; border-bottom: 1px solid rgba(243,247,252,0.14)">Stores</th>
+            <th style="padding: 8px 10px; text-align: right; font-size: 10px; font-weight: 500; letter-spacing: 0.10em; text-transform: uppercase; color: #4f6c8e; border-bottom: 1px solid rgba(243,247,252,0.14)">Reps</th>
+            <th style="padding: 8px 10px; text-align: right; font-size: 10px; font-weight: 500; letter-spacing: 0.10em; text-transform: uppercase; color: #4f6c8e; border-bottom: 1px solid rgba(243,247,252,0.14)">Managers</th>
+            <th style="padding: 8px 10px; text-align: right; font-size: 10px; font-weight: 500; letter-spacing: 0.10em; text-transform: uppercase; color: #4f6c8e; border-bottom: 1px solid rgba(243,247,252,0.14)">Stores / rep</th>
+            <th style="padding: 8px 10px; text-align: right; font-size: 10px; font-weight: 500; letter-spacing: 0.10em; text-transform: uppercase; color: #4f6c8e; border-bottom: 1px solid rgba(243,247,252,0.14)">Calls / mo</th>
+            <th style="padding: 8px 10px; text-align: right; font-size: 10px; font-weight: 500; letter-spacing: 0.10em; text-transform: uppercase; color: #4f6c8e; border-bottom: 1px solid rgba(243,247,252,0.14)">Calls / store</th>
+            <th style="padding: 8px 10px; text-align: right; font-size: 10px; font-weight: 500; letter-spacing: 0.10em; text-transform: uppercase; color: #4f6c8e; border-bottom: 1px solid rgba(243,247,252,0.14)">Unscheduled</th>
+            <th style="padding: 8px 10px; font-size: 10px; font-weight: 500; letter-spacing: 0.10em; text-transform: uppercase; color: #4f6c8e; border-bottom: 1px solid rgba(243,247,252,0.14); width: 130px">Share of calls</th>
+          </tr>
+        </thead>
+        <tbody>
+          <sc-for list="{{ regionScorecard }}" as="r" hint-placeholder-count="10">
+            <tr style="border-bottom: 1px solid rgba(243,247,252,0.06)">
+              <td style="padding: 10px; font-size: 12.5px; color: #ec6d25">{{ r.region }}</td>
+              <td style="padding: 10px; font-size: 11.5px; color: #9dc4ec">{{ r.division }}</td>
+              <td style="padding: 10px; font-size: 12.5px; color: #f3f7fc; text-align: right; font-variant-numeric: tabular-nums">{{ r.stores }}</td>
+              <td style="padding: 10px; font-size: 12.5px; color: #c9d7e6; text-align: right; font-variant-numeric: tabular-nums">{{ r.reps }}</td>
+              <td style="padding: 10px; font-size: 12.5px; color: #c9d7e6; text-align: right; font-variant-numeric: tabular-nums">{{ r.mgrs }}</td>
+              <td style="padding: 10px; font-size: 12.5px; color: #c9d7e6; text-align: right; font-variant-numeric: tabular-nums">{{ r.perRep }}</td>
+              <td style="padding: 10px; font-size: 12.5px; color: #c9d7e6; text-align: right; font-variant-numeric: tabular-nums">{{ r.calls }}</td>
+              <td style="padding: 10px; font-size: 12.5px; color: #f3f7fc; text-align: right; font-variant-numeric: tabular-nums">{{ r.perStore }}</td>
+              <td style="padding: 10px; font-size: 12.5px; text-align: right; font-variant-numeric: tabular-nums; color: {{ r.gapFg }}">{{ r.gap }}</td>
+              <td style="padding: 10px">
+                <span style="display: block; height: 6px; background: rgba(236,109,37,0.10); border-radius: 3px; overflow: hidden">
+                  <span style="display: block; height: 6px; border-radius: 3px; background: #ec6d25; width: {{ r.pct }}%"></span>
+                </span>
+              </td>
+            </tr>
+          </sc-for>
+        </tbody>
+      </table>
+    </div>
+    </sc-if>
+
+    <sc-if value="{{ pReps }}">
+    <div style="margin-top: 26px">
+
+      <div style="padding: 20px 22px 22px; background: #0b2145; border: 1px solid rgba(243,247,252,0.12); border-radius: 10px">
+        <div style="font-size: 13.5px; font-weight: 600">Reps by call load</div>
+        <div style="margin-top: 3px; font-size: 11px; color: #4f6c8e">{{ repCount }} reps in view · click for their cycle</div>
+        <div style="max-height: 68vh; overflow-y: auto; margin-top: 14px">
+          <table style="width: 100%; border-collapse: collapse">
+            <thead>
+              <tr>
+                <th style="position: sticky; top: 0; background: #0b2145; padding: 8px 10px; text-align: left; font-size: 10px; font-weight: 500; letter-spacing: 0.10em; text-transform: uppercase; color: #4f6c8e; border-bottom: 1px solid rgba(243,247,252,0.14)">Rep</th>
+                <th style="position: sticky; top: 0; background: #0b2145; padding: 8px 10px; text-align: right; font-size: 10px; font-weight: 500; letter-spacing: 0.10em; text-transform: uppercase; color: #4f6c8e; border-bottom: 1px solid rgba(243,247,252,0.14)">Stores</th>
+                <th style="position: sticky; top: 0; background: #0b2145; padding: 8px 10px; text-align: right; font-size: 10px; font-weight: 500; letter-spacing: 0.10em; text-transform: uppercase; color: #4f6c8e; border-bottom: 1px solid rgba(243,247,252,0.14)">Calls / mo</th>
+                <th style="position: sticky; top: 0; background: #0b2145; padding: 8px 10px; text-align: right; font-size: 10px; font-weight: 500; letter-spacing: 0.10em; text-transform: uppercase; color: #4f6c8e; border-bottom: 1px solid rgba(243,247,252,0.14)">Busiest day</th>
+              </tr>
+            </thead>
+            <tbody>
+              <sc-for list="{{ repRows }}" as="r" hint-placeholder-count="10">
+                <tr onClick="{{ r.onClick }}" style="border-bottom: 1px solid rgba(243,247,252,0.06); cursor: pointer" style-hover="background: rgba(236,109,37,0.09)">
+                  <td style="padding: 9px 10px; font-size: 12.5px">
+                    <div style="color: #f3f7fc">{{ r.name }}</div>
+                    <div style="font-size: 10.5px; color: #4f6c8e; margin-top: 2px">{{ r.meta }}</div>
+                  </td>
+                  <td style="padding: 9px 10px; font-size: 12.5px; color: #c9d7e6; text-align: right; font-variant-numeric: tabular-nums">{{ r.stores }}</td>
+                  <td style="padding: 9px 10px; font-size: 12.5px; color: #ec6d25; text-align: right; font-variant-numeric: tabular-nums">{{ r.calls }}</td>
+                  <td style="padding: 9px 10px; font-size: 11.5px; color: #5f80a6; text-align: right">{{ r.busiest }}</td>
+                </tr>
+              </sc-for>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+    </sc-if>
+
+    <sc-if value="{{ pStores }}">
+    <div style="margin-top: 26px">
+      <div style="padding: 20px 22px 22px; background: #0b2145; border: 1px solid rgba(243,247,252,0.12); border-radius: 10px">
+        <div style="display: flex; align-items: baseline; gap: 12px">
+          <div>
+            <div style="font-size: 13.5px; font-weight: 600">Store visit plans</div>
+            <div style="margin-top: 3px; font-size: 11px; color: #4f6c8e">{{ storeNote }}</div>
+          </div>
+          <div style="flex: 1"></div>
+          <select value="{{ storeSelect }}" data-key="store" onChange="{{ onSelect }}" style="max-width: 260px; padding: 7px 9px; font: inherit; font-size: 12px; color: #f3f7fc; background: #12305c; border: 1px solid rgba(243,247,252,0.16); border-radius: 10px; cursor: pointer">
+            <sc-for list="{{ storeOptions }}" as="o" hint-placeholder-count="3">
+              <option value="{{ o }}" style="background: #12305c; color: #f3f7fc">{{ o }}</option>
+            </sc-for>
+          </select>
+          <div style="display: flex; gap: 4px; padding: 3px; background: #0a1c3a; border: 1px solid rgba(243,247,252,0.10); border-radius: 10px">
+            <sc-for list="{{ sortTabs }}" as="t" hint-placeholder-count="3">
+              <button onClick="{{ t.onClick }}" style="padding: 5px 12px; font: inherit; font-size: 11.5px; border: none; border-radius: 6px; cursor: pointer; background: {{ t.bg }}; color: {{ t.fg }}">{{ t.label }}</button>
+            </sc-for>
+          </div>
+        </div>
+        <div style="max-height: 460px; overflow-y: auto; margin-top: 14px">
+          <table style="width: 100%; border-collapse: collapse">
+            <thead>
+              <tr>
+                <th style="position: sticky; top: 0; background: #0b2145; padding: 8px 10px; text-align: left; font-size: 10px; font-weight: 500; letter-spacing: 0.10em; text-transform: uppercase; color: #4f6c8e; border-bottom: 1px solid rgba(243,247,252,0.14)">Store</th>
+                <th style="position: sticky; top: 0; background: #0b2145; padding: 8px 10px; text-align: left; font-size: 10px; font-weight: 500; letter-spacing: 0.10em; text-transform: uppercase; color: #4f6c8e; border-bottom: 1px solid rgba(243,247,252,0.14)">Rep</th>
+                <th style="position: sticky; top: 0; background: #0b2145; padding: 8px 10px; text-align: left; font-size: 10px; font-weight: 500; letter-spacing: 0.10em; text-transform: uppercase; color: #4f6c8e; border-bottom: 1px solid rgba(243,247,252,0.14)">Days</th>
+                <th style="position: sticky; top: 0; background: #0b2145; padding: 8px 10px; text-align: left; font-size: 10px; font-weight: 500; letter-spacing: 0.10em; text-transform: uppercase; color: #4f6c8e; border-bottom: 1px solid rgba(243,247,252,0.14)">Weeks</th>
+                <th style="position: sticky; top: 0; background: #0b2145; padding: 8px 10px; text-align: right; font-size: 10px; font-weight: 500; letter-spacing: 0.10em; text-transform: uppercase; color: #4f6c8e; border-bottom: 1px solid rgba(243,247,252,0.14)">ACV</th>
+              </tr>
+            </thead>
+            <tbody>
+              <sc-for list="{{ storeRows }}" as="s" hint-placeholder-count="10">
+                <tr onClick="{{ s.onClick }}" style="border-bottom: 1px solid rgba(243,247,252,0.06); cursor: pointer" style-hover="background: rgba(236,109,37,0.09)">
+                  <td style="padding: 9px 10px; font-size: 12.5px">
+                    <div style="color: #f3f7fc">{{ s.store }}</div>
+                    <div style="font-size: 10.5px; color: #4f6c8e; margin-top: 2px">{{ s.meta }}</div>
+                  </td>
+                  <td style="padding: 9px 10px; font-size: 11.5px; color: #9dc4ec">{{ s.rep }}</td>
+                  <td style="padding: 9px 10px">
+                    <span style="display: flex; gap: 3px">
+                      <sc-for list="{{ s.dayChips }}" as="d" hint-placeholder-count="7">
+                        <span style="width: 17px; height: 17px; display: grid; place-items: center; font-size: 9px; border-radius: 4px; color: {{ d.fg }}; background: {{ d.bg }}">{{ d.label }}</span>
+                      </sc-for>
+                    </span>
+                  </td>
+                  <td style="padding: 9px 10px">
+                    <span style="display: flex; gap: 3px">
+                      <sc-for list="{{ s.weekChips }}" as="w" hint-placeholder-count="4">
+                        <span style="width: 17px; height: 17px; display: grid; place-items: center; font-size: 9px; border-radius: 4px; color: {{ w.fg }}; background: {{ w.bg }}">{{ w.label }}</span>
+                      </sc-for>
+                    </span>
+                  </td>
+                  <td style="padding: 9px 10px; font-size: 11.5px; color: #c9d7e6; text-align: right; font-variant-numeric: tabular-nums">{{ s.acv }}</td>
+                </tr>
+              </sc-for>
+            </tbody>
+          </table>
+        </div>
+        <div style="display: flex; align-items: center; gap: 10px; margin-top: 14px; padding-top: 12px; border-top: 1px solid rgba(243,247,252,0.08)">
+          <button onClick="{{ prevPage }}" style="padding: 6px 14px; font: inherit; font-size: 11.5px; background: transparent; border: 1px solid rgba(243,247,252,0.14); border-radius: 8px; cursor: pointer; color: {{ prevFg }}" style-hover="background: rgba(236,109,37,0.12)">← Previous</button>
+          <button onClick="{{ nextPage }}" style="padding: 6px 14px; font: inherit; font-size: 11.5px; background: transparent; border: 1px solid rgba(243,247,252,0.14); border-radius: 8px; cursor: pointer; color: {{ nextFg }}" style-hover="background: rgba(236,109,37,0.12)">Next →</button>
+          <div style="flex: 1"></div>
+          <div style="font-size: 11.5px; color: #5f80a6">{{ pageLabel }}</div>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+  </div>
+  </sc-if>
+
+  <sc-if value="{{ showRep }}">
+  <div style="padding: 20px 32px 0">
+    <button onClick="{{ goHome }}" style="padding: 6px 14px; font: inherit; font-size: 11.5px; color: #ec6d25; background: transparent; border: 1px solid rgba(236,109,37,0.45); border-radius: 6px; cursor: pointer" style-hover="background: rgba(236,109,37,0.14)">← Back to overview</button>
+    <div style="margin-top: 20px; display: flex; align-items: flex-end; gap: 18px; flex-wrap: wrap">
+      <div>
+        <div style="font-size: 10.5px; letter-spacing: 0.12em; text-transform: uppercase; color: #4f6c8e">Representative</div>
+        <div style="margin-top: 6px; font-size: 30px; font-weight: 600; letter-spacing: -0.02em">{{ rep.name }}</div>
+        <div style="margin-top: 6px; font-size: 12.5px; color: #5f80a6">{{ rep.sub }}</div>
+      </div>
+    </div>
+    <div style="height: 1px; margin-top: 20px; background: linear-gradient(to right, transparent, rgba(243,247,252,0.16) 48px, rgba(243,247,252,0.16) calc(100% - 48px), transparent)"></div>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 14px; margin-top: 22px">
+      <sc-for list="{{ rep.kpis }}" as="k" hint-placeholder-count="5">
+        <div style="padding: 15px 17px 16px; background: #0b2145; border: 1px solid rgba(243,247,252,0.12); border-radius: 10px">
+          <div style="font-size: 10.5px; letter-spacing: 0.12em; text-transform: uppercase; color: #4f6c8e">{{ k.label }}</div>
+          <div style="margin-top: 9px; font-size: 24px; font-weight: 600; letter-spacing: -0.02em">{{ k.value }}</div>
+        </div>
+      </sc-for>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 22px; align-items: start">
+      <div style="padding: 18px 20px 20px; background: #0b2145; border: 1px solid rgba(243,247,252,0.12); border-radius: 10px">
+        <div style="font-size: 12.5px; font-weight: 600">Weekly rhythm</div>
+        <div style="margin-top: 3px; font-size: 11px; color: #4f6c8e">Calls landing on each day</div>
+        <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 18px">
+          <sc-for list="{{ rep.dayBars }}" as="b" hint-placeholder-count="7">
+            <div style="display: grid; grid-template-columns: 34px 1fr 40px; align-items: center; gap: 10px">
+              <span style="font-size: 11px; color: #5f80a6">{{ b.label }}</span>
+              <span style="height: 8px; background: rgba(243,247,252,0.07); border-radius: 4px; overflow: hidden; display: block">
+                <span style="display: block; height: 8px; border-radius: 4px; background: linear-gradient(to right, #ec6d25, #ec6d25); width: {{ b.pct }}%"></span>
+              </span>
+              <span style="font-size: 11.5px; color: #c9d7e6; text-align: right; font-variant-numeric: tabular-nums">{{ b.value }}</span>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+      <div style="padding: 18px 20px 20px; background: #0b2145; border: 1px solid rgba(243,247,252,0.12); border-radius: 10px">
+        <div style="font-size: 12.5px; font-weight: 600">Portfolio</div>
+        <div style="margin-top: 3px; font-size: 11px; color: #4f6c8e">Banners and channels covered</div>
+        <div style="display: flex; flex-direction: column; gap: 9px; margin-top: 18px">
+          <sc-for list="{{ rep.bannerBars }}" as="b" hint-placeholder-count="5">
+            <div>
+              <div style="display: flex; justify-content: space-between; font-size: 11px; color: #9dc4ec; margin-bottom: 4px">
+                <span>{{ b.label }}</span>
+                <span style="color: #5f80a6; font-variant-numeric: tabular-nums">{{ b.value }}</span>
+              </div>
+              <span style="display: block; height: 6px; background: rgba(236,109,37,0.10); border-radius: 3px; overflow: hidden">
+                <span style="display: block; height: 6px; border-radius: 3px; background: #ec6d25; width: {{ b.pct }}%"></span>
+              </span>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-top: 22px; padding: 20px 22px 22px; background: #0b2145; border: 1px solid rgba(243,247,252,0.12); border-radius: 10px">
+      <div style="font-size: 13.5px; font-weight: 600">Call cycle</div>
+      <div style="margin-top: 3px; font-size: 11px; color: #4f6c8e">Every store on this rep's plan</div>
+      <table style="width: 100%; border-collapse: collapse; margin-top: 16px">
+        <thead>
+          <tr>
+            <th style="padding: 8px 10px; text-align: left; font-size: 10px; font-weight: 500; letter-spacing: 0.10em; text-transform: uppercase; color: #4f6c8e; border-bottom: 1px solid rgba(243,247,252,0.14)">Store</th>
+            <th style="padding: 8px 10px; text-align: left; font-size: 10px; font-weight: 500; letter-spacing: 0.10em; text-transform: uppercase; color: #4f6c8e; border-bottom: 1px solid rgba(243,247,252,0.14)">Frequency</th>
+            <th style="padding: 8px 10px; text-align: left; font-size: 10px; font-weight: 500; letter-spacing: 0.10em; text-transform: uppercase; color: #4f6c8e; border-bottom: 1px solid rgba(243,247,252,0.14)">Days</th>
+            <th style="padding: 8px 10px; text-align: left; font-size: 10px; font-weight: 500; letter-spacing: 0.10em; text-transform: uppercase; color: #4f6c8e; border-bottom: 1px solid rgba(243,247,252,0.14)">Weeks</th>
+            <th style="padding: 8px 10px; text-align: right; font-size: 10px; font-weight: 500; letter-spacing: 0.10em; text-transform: uppercase; color: #4f6c8e; border-bottom: 1px solid rgba(243,247,252,0.14)">ACV</th>
+          </tr>
+        </thead>
+        <tbody>
+          <sc-for list="{{ rep.rows }}" as="s" hint-placeholder-count="8">
+            <tr onClick="{{ s.onClick }}" style="border-bottom: 1px solid rgba(243,247,252,0.06); cursor: pointer" style-hover="background: rgba(236,109,37,0.09)">
+              <td style="padding: 9px 10px; font-size: 12.5px">
+                <div style="color: #f3f7fc">{{ s.store }}</div>
+                <div style="font-size: 10.5px; color: #4f6c8e; margin-top: 2px">{{ s.meta }}</div>
+              </td>
+              <td style="padding: 9px 10px; font-size: 11.5px; color: #9dc4ec">{{ s.freq }}</td>
+              <td style="padding: 9px 10px">
+                <span style="display: flex; gap: 3px">
+                  <sc-for list="{{ s.dayChips }}" as="d" hint-placeholder-count="7">
+                    <span style="width: 17px; height: 17px; display: grid; place-items: center; font-size: 9px; border-radius: 4px; color: {{ d.fg }}; background: {{ d.bg }}">{{ d.label }}</span>
+                  </sc-for>
+                </span>
+              </td>
+              <td style="padding: 9px 10px">
+                <span style="display: flex; gap: 3px">
+                  <sc-for list="{{ s.weekChips }}" as="w" hint-placeholder-count="4">
+                    <span style="width: 17px; height: 17px; display: grid; place-items: center; font-size: 9px; border-radius: 4px; color: {{ w.fg }}; background: {{ w.bg }}">{{ w.label }}</span>
+                  </sc-for>
+                </span>
+              </td>
+              <td style="padding: 9px 10px; font-size: 11.5px; color: #c9d7e6; text-align: right; font-variant-numeric: tabular-nums">{{ s.acv }}</td>
+            </tr>
+          </sc-for>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  </sc-if>
+
+  <sc-if value="{{ showStore }}">
+  <div style="padding: 20px 32px 0">
+    <div style="display: flex; gap: 8px">
+      <button onClick="{{ goHome }}" style="padding: 6px 14px; font: inherit; font-size: 11.5px; color: #ec6d25; background: transparent; border: 1px solid rgba(236,109,37,0.45); border-radius: 6px; cursor: pointer" style-hover="background: rgba(236,109,37,0.14)">← Overview</button>
+      <button onClick="{{ store.openRep }}" style="padding: 6px 14px; font: inherit; font-size: 11.5px; color: #9dc4ec; background: transparent; border: 1px solid rgba(243,247,252,0.16); border-radius: 6px; cursor: pointer" style-hover="background: rgba(243,247,252,0.06)">{{ store.repBtn }}</button>
+    </div>
+    <div style="margin-top: 20px">
+      <div style="font-size: 10.5px; letter-spacing: 0.12em; text-transform: uppercase; color: #4f6c8e">{{ store.banner }}</div>
+      <div style="margin-top: 6px; font-size: 30px; font-weight: 600; letter-spacing: -0.02em; max-width: 900px; text-wrap: pretty">{{ store.name }}</div>
+      <div style="display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px">
+        <sc-for list="{{ store.tags }}" as="t" hint-placeholder-count="3">
+          <span style="padding: 4px 10px; font-size: 11px; border-radius: 999px; color: {{ t.fg }}; background: {{ t.bg }}; border: 1px solid {{ t.bd }}">{{ t.label }}</span>
+        </sc-for>
+      </div>
+    </div>
+    <div style="height: 1px; margin-top: 20px; background: linear-gradient(to right, transparent, rgba(243,247,252,0.16) 48px, rgba(243,247,252,0.16) calc(100% - 48px), transparent)"></div>
+
+    <div style="display: grid; grid-template-columns: 1.1fr 1fr; gap: 14px; margin-top: 22px; align-items: start">
+      <div style="padding: 20px 22px 22px; background: #0b2145; border: 1px solid rgba(243,247,252,0.12); border-radius: 10px">
+        <div style="font-size: 12.5px; font-weight: 600">Visit plan</div>
+        <div style="margin-top: 3px; font-size: 11px; color: #4f6c8e">{{ store.planNote }}</div>
+        <div style="display: flex; gap: 6px; margin-top: 18px">
+          <sc-for list="{{ store.dayCells }}" as="d" hint-placeholder-count="7">
+            <div style="flex: 1; padding: 12px 4px; text-align: center; border-radius: 10px; background: {{ d.bg }}; border: 1px solid {{ d.bd }}">
+              <div style="font-size: 10px; letter-spacing: 0.08em; color: {{ d.fg }}">{{ d.label }}</div>
+              <div style="margin-top: 8px; font-size: 15px; color: {{ d.markFg }}">{{ d.mark }}</div>
+            </div>
+          </sc-for>
+        </div>
+        <div style="margin-top: 20px; font-size: 11px; letter-spacing: 0.10em; text-transform: uppercase; color: #4f6c8e">Smart Sell weeks</div>
+        <div style="display: flex; gap: 6px; margin-top: 10px">
+          <sc-for list="{{ store.weekCells }}" as="w" hint-placeholder-count="4">
+            <div style="flex: 1; padding: 12px 4px; text-align: center; border-radius: 10px; background: {{ w.bg }}; border: 1px solid {{ w.bd }}">
+              <div style="font-size: 10px; letter-spacing: 0.08em; color: {{ w.fg }}">{{ w.label }}</div>
+              <div style="margin-top: 8px; font-size: 15px; color: {{ w.markFg }}">{{ w.mark }}</div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+      <div style="padding: 20px 22px 22px; background: #0b2145; border: 1px solid rgba(243,247,252,0.12); border-radius: 10px">
+        <div style="font-size: 12.5px; font-weight: 600">Record</div>
+        <div style="display: grid; grid-template-columns: 1fr; gap: 0; margin-top: 12px">
+          <sc-for list="{{ store.fields }}" as="f" hint-placeholder-count="10">
+            <div style="display: flex; justify-content: space-between; gap: 16px; padding: 9px 0; border-bottom: 1px solid rgba(243,247,252,0.06)">
+              <span style="font-size: 11.5px; color: #4f6c8e">{{ f.label }}</span>
+              <span style="font-size: 12.5px; color: #f3f7fc; text-align: right">{{ f.value }}</span>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+  </div>
+  </sc-if>
+
+  <sc-if value="{{ loading }}">
+    <div style="padding: 60px 32px; font-size: 13px; color: #4f6c8e">Loading visit plan data…</div>
+  </sc-if>
+  </div>
+</div>
+</sc-if>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{}">
+const DAYS = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+const ON = { bg: 'rgba(236,109,37,0.30)', fg: '#fde7d8' };
+const OFF = { bg: 'rgba(243,247,252,0.05)', fg: '#2a4568' };
+
+class Component extends DCLogic {
+  state = {
+    rows: null, authed: false, loginEmail: '', loginPass: '', loginError: '',
+    view: 'dash', page: 'overview', repName: null, storeIdx: null,
+    group: 'REGION', sort: 'acv', query: '',
+    f: { division: 'All', region: 'All', channel: 'All', banner: 'All', repType: 'All', freq: 'All', manager: 'All', active: 'All', store: 'All' },
+    tog: { trax: false, gold: false, posh: false }
+  };
+
+  componentDidMount() {
+    try { if (localStorage.getItem('cc_authed') === '1') this.setState({ authed: true }); } catch (e) {}
+    fetch('cycle-data.json').then(r => r.json()).then(d => {
+      const rows = d.rows.map((r, i) => {
+        const days = [...r[18]].map(c => c === '1');
+        const wks = [...r[19]].map(c => c === '1');
+        const nd = days.filter(Boolean).length, nw = wks.filter(Boolean).length;
+        return { i, code: r[0], store: r[1], storeId: r[2], acv: r[3], trax: !!r[4], active: r[5],
+          posh: !!r[6], gold: !!r[7], division: r[8], channel: r[9], region: r[10], banner: r[11] || '—',
+          empId: r[12], rep: r[13], repType: r[14], email: r[15], freq: r[16], manager: r[17],
+          division: this.DIVISION_OF[r[10]] || 'COASTAL', sourceDivision: r[8],
+          days, wks, nd, nw, calls: nd * nw };
+      });
+      this.setState({ rows });
+    }).catch(e => console.error('data load failed', e));
+  }
+
+  DIVISION_OF = {
+    'GAUTENG': 'INLAND', 'MPUMALANGA': 'INLAND', 'LIMPOPO': 'INLAND',
+    'FREE STATE': 'CENTRAL', 'NORTH WEST': 'CENTRAL'
+  };
+  DIV_ORDER = ['INLAND', 'CENTRAL', 'COASTAL'];
+  FREQ = [
+    { k: 'DEDICATED WEEKLY', label: 'Dedicated weekly', c: '#ec6d25' },
+    { k: 'DEDICATED BI WEEKLY', label: 'Dedicated bi-weekly', c: '#ee7f3c' },
+    { k: 'DEDICATED MONTHLY', label: 'Dedicated monthly', c: '#ec6d25' },
+    { k: 'SYNDICATED BI WEEKLY', label: 'Syndicated bi-weekly', c: '#6fb2ff' },
+    { k: 'SYNDICATED MONTHLY', label: 'Syndicated monthly', c: '#9dc4ec' },
+    { k: 'FIELDMARKETER WEEKLY', label: 'Fieldmarketer weekly', c: '#3d5f85' },
+    { k: 'FIELDMARKETER MONTHLY', label: 'Fieldmarketer monthly', c: '#c9d7e6' }
+  ];
+  signIn() {
+    try { localStorage.setItem('cc_authed', '1'); } catch (e) {}
+    this.setState({ authed: true, loginPass: '', loginError: '' });
+  }
+
+  num(n) { return (n || 0).toLocaleString('en-ZA'); }
+  rand(n) { if (!n) return 'R0'; if (n >= 1e9) return 'R' + (n / 1e9).toFixed(2) + 'bn'; if (n >= 1e6) return 'R' + (n / 1e6).toFixed(1) + 'm'; if (n >= 1e3) return 'R' + Math.round(n / 1e3) + 'k'; return 'R' + n; }
+  set(k, v) { this.setState(s => ({ tablePage: 0, f: Object.assign({}, s.f, { [k]: v }) })); }
+
+  filtered(rows) {
+    const f = this.state.f, t = this.state.tog, q = this.state.query.trim().toLowerCase();
+    return rows.filter(r =>
+      (f.division === 'All' || r.division === f.division) &&
+      (f.region === 'All' || r.region === f.region) &&
+      (f.channel === 'All' || r.channel === f.channel) &&
+      (f.banner === 'All' || r.banner === f.banner) &&
+      (f.repType === 'All' || r.repType === f.repType) &&
+      (f.freq === 'All' || r.freq === f.freq) &&
+      (f.manager === 'All' || r.manager === f.manager) &&
+      (f.active === 'All' || r.active === f.active) &&
+      (f.store === 'All' || r.store === f.store) &&
+      (!t.trax || r.trax) && (!t.gold || r.gold) && (!t.posh || r.posh) &&
+      (!q || r.store.toLowerCase().includes(q) || r.rep.toLowerCase().includes(q) || String(r.code).toLowerCase().includes(q))
+    );
+  }
+
+  otherFiltered(rows) {
+    const keep = this.state.f.store;
+    this.state.f.store = 'All';
+    const out = this.filtered(rows);
+    this.state.f.store = keep;
+    return out;
+  }
+
+  opts(rows, key) {
+    return ['All'].concat([...new Set(rows.map(r => r[key]))].filter(Boolean).sort());
+  }
+
+  chips(flags, labels) {
+    return flags.map((on, i) => ({ label: labels[i], bg: on ? ON.bg : OFF.bg, fg: on ? ON.fg : OFF.fg }));
+  }
+
+  renderVals() {
+    const rows = this.state.rows;
+    const auth = {
+      showLogin: !this.state.authed, showApp: this.state.authed,
+      loginEmail: this.state.loginEmail, loginPass: this.state.loginPass, loginError: this.state.loginError,
+      onLoginEmail: e => this.setState({ loginEmail: e.target.value, loginError: '' }),
+      onLoginPass: e => this.setState({ loginPass: e.target.value, loginError: '' }),
+      onLoginKey: e => { if (e.key === 'Enter') this.signIn(); },
+      loginFeatures: [
+        { icon: 'ph ph-storefront', title: 'Store-level view', body: 'Every store, banner and channel in one place.' },
+        { icon: 'ph ph-users-three', title: 'Field resources', body: 'Reps, rep types and their reporting lines.' },
+        { icon: 'ph ph-map-trifold', title: 'Full national reach', body: 'Coverage across every region and division.' }
+      ],
+      onLogin: () => this.signIn(),
+      onLogout: () => { try { localStorage.removeItem('cc_authed'); } catch (err) {} this.setState({ authed: false, loginPass: '' }); }
+    };
+    if (!rows) return { ...auth, loading: true, showDash: false, showRep: false, showStore: false, crumb: '',
+      pOverview: false, pDivisions: false, pReps: false, pStores: false,
+      pageTitle: 'Overview', pageSub: 'Loading visit plan data', storesInView: '—', rowNote: '—',
+      crumbKind: '', navItems: [], goHome: () => {} };
+
+    const goHome = () => this.setState({ view: 'dash', repName: null, storeIdx: null });
+    const openRep = name => this.setState({ view: 'rep', repName: name });
+    const openStore = i => this.setState({ view: 'store', storeIdx: i });
+    const v = this.filtered(rows);
+
+    const page = this.state.page;
+    const PAGES = [
+      { k: 'overview', label: 'Overview', icon: 'ph ph-squares-four', sub: 'Coverage, cadence and cycle load at a glance' },
+      { k: 'divisions', label: 'Divisional coverage', icon: 'ph ph-map-trifold', sub: 'Inland, Central and Coastal side by side' },
+      { k: 'reps', label: 'Reps', icon: 'ph ph-users-three', sub: 'Call load per representative — click through to their cycle' },
+      { k: 'stores', label: 'Stores', icon: 'ph ph-storefront', sub: 'Every store visit plan, searchable' }
+    ];
+    const counts = { overview: '', divisions: 3, reps: new Set(v.map(r => r.rep)).size, stores: this.num(v.length) };
+    const cur = PAGES.find(p => p.k === page) || PAGES[0];
+    const base = {
+      ...auth,
+      loading: false, goHome,
+      showDash: this.state.view === 'dash',
+      showRep: this.state.view === 'rep',
+      showStore: this.state.view === 'store',
+      pOverview: page === 'overview', pDivisions: page === 'divisions',
+      pReps: page === 'reps', pStores: page === 'stores',
+      pageTitle: this.state.view === 'rep' ? this.state.repName
+        : this.state.view === 'store' ? rows[this.state.storeIdx].store : cur.label,
+      pageSub: this.state.view === 'rep' ? 'Representative detail'
+        : this.state.view === 'store' ? 'Store detail' : cur.sub,
+      storesInView: this.num(v.length),
+      rowNote: this.num(rows.length) + ' store plans loaded',
+      crumbKind: this.state.view === 'rep' ? 'Representative' : 'Store',
+      navItems: PAGES.map(p => {
+        const on = page === p.k && this.state.view === 'dash';
+        return { label: p.label, count: counts[p.k], icon: p.icon,
+          bg: on ? 'rgba(236,109,37,0.12)' : 'transparent',
+          fg: on ? '#f3f7fc' : '#9dc4ec',
+          bd: on ? 'rgba(236,109,37,0.40)' : 'transparent',
+          dot: on ? '#ec6d25' : '#3d5f85',
+          onClick: () => this.setState({ page: p.k, view: 'dash', repName: null, storeIdx: null }) };
+      }),
+      crumb: this.state.view === 'rep' ? this.state.repName
+        : this.state.view === 'store' ? rows[this.state.storeIdx].store : ''
+    };
+
+    // ---- store detail
+    if (this.state.view === 'store') {
+      const r = rows[this.state.storeIdx];
+      const tags = [{ label: r.channel, k: 'n' }, { label: r.region, k: 'n' }, { label: r.division, k: 'n' }, { label: r.freq, k: 'a' }];
+      if (r.gold) tags.push({ label: 'Gold Mine', k: 'a' });
+      if (r.posh) tags.push({ label: 'Posh store', k: 'a' });
+      if (r.trax) tags.push({ label: 'TRAX', k: 'a' });
+      if (r.active !== 'YES') tags.push({ label: r.active, k: 'a' });
+      return Object.assign(base, {
+        store: {
+          name: r.store, banner: r.banner,
+          repBtn: 'Rep: ' + r.rep, openRep: () => openRep(r.rep),
+          planNote: r.calls ? r.nd + ' day' + (r.nd > 1 ? 's' : '') + ' × ' + r.nw + ' week' + (r.nw > 1 ? 's' : '') + ' = ' + r.calls + ' calls a month' : 'No cycle week set — this store is unscheduled',
+          tags: tags.map(t => t.k === 'a'
+            ? { label: t.label, fg: '#ec6d25', bg: 'rgba(236,109,37,0.16)', bd: 'rgba(236,109,37,0.40)' }
+            : { label: t.label, fg: '#9dc4ec', bg: 'rgba(243,247,252,0.05)', bd: 'rgba(243,247,252,0.14)' }),
+          dayCells: r.days.map((on, i) => ({ label: DAYS[i].toUpperCase(), mark: on ? '●' : '·',
+            bg: on ? 'rgba(236,109,37,0.16)' : 'rgba(243,247,252,0.03)',
+            bd: on ? 'rgba(236,109,37,0.40)' : 'rgba(243,247,252,0.08)',
+            fg: on ? '#ec6d25' : '#4f6c8e', markFg: on ? '#ec6d25' : '#1c3f6b' })),
+          weekCells: r.wks.map((on, i) => ({ label: 'WK' + (i + 1), mark: on ? '●' : '·',
+            bg: on ? 'rgba(236,109,37,0.16)' : 'rgba(243,247,252,0.03)',
+            bd: on ? 'rgba(236,109,37,0.40)' : 'rgba(243,247,252,0.08)',
+            fg: on ? '#ec6d25' : '#4f6c8e', markFg: on ? '#ec6d25' : '#1c3f6b' })),
+          fields: [
+            { label: 'Store code', value: r.code }, { label: 'Store ID', value: r.storeId },
+            { label: 'Banner', value: r.banner }, { label: 'Channel', value: r.channel },
+            { label: 'Region', value: r.region }, { label: 'Division', value: r.division },
+            { label: 'ACV', value: this.rand(r.acv) },
+            { label: 'Rep', value: r.rep + ' (' + r.empId + ')' },
+            { label: 'Rep type', value: r.repType }, { label: 'Email', value: r.email },
+            { label: 'Line manager', value: r.manager }, { label: 'Status', value: r.active }
+          ]
+        }
+      });
+    }
+
+    // ---- rep detail
+    if (this.state.view === 'rep') {
+      const name = this.state.repName;
+      const rr = rows.filter(r => r.rep === name);
+      const calls = rr.reduce((a, r) => a + r.calls, 0);
+      const dayC = DAYS.map((_, i) => rr.reduce((a, r) => a + (r.days[i] ? r.nw : 0), 0));
+      const dmax = Math.max(1, ...dayC);
+      const bm = new Map();
+      rr.forEach(r => bm.set(r.banner, (bm.get(r.banner) || 0) + 1));
+      const bl = [...bm.entries()].sort((a, b) => b[1] - a[1]).slice(0, 8);
+      const bmax = Math.max(1, ...bl.map(x => x[1]));
+      const r0 = rr[0] || {};
+      return Object.assign(base, {
+        rep: {
+          name,
+          sub: [r0.repType, r0.division, 'Line manager: ' + r0.manager, r0.email].filter(Boolean).join('  ·  '),
+          kpis: [
+            { label: 'Stores', value: this.num(rr.length) },
+            { label: 'Calls / month', value: this.num(calls) },
+            { label: 'Calls / week', value: (calls / 4).toFixed(1) },
+            { label: 'Portfolio ACV', value: this.rand(rr.reduce((a, r) => a + r.acv, 0)) },
+            { label: 'Gold Mine stores', value: this.num(rr.filter(r => r.gold).length) },
+            { label: 'Unscheduled', value: this.num(rr.filter(r => !r.nw).length) }
+          ],
+          dayBars: DAYS.map((d, i) => ({ label: d, value: dayC[i], pct: Math.round(dayC[i] / dmax * 100) })),
+          bannerBars: bl.map(([k, n]) => ({ label: k, value: n, pct: Math.round(n / bmax * 100) })),
+          rows: rr.sort((a, b) => b.acv - a.acv).map(r => ({
+            store: r.store, meta: r.code + '  ·  ' + r.region + '  ·  ' + r.channel,
+            freq: r.freq, acv: this.rand(r.acv),
+            dayChips: this.chips(r.days, DAYS.map(d => d[0])),
+            weekChips: this.chips(r.wks, ['1', '2', '3', '4']),
+            onClick: () => openStore(r.i)
+          }))
+        }
+      });
+    }
+
+    // ---- dashboard
+    const calls = v.reduce((a, r) => a + r.calls, 0);
+    const reps = new Set(v.map(r => r.rep));
+    const unsched = v.filter(r => !r.nw).length;
+    const gold = v.filter(r => r.gold).length;
+    const kpis = [
+      { label: 'Stores in plan', value: this.num(v.length), sub: v.length === rows.length ? 'full master file' : 'of ' + this.num(rows.length) + ' total' },
+      { label: 'Calls / month', value: this.num(calls), sub: this.num(Math.round(calls / 4)) + ' a week' },
+      { label: 'Calls per store', value: v.length ? (calls / v.length).toFixed(2) : '0', sub: 'monthly average' },
+      { label: 'Reps deployed', value: this.num(reps.size), sub: reps.size ? (v.length / reps.size).toFixed(0) + ' stores each' : '—' },
+      { label: 'Unscheduled stores', value: this.num(unsched), sub: 'no Smart Sell week set' },
+      { label: 'Gold Mine stores', value: this.num(gold), sub: v.length ? (gold / v.length * 100).toFixed(1) + '% of view' : '—' },
+      { label: 'TRAX stores', value: this.num(v.filter(r => r.trax).length), sub: this.num(v.filter(r => r.posh).length) + ' Posh stores' },
+      { label: 'Line managers', value: this.num(new Set(v.map(r => r.manager)).size), sub: this.num(v.filter(r => r.active !== 'YES').length) + ' stores in revamp' },
+      { label: 'Portfolio ACV', value: this.rand(v.reduce((a, r) => a + r.acv, 0)), sub: this.num(v.filter(r => r.acv > 0).length) + ' stores valued' }
+    ];
+
+    const dayC = DAYS.map((_, i) => v.reduce((a, r) => a + (r.days[i] ? r.nw : 0), 0));
+    const dmax = Math.max(1, ...dayC);
+    const wkC = [0, 1, 2, 3].map(i => v.filter(r => r.wks[i]).length);
+    const wmax = Math.max(1, ...wkC);
+    const fm = new Map();
+    v.forEach(r => fm.set(r.freq, (fm.get(r.freq) || 0) + 1));
+    const fl = [...fm.entries()].sort((a, b) => b[1] - a[1]);
+    const fmax = Math.max(1, ...fl.map(x => x[1]));
+
+    const rm = new Map();
+    v.forEach(r => {
+      let g = rm.get(r.rep);
+      if (!g) rm.set(r.rep, g = { name: r.rep, stores: 0, calls: 0, type: r.repType, region: r.region, days: [0, 0, 0, 0, 0, 0, 0] });
+      g.stores++; g.calls += r.calls;
+      r.days.forEach((on, i) => { if (on) g.days[i] += r.nw; });
+    });
+    const rl = [...rm.values()].sort((a, b) => b.calls - a.calls);
+
+    const sorters = {
+      acv: (a, b) => b.acv - a.acv,
+      calls: (a, b) => b.calls - a.calls,
+      name: (a, b) => a.store.localeCompare(b.store)
+    };
+    const PER = 50;
+    const pages = Math.max(1, Math.ceil(v.length / PER));
+    const pg = Math.min(this.state.tablePage || 0, pages - 1);
+    const sorted = v.slice().sort(sorters[this.state.sort]);
+    const shown = sorted.slice(pg * PER, pg * PER + PER);
+
+    const tabBtn = (label, on, fn) => ({ label, onClick: fn,
+      bg: on ? 'rgba(236,109,37,0.22)' : 'transparent', fg: on ? '#fde7d8' : '#5f80a6' });
+
+    const activeCount = Object.values(this.state.f).filter(x => x !== 'All').length
+      + Object.values(this.state.tog).filter(Boolean).length + (this.state.query ? 1 : 0);
+
+    return Object.assign(base, {
+      kpis,
+      filterSummary: activeCount ? activeCount + ' active · ' + this.num(v.length) + ' stores' : this.num(v.length) + ' stores · no filters',
+      resetFilters: () => this.setState({ tablePage: 0, f: { division: 'All', region: 'All', channel: 'All', banner: 'All', repType: 'All', freq: 'All', manager: 'All', active: 'All', store: 'All' }, tog: { trax: false, gold: false, posh: false }, query: '' }),
+      query: this.state.query,
+      onQuery: e => this.setState({ query: e.target.value, tablePage: 0 }),
+      onSelect: e => this.set(e.target.dataset.key, e.target.value),
+      selects: [
+        { key: 'division', label: 'Division', value: this.state.f.division, options: this.opts(rows, 'division') },
+        { key: 'region', label: 'Region', value: this.state.f.region, options: this.opts(rows, 'region') },
+        { key: 'channel', label: 'Channel', value: this.state.f.channel, options: this.opts(rows, 'channel') },
+        { key: 'banner', label: 'Banner', value: this.state.f.banner, options: this.opts(rows, 'banner') },
+        { key: 'repType', label: 'Rep type', value: this.state.f.repType, options: this.opts(rows, 'repType') },
+        { key: 'freq', label: 'Calling frequency', value: this.state.f.freq, options: this.opts(rows, 'freq') },
+        { key: 'manager', label: 'Line manager', value: this.state.f.manager, options: this.opts(rows, 'manager') },
+        { key: 'active', label: 'Status', value: this.state.f.active, options: this.opts(rows, 'active') }
+      ],
+      toggles: [
+        { k: 'trax', label: 'TRAX only' }, { k: 'gold', label: 'Gold Mine only' }, { k: 'posh', label: 'Posh only' }
+      ].map(t => {
+        const on = this.state.tog[t.k];
+        return { label: t.label,
+          bg: on ? 'rgba(236,109,37,0.22)' : 'transparent',
+          fg: on ? '#fde7d8' : '#f3f7fc',
+          bd: on ? 'rgba(236,109,37,0.55)' : 'rgba(243,247,252,0.14)',
+          onClick: () => this.setState(s => ({ tablePage: 0, tog: Object.assign({}, s.tog, { [t.k]: !s.tog[t.k] }) })) };
+      }),
+      repTypeRows: (() => {
+        const m = new Map();
+        v.forEach(r => {
+          let g = m.get(r.repType);
+          if (!g) m.set(r.repType, g = { label: r.repType, stores: 0, reps: new Set(), mgrs: new Set() });
+          g.stores++; g.reps.add(r.rep); g.mgrs.add(r.manager);
+        });
+        const l = [...m.values()].sort((a, b) => b.stores - a.stores);
+        const mx = Math.max(1, ...l.map(g => g.stores));
+        return l.map(g => ({ label: g.label, reps: g.reps.size, mgrs: g.mgrs.size,
+          stores: this.num(g.stores), pct: Math.round(g.stores / mx * 100) }));
+      })(),
+      divisionPanels: (() => {
+        const panels = this.DIV_ORDER.map(d => {
+          const rr = v.filter(r => r.division === d);
+          const calls = rr.reduce((a, x) => a + x.calls, 0);
+          const reps = new Set(rr.map(r => r.rep)).size;
+          const mgrs = new Set(rr.map(r => r.manager)).size;
+          const rm = new Map();
+          rr.forEach(r => rm.set(r.region, (rm.get(r.region) || 0) + 1));
+          const top = [...rm.entries()].sort((a, b) => b[1] - a[1]);
+          const tmax = Math.max(1, ...top.map(x => x[1]));
+          return { label: d, stores: rr.length, storesFmt: this.num(rr.length),
+            pct: v.length ? (rr.length / v.length * 100).toFixed(1) : '0',
+            pctNum: v.length ? Math.round(rr.length / v.length * 100) : 0,
+            perStore: rr.length ? (calls / rr.length).toFixed(2) : '0',
+            stats: [
+              { label: 'Reps', value: this.num(reps) },
+              { label: 'Line managers', value: this.num(mgrs) },
+              { label: 'Banners', value: this.num(new Set(rr.map(r => r.banner)).size) },
+              { label: 'Stores / rep', value: reps ? (rr.length / reps).toFixed(1) : '—' },
+              { label: 'Calls / month', value: this.num(calls) },
+              { label: 'Manager span', value: mgrs ? (reps / mgrs).toFixed(1) + ' reps' : '—' },
+              { label: 'Gold Mine', value: this.num(rr.filter(r => r.gold).length) },
+              { label: 'Unscheduled', value: this.num(rr.filter(r => !r.nw).length) }
+            ],
+            regions: top.map(([k, n]) => ({ label: k, value: this.num(n), pct: Math.round(n / tmax * 100) })) };
+        });
+        const order = panels.slice().sort((a, b) => b.stores - a.stores);
+        return panels.map(p => ({ ...p,
+          badge: p === order[0] ? 'Largest footprint' : p === order[order.length - 1] ? 'Smallest footprint' : 'Mid-range',
+          badgeFg: p === order[0] ? '#fde7d8' : '#c9d7e6',
+          badgeBg: p === order[0] ? 'rgba(236,109,37,0.18)' : 'rgba(243,247,252,0.05)',
+          badgeBd: p === order[0] ? 'rgba(236,109,37,0.45)' : 'rgba(243,247,252,0.16)' }));
+      })(),
+      regionScorecard: (() => {
+        const m = new Map();
+        v.forEach(r => {
+          let g = m.get(r.region);
+          if (!g) m.set(r.region, g = { region: r.region, division: r.division, stores: 0, calls: 0, gap: 0, reps: new Set(), mgrs: new Set() });
+          g.stores++; g.calls += r.calls; g.reps.add(r.rep); g.mgrs.add(r.manager);
+          if (!r.nw) g.gap++;
+        });
+        const l = [...m.values()].sort((a, b) => b.stores - a.stores);
+        const mx = Math.max(1, ...l.map(g => g.calls));
+        return l.map(g => ({ region: g.region, division: g.division, stores: this.num(g.stores),
+          reps: g.reps.size, mgrs: g.mgrs.size, calls: this.num(g.calls),
+          perRep: (g.stores / g.reps.size).toFixed(1), perStore: (g.calls / g.stores).toFixed(2),
+          gap: g.gap, gapFg: g.gap ? '#ec6d25' : '#3d5f85', pct: Math.round(g.calls / mx * 100) }));
+      })(),
+      divisionCards: this.DIV_ORDER.map(d => {
+        const rr = v.filter(r => r.division === d);
+        const regions = [...new Set(rr.map(r => r.region))].sort();
+        return { label: d, stores: this.num(rr.length),
+          calls: this.num(rr.reduce((a, r) => a + r.calls, 0)) + ' calls / mo',
+          reps: new Set(rr.map(r => r.rep)).size + ' reps',
+          regions: regions.join(', ') || '—',
+          pct: v.length ? Math.round(rr.length / v.length * 100) : 0 };
+      }),
+      regionBars: (() => {
+        const m = new Map();
+        v.forEach(r => {
+          let g = m.get(r.region);
+          if (!g) m.set(r.region, g = { label: r.region, stores: 0, calls: 0, freq: new Map() });
+          g.stores++; g.calls += r.calls;
+          g.freq.set(r.freq, (g.freq.get(r.freq) || 0) + 1);
+        });
+        const l = [...m.values()].sort((a, b) => b.stores - a.stores);
+        const mx = Math.max(1, ...l.map(g => g.stores));
+        return l.map(g => ({ label: g.label, value: this.num(g.stores),
+          calls: this.num(g.calls) + ' calls', pct: Math.round(g.stores / mx * 100),
+          segs: this.FREQ.filter(f => g.freq.get(f.k)).map(f => ({
+            color: f.c, w: (g.freq.get(f.k) / g.stores * 100).toFixed(2),
+            title: f.k + ': ' + g.freq.get(f.k) + ' stores' })) }));
+      })(),
+      freqLegend: this.FREQ.filter(f => v.some(r => r.freq === f.k)).map(f => ({ label: f.label, color: f.c })),
+      bannerBars: (() => {
+        const m = new Map();
+        v.forEach(r => m.set(r.banner, (m.get(r.banner) || 0) + 1));
+        const l = [...m.entries()].sort((a, b) => b[1] - a[1]).slice(0, 10);
+        const mx = Math.max(1, ...l.map(x => x[1]));
+        return l.map(([k, n]) => ({ label: k, value: this.num(n), pct: Math.round(n / mx * 100) }));
+      })(),
+      managerTypeRows: (() => {
+        const mgr = new Map();
+        v.forEach(r => {
+          let g = mgr.get(r.manager);
+          if (!g) mgr.set(r.manager, g = new Map());
+          g.set(r.repType, (g.get(r.repType) || 0) + 1);
+        });
+        const buckets = new Map();
+        mgr.forEach(types => {
+          const main = [...types.entries()].sort((a, b) => b[1] - a[1])[0][0];
+          let b = buckets.get(main);
+          if (!b) buckets.set(main, b = { label: main, mgrs: 0, stores: 0 });
+          b.mgrs++; b.stores += [...types.values()].reduce((a, n) => a + n, 0);
+        });
+        const l = [...buckets.values()].sort((a, b) => b.mgrs - a.mgrs);
+        const total = l.reduce((a, g) => a + g.mgrs, 0) || 1;
+        return l.map(g => ({ label: g.label, mgrs: g.mgrs, stores: this.num(g.stores),
+          span: (g.stores / g.mgrs).toFixed(0) + ' per mgr', pct: Math.round(g.mgrs / total * 100) }));
+      })(),
+      channelBars: (() => {
+        const m = new Map();
+        v.forEach(r => m.set(r.channel, (m.get(r.channel) || 0) + 1));
+        const l = [...m.entries()].sort((a, b) => b[1] - a[1]);
+        const mx = Math.max(1, ...l.map(x => x[1]));
+        return l.map(([k, n]) => ({ label: k, value: this.num(n), pct: Math.round(n / mx * 100) }));
+      })(),
+      dayBars: DAYS.map((d, i) => ({ label: d, value: this.num(dayC[i]), pct: Math.round(dayC[i] / dmax * 100) })),
+      freqBars: fl.map(([k, n]) => ({ label: k, value: this.num(n), pct: Math.round(n / fmax * 100) })),
+      repCount: this.num(rl.length),
+      repRows: rl.map(r => ({ name: r.name, stores: this.num(r.stores), calls: this.num(r.calls),
+        meta: [r.type, r.region].join('  ·  '),
+        busiest: DAYS[r.days.indexOf(Math.max(...r.days))] + ' (' + Math.max(...r.days) + ')',
+        onClick: () => openRep(r.name) })),
+      storeSelect: this.state.f.store,
+      storeOptions: ['All'].concat([...new Set(this.otherFiltered(rows).map(r => r.store))].sort()),
+      storeNote: this.num(v.length) + ' stores in view · showing ' + (v.length ? pg * PER + 1 : 0) + '–' + Math.min(v.length, pg * PER + PER),
+      pageLabel: 'Page ' + (pg + 1) + ' of ' + this.num(pages),
+      prevPage: () => this.setState({ tablePage: Math.max(0, pg - 1) }),
+      nextPage: () => this.setState({ tablePage: Math.min(pages - 1, pg + 1) }),
+      prevFg: pg > 0 ? '#ec6d25' : '#3d5f85',
+      nextFg: pg < pages - 1 ? '#ec6d25' : '#3d5f85',
+      sortTabs: [['acv', 'ACV'], ['calls', 'Calls'], ['name', 'A–Z']].map(([k, l]) =>
+        tabBtn(l, this.state.sort === k, () => this.setState({ sort: k, tablePage: 0 }))),
+      storeRows: shown.map(r => ({
+        store: r.store, rep: r.rep, acv: this.rand(r.acv),
+        meta: r.code + '  ·  ' + r.banner + '  ·  ' + r.region,
+        dayChips: this.chips(r.days, DAYS.map(d => d[0])),
+        weekChips: this.chips(r.wks, ['1', '2', '3', '4']),
+        onClick: () => openStore(r.i)
+      }))
+    });
+  }
+}
+</script>
+</body>
+</html>
