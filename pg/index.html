@@ -156,48 +156,7 @@
       </sc-for>
     </div>
 
-
-    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 14px; align-items: start">
-      <div style="padding: 16px 20px 18px; background: #0b2145; border: 1px solid rgba(243,247,252,0.12); border-radius: 10px">
-        <div style="display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap">
-          <div style="font-size: 12.5px; font-weight: 600; color: #f3f7fc">Division split</div>
-          <div style="font-size: 11px; color: #4f6c8e">Inland · Central · Coastal, grouped from region</div>
-        </div>
-        <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin-top: 12px">
-          <sc-for list="{{ divisionCards }}" as="d" hint-placeholder-count="3">
-            <div style="min-width: 0; padding: 12px 13px 13px; background: rgba(23,58,107,0.55); border: 1px solid rgba(236,109,37,0.30); border-radius: 10px">
-              <div style="display: flex; align-items: baseline; gap: 8px">
-                <span style="font-size: 10px; letter-spacing: 0.10em; text-transform: uppercase; color: #f3f7fc">{{ d.label }}</span>
-                <span style="font-size: 10px; color: #ec6d25">{{ d.pct }}%</span>
-              </div>
-              <div style="margin-top: 8px; font-size: 22px; font-weight: 600; line-height: 1.1">{{ d.stores }}</div>
-              <div style="margin-top: 4px; font-size: 10.5px; color: #5f80a6">{{ d.reps }}</div>
-              <div style="margin-top: 4px; font-size: 10px; color: #9dc4ec">{{ d.calls }}</div>
-            </div>
-          </sc-for>
-        </div>
-      </div>
-      <div style="padding: 16px 20px 18px; background: #0b2145; border: 1px solid rgba(243,247,252,0.12); border-radius: 10px">
-        <div style="display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap">
-          <div style="font-size: 12.5px; font-weight: 600; color: #f3f7fc">Managers by team type</div>
-          <div style="font-size: 11px; color: #4f6c8e">counted against the rep type they mostly oversee</div>
-        </div>
-        <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin-top: 12px">
-          <sc-for list="{{ managerTypeRows }}" as="m" hint-placeholder-count="3">
-            <div style="min-width: 0; padding: 12px 13px 13px; background: rgba(23,58,107,0.55); border: 1px solid rgba(243,247,252,0.10); border-radius: 10px">
-              <div style="font-size: 9.5px; letter-spacing: 0.08em; text-transform: uppercase; color: #9dc4ec; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{ m.label }}</div>
-              <div style="margin-top: 8px; font-size: 22px; font-weight: 600; line-height: 1.1">{{ m.mgrs }}</div>
-              <div style="margin-top: 4px; font-size: 10.5px; color: #5f80a6">{{ m.stores }} stores</div>
-              <div style="margin-top: 4px; font-size: 10px; color: #ec6d25">{{ m.span }}</div>
-            </div>
-          </sc-for>
-        </div>
-      </div>
-    </div>
-
-    </sc-if>
-
-    <div style="margin-top: 26px; padding: 16px 18px; background: rgba(11,33,69,0.78); border: 1px solid rgba(243,247,252,0.08); border-radius: 10px">
+    <div style="margin-top: 14px; padding: 16px 18px; background: rgba(11,33,69,0.78); border: 1px solid rgba(243,247,252,0.08); border-radius: 10px">
       <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 14px">
         <div style="font-size: 10.5px; letter-spacing: 0.12em; text-transform: uppercase; color: #f3f7fc">Filters</div>
         <div style="flex: 1; height: 1px; background: linear-gradient(to right, rgba(243,247,252,0.12), transparent)"></div>
@@ -226,6 +185,58 @@
         </sc-for>
       </div>
     </div>
+
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 14px; align-items: start">
+      <div style="padding: 16px 20px 18px; background: #0b2145; border: 1px solid rgba(243,247,252,0.12); border-radius: 10px">
+        <div style="display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap">
+          <div style="font-size: 12.5px; font-weight: 600; color: #f3f7fc">Stores by division</div>
+          <div style="font-size: 11px; color: #4f6c8e">stores, grouped from region</div>
+        </div>
+        <div style="display: flex; justify-content: center; margin-top: 12px">
+          <div style="position: relative; width: 168px; height: 168px">
+            <svg viewBox="0 0 140 140" style="width: 168px; height: 168px; transform: rotate(-90deg)">
+              <circle cx="70" cy="70" r="{{ divisionDonut.r }}" fill="none" stroke="rgba(243,247,252,0.08)" stroke-width="16"></circle>
+              <sc-for list="{{ divisionDonut.segs }}" as="seg" hint-placeholder-count="3">
+                <circle cx="70" cy="70" r="{{ divisionDonut.r }}" fill="none" stroke="{{ seg.color }}" stroke-width="16"
+                  stroke-dasharray="{{ seg.dash }}" stroke-dashoffset="{{ seg.dashoffset }}"></circle>
+              </sc-for>
+            </svg>
+            <div style="position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center">
+              <div style="font-size: 24px; font-weight: 700; color: #f3f7fc; line-height: 1">{{ divisionDonut.total }}</div>
+              <div style="margin-top: 3px; font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase; color: #5f80a6">Stores</div>
+            </div>
+          </div>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 14px">
+          <sc-for list="{{ divisionDonut.legend }}" as="l" hint-placeholder-count="3">
+            <div style="display: flex; align-items: center; gap: 8px; font-size: 11.5px">
+              <span style="width: 8px; height: 8px; border-radius: 2px; background: {{ l.color }}; flex: none"></span>
+              <span style="color: #9dc4ec; flex: 1">{{ l.label }}</span>
+              <span style="color: #f3f7fc; font-variant-numeric: tabular-nums">{{ l.stores }}</span>
+              <span style="color: #5f80a6; font-variant-numeric: tabular-nums; min-width: 40px; text-align: right">{{ l.pct }}%</span>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+      <div style="padding: 16px 20px 18px; background: #0b2145; border: 1px solid rgba(243,247,252,0.12); border-radius: 10px">
+        <div style="display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap">
+          <div style="font-size: 12.5px; font-weight: 600; color: #f3f7fc">Managers by team type</div>
+          <div style="font-size: 11px; color: #4f6c8e">counted against the rep type they mostly oversee</div>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin-top: 12px">
+          <sc-for list="{{ managerTypeRows }}" as="m" hint-placeholder-count="3">
+            <div style="min-width: 0; padding: 12px 13px 13px; background: rgba(23,58,107,0.55); border: 1px solid rgba(243,247,252,0.10); border-radius: 10px">
+              <div style="font-size: 9.5px; letter-spacing: 0.08em; text-transform: uppercase; color: #9dc4ec; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{ m.label }}</div>
+              <div style="margin-top: 8px; font-size: 22px; font-weight: 600; line-height: 1.1">{{ m.mgrs }}</div>
+              <div style="margin-top: 4px; font-size: 10.5px; color: #5f80a6">{{ m.stores }} stores</div>
+              <div style="margin-top: 4px; font-size: 10px; color: #ec6d25">{{ m.span }}</div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+
+    </sc-if>
 
     <sc-if value="{{ pOverview }}">
     <div style="display: grid; grid-template-columns: 1.55fr 1fr; gap: 14px; margin-top: 14px; align-items: stretch">
@@ -297,7 +308,7 @@
     </div>
     </div>
 
-    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 14px; align-items: stretch">
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 14px; align-items: start">
       <div style="padding: 18px 20px 20px; background: #0b2145; border: 1px solid rgba(243,247,252,0.12); border-radius: 10px">
         <div style="font-size: 12.5px; font-weight: 600; color: #f3f7fc">Stores covered by banner</div>
         <div style="margin-top: 3px; font-size: 11px; color: #4f6c8e">Top 10 banners by store count</div>
@@ -336,7 +347,7 @@
     </sc-if>
 
     <sc-if value="{{ pOverview }}">
-    <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin-top: 14px; align-items: stretch">
+    <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin-top: 14px; align-items: start">
 
       <div style="padding: 18px 20px 20px; background: #0b2145; border: 1px solid rgba(243,247,252,0.12); border-radius: 10px">
         <div style="font-size: 12.5px; font-weight: 600">Calls by day of week</div>
@@ -1106,15 +1117,27 @@ class Component extends DCLogic {
           perRep: (g.stores / g.reps.size).toFixed(1), perStore: (g.calls / g.stores).toFixed(2),
           gap: g.gap, gapFg: g.gap ? '#ec6d25' : '#3d5f85', pct: Math.round(g.calls / mx * 100) }));
       })(),
-      divisionCards: this.DIV_ORDER.map(d => {
-        const rr = v.filter(r => r.division === d);
-        const regions = [...new Set(rr.map(r => r.region))].sort();
-        return { label: d, stores: this.num(rr.length),
-          calls: this.num(rr.reduce((a, r) => a + r.calls, 0)) + ' calls / mo',
-          reps: new Set(rr.map(r => r.rep)).size + ' reps',
-          regions: regions.join(', ') || '—',
-          pct: v.length ? Math.round(rr.length / v.length * 100) : 0 };
-      }),
+      divisionDonut: (() => {
+        const order = [{ k: 'COASTAL', color: '#ec6d25' }, { k: 'INLAND', color: '#6fb2ff' }, { k: 'CENTRAL', color: '#3d5f85' }];
+        const total = v.length, r = 54, C = 2 * Math.PI * r;
+        let offset = 0;
+        const segs = order.map(o => {
+          const n = v.filter(row => row.division === o.k).length;
+          const frac = total ? n / total : 0;
+          const len = frac * C;
+          const seg = { color: o.color, dash: len.toFixed(2) + ' ' + (C - len).toFixed(2), dashoffset: (-offset).toFixed(2) };
+          offset += len;
+          return seg;
+        });
+        const legend = order.map(o => {
+          const n = v.filter(row => row.division === o.k).length;
+          return {
+            label: o.k.charAt(0) + o.k.slice(1).toLowerCase(), color: o.color,
+            stores: this.num(n), pct: total ? (n / total * 100).toFixed(1) : '0.0'
+          };
+        });
+        return { total: this.num(total), segs, legend, r, C: C.toFixed(2) };
+      })(),
       regionBars: (() => {
         const m = new Map();
         v.forEach(r => {
