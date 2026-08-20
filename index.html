@@ -677,16 +677,30 @@ class Component extends DCLogic {
   state = {
     ready: false, err: '', page: 'overview',
     region: '', division: '', banner: '', channel: '', rep: '', merchName: '', manager: '', rtype: '',
+    regionalManager: '', generalManager: '', headOfSyndicated: '',
     resQuery: '', bannerQuery: '', gapQuery: '', slQuery: '',
     gapTab: 'repOnly', slTab: 'all', sortKey: 'stores', sortDir: -1,
   };
 
   componentDidMount() {
+    const normKey = (s) => (s || '').toUpperCase().trim().replace(/\s+/g, ' ');
+    const hierarchyReady = fetch('hierarchy.json').then((r) => r.ok ? r.json() : {}).catch(() => ({}));
+
     const applyPayload = (raw) => {
-      this.repRows = raw.rep_rows || [];
-      this.merchRows = raw.merch_rows || [];
-      this.ts = raw.timestamp;
-      this.setState({ ready: true });
+      hierarchyReady.then((hierarchyMap) => {
+        this.hierarchyMap = hierarchyMap;
+        const withHierarchy = (rows) => rows.map((r) => {
+          const h = hierarchyMap[normKey(r.resourceName)];
+          return h ? Object.assign({}, r, {
+            headOfSyndicated: h.headOfSyndicated, generalManager: h.generalManager,
+            regionalManager: h.regionalManager, manager2: h.manager2,
+          }) : r;
+        });
+        this.repRows = withHierarchy(raw.rep_rows || []);
+        this.merchRows = withHierarchy(raw.merch_rows || []);
+        this.ts = raw.timestamp;
+        this.setState({ ready: true });
+      });
     };
 
     if (isLocalDev()) {
@@ -725,12 +739,15 @@ class Component extends DCLogic {
     if (applyRep && s.rep && r.resourceName !== s.rep) return false;
     if (!applyRep && s.merchName && r.resourceName !== s.merchName) return false;
     if (s.manager && r.managerName !== s.manager) return false;
+    if (s.regionalManager && r.regionalManager !== s.regionalManager) return false;
+    if (s.generalManager && r.generalManager !== s.generalManager) return false;
+    if (s.headOfSyndicated && r.headOfSyndicated !== s.headOfSyndicated) return false;
     return true;
   }
 
   model() {
     const s = this.state;
-    const sig = [s.region, s.division, s.banner, s.channel, s.rep, s.merchName, s.manager, s.rtype].join('§');
+    const sig = [s.region, s.division, s.banner, s.channel, s.rep, s.merchName, s.manager, s.rtype, s.regionalManager, s.generalManager, s.headOfSyndicated].join('§');
     if (this._sig === sig && this._m) return this._m;
     const rep = this.repRows.filter((r) => this.match(r, true));
     const merch = this.merchRows.filter((r) => this.match(r, false));
@@ -844,13 +861,17 @@ class Component extends DCLogic {
       isDivision: s.page === 'division', isBanner: s.page === 'banner', isGaps: s.page === 'gaps',
       isStoreLevel: s.page === 'storelevel',
       fRegion: s.region, fDivision: s.division, fBanner: s.banner, fChannel: s.channel, fRep: s.rep, fMerchName: s.merchName, fManager: s.manager, fType: s.rtype,
+      fRegionalManager: s.regionalManager, fGeneralManager: s.generalManager, fHeadOfSyndicated: s.headOfSyndicated,
       onRegion: (e) => this.set({ region: e.target.value }), onDivision: (e) => this.set({ division: e.target.value }),
       onBanner: (e) => this.set({ banner: e.target.value }), onChannel: (e) => this.set({ channel: e.target.value }),
       onRep: (e) => this.set({ rep: e.target.value }),
       onMerchName: (e) => this.set({ merchName: e.target.value }),
       onManager: (e) => this.set({ manager: e.target.value }),
+      onRegionalManager: (e) => this.set({ regionalManager: e.target.value }),
+      onGeneralManager: (e) => this.set({ generalManager: e.target.value }),
+      onHeadOfSyndicated: (e) => this.set({ headOfSyndicated: e.target.value }),
       onType: (e) => this.set({ rtype: e.target.value }),
-      onReset: () => this.set({ region: '', division: '', banner: '', channel: '', rep: '', merchName: '', manager: '', rtype: '' }),
+      onReset: () => this.set({ region: '', division: '', banner: '', channel: '', rep: '', merchName: '', manager: '', rtype: '', regionalManager: '', generalManager: '', headOfSyndicated: '' }),
       onResQuery: (e) => this.set({ resQuery: e.target.value }),
       onBannerQuery: (e) => this.set({ bannerQuery: e.target.value }),
       onGapQuery: (e) => this.set({ gapQuery: e.target.value }),
@@ -861,15 +882,19 @@ class Component extends DCLogic {
 
     const m = this.model();
     const total = m.all.length;
-    const activeFilters = ['region', 'division', 'banner', 'channel', 'rep', 'merchName', 'manager', 'rtype'].filter((k) => s[k]);
+    const activeFilters = ['region', 'division', 'banner', 'channel', 'rep', 'merchName', 'manager', 'rtype', 'regionalManager', 'generalManager', 'headOfSyndicated'].filter((k) => s[k]);
 
     if (!this._opts) {
       const rs = new Set(), ds = new Set(), bs = new Set(), cs = new Set(), ms = new Set(), rns = new Set(), mns = new Set();
+      const rms = new Set(), gms = new Set(), hoss = new Set();
       [...this.repRows, ...this.merchRows].forEach((r) => {
         if (r.region) rs.add(r.region);
         if (r.division) ds.add(r.division);
         if (r.banner) { bs.add(r.banner); cs.add(channelOf(r.banner)); }
         if (r.managerName) ms.add(r.managerName);
+        if (r.regionalManager) rms.add(r.regionalManager);
+        if (r.generalManager) gms.add(r.generalManager);
+        if (r.headOfSyndicated) hoss.add(r.headOfSyndicated);
       });
       this.repRows.forEach((r) => { if (r.resourceName) rns.add(r.resourceName); });
       this.merchRows.forEach((r) => { if (r.resourceName) mns.add(r.resourceName); });
@@ -878,7 +903,11 @@ class Component extends DCLogic {
       this._merchTypes = typesOf(this.merchRows);
       this._allTypes = typesOf([...this.repRows, ...this.merchRows]);
       const sorted = (x) => [...x].sort();
-      this._opts = { regionOptions: sorted(rs), divisionOptions: sorted(ds), bannerOptions: sorted(bs), channelOptions: sorted(cs), managerOptions: sorted(ms), repOptions: sorted(rns), merchOptions: sorted(mns) };
+      this._opts = {
+        regionOptions: sorted(rs), divisionOptions: sorted(ds), bannerOptions: sorted(bs), channelOptions: sorted(cs),
+        managerOptions: sorted(ms), repOptions: sorted(rns), merchOptions: sorted(mns),
+        regionalManagerOptions: sorted(rms), generalManagerOptions: sorted(gms), headOfSyndicatedOptions: sorted(hoss),
+      };
     }
 
     const out = Object.assign(base, this._opts, {

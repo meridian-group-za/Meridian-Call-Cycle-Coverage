@@ -51,6 +51,12 @@ def build_payload():
         d = json.load(f)
     rep_rows, merch_rows = [], []
     for raw in d['combinedMaster']:
+        # "Office" banner is internal Meridian admin/conference-room
+        # addresses (e.g. "MERIDIAN OFFICE - GAUTENG"), not real stores --
+        # Carin confirmed 2026-08-20 these should be dropped entirely
+        # rather than land in "Other / Unclassified".
+        if (raw.get('BANNER') or '').strip().upper() == 'OFFICE':
+            continue
         row, is_merch = slim(raw)
         (merch_rows if is_merch else rep_rows).append(row)
     return {'timestamp': d['timestamp'], 'processedBy': d.get('processedBy'), 'rep_rows': rep_rows, 'merch_rows': merch_rows}

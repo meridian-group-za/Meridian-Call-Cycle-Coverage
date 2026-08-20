@@ -76,6 +76,9 @@ function normDivision(v) {
 function transformCombinedMaster(raw) {
   const rep_rows = [], merch_rows = [];
   (raw.combinedMaster || []).forEach((r) => {
+    // "Office" banner is internal Meridian admin/conference-room addresses,
+    // not real stores -- drop entirely rather than land in "Other / Unclassified".
+    if ((r["BANNER"] || "").trim().toUpperCase() === "OFFICE") return;
     const isMerch = (r["RESOURCE TYPE"] || "").includes("MERCHANDISER");
     const row = {
       storeCode: r["GEO REP STORE CODE"] || r["STORE CODE"],
