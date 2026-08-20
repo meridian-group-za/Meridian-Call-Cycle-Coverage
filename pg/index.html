@@ -106,7 +106,7 @@
     <div style="padding: 20px 20px 8px; font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: #4f6c8e">Pages</div>
     <nav style="display: flex; flex-direction: column; gap: 3px; padding: 0 12px">
       <sc-for list="{{ navItems }}" as="n" hint-placeholder-count="4">
-        <button onClick="{{ n.onClick }}" style="display: flex; align-items: center; gap: 10px; width: 100%; padding: 9px 12px; font: inherit; font-size: 12.5px; text-align: left; border: 1px solid {{ n.bd }}; border-radius: 10px; cursor: pointer; background: {{ n.bg }}; color: {{ n.fg }}">
+        <button onClick="{{ n.onClick }}" style="display: flex; align-items: center; gap: 10px; width: 100%; padding: 10px 12px; font: inherit; font-size: 14.5px; font-weight: 500; text-align: left; border: 1px solid {{ n.bd }}; border-radius: 10px; cursor: pointer; background: {{ n.bg }}; color: {{ n.fg }}">
           <i class="{{ n.icon }}" style="font-size: 17px; flex: none; color: {{ n.dot }}"></i>
           <span style="flex: 1">{{ n.label }}</span>
           <span style="font-size: 11px; color: #4f6c8e; font-variant-numeric: tabular-nums">{{ n.count }}</span>
@@ -176,18 +176,18 @@
 
     <sc-if value="{{ pOverview }}" hint-placeholder-val="{{ true }}">
     <div style="display: grid; grid-template-columns: minmax(320px, 0.95fr) 1.6fr; gap: 14px">
-      <div style="background: linear-gradient(155deg, #0d2a52 0%, #071834 60%, #061530 100%); border: 1px solid #1c3f6b; border-radius: 16px; padding: 26px">
+      <div style="background: linear-gradient(155deg, #0d2a52 0%, #071834 60%, #061530 100%); border: 1px solid #1c3f6b; border-radius: 16px; padding: 16px 18px">
         <div style="font-size: 9.5px; letter-spacing: 0.12em; text-transform: uppercase; color: #f2955c">Network covered</div>
-        <div style="font-size: 52px; font-weight: 600; line-height: 1.05; margin: 6px 0 2px">{{ storesInView }}</div>
-        <div style="font-size: 11.5px; color: #c9d7e6; margin-bottom: 22px">stores on a dedicated call cycle</div>
-        <div style="display: flex; height: 9px; border-radius: 5px; overflow: hidden; background: #1c3f6b; margin-bottom: 14px">
+        <div style="font-size: 38px; font-weight: 600; line-height: 1.05; margin: 4px 0 2px">{{ storesInView }}</div>
+        <div style="font-size: 11px; color: #c9d7e6; margin-bottom: 12px">stores on a dedicated call cycle</div>
+        <div style="display: flex; height: 8px; border-radius: 4px; overflow: hidden; background: #1c3f6b; margin-bottom: 8px">
           <sc-for list="{{ mix }}" as="m" hint-placeholder-count="3">
             <div style="width: {{ m.w }}; background: {{ m.color }}"></div>
           </sc-for>
         </div>
-        <div style="display: grid; gap: 8px">
+        <div style="display: grid; gap: 5px">
           <sc-for list="{{ mix }}" as="m" hint-placeholder-count="3">
-            <div style="display: flex; align-items: baseline; gap: 8px; font-size: 11.5px">
+            <div style="display: flex; align-items: baseline; gap: 8px; font-size: 11px">
               <span style="width: 7px; height: 7px; border-radius: 2px; background: {{ m.color }}"></span>
               <span style="color: #c9d7e6; flex: 1">{{ m.label }}</span>
               <b style="font-weight: 600">{{ m.value }}</b>
@@ -197,24 +197,24 @@
         </div>
       </div>
 
-      <div style="display: grid; gap: 14px; align-content: start">
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(132px, 1fr)); gap: 10px">
+      <div style="display: grid; gap: 10px; align-content: start">
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(132px, 1fr)); gap: 8px">
           <sc-for list="{{ headlineStats }}" as="s" hint-placeholder-count="6">
-            <div style="min-width: 0; background: #061530; border: 1px solid #1c3f6b; border-radius: 10px; padding: 14px">
-              <div style="display: flex; align-items: center; gap: 6px; font-size: 9px; letter-spacing: 0.09em; text-transform: uppercase; color: #5f80a6; margin-bottom: 6px">
+            <div style="min-width: 0; background: #061530; border: 1px solid #1c3f6b; border-radius: 10px; padding: 9px 12px">
+              <div style="display: flex; align-items: center; gap: 6px; font-size: 9px; letter-spacing: 0.09em; text-transform: uppercase; color: #5f80a6; margin-bottom: 4px">
                 <i class="{{ s.icon }}" style="font-size: 13px; color: #ee7f3c"></i><span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{ s.label }}</span>
               </div>
-              <div style="font-size: 21px; font-weight: 600; line-height: 1.1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{ s.value }}</div>
-              <div style="font-size: 10.5px; color: #5f80a6; margin-top: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{ s.sub }}</div>
+              <div style="font-size: 18px; font-weight: 600; line-height: 1.1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{ s.value }}</div>
+              <div style="font-size: 10px; color: #5f80a6; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{ s.sub }}</div>
             </div>
           </sc-for>
         </div>
 
-        <div style="background: #061530; border: 1px solid #1c3f6b; border-radius: 16px; padding: 22px 22px 16px">
-          <div style="font-size: 9.5px; letter-spacing: 0.12em; text-transform: uppercase; color: #5f80a6; margin-bottom: 14px">What the data says</div>
-          <div style="display: grid; gap: 14px">
+        <div style="background: #061530; border: 1px solid #1c3f6b; border-radius: 16px; padding: 12px 16px 10px">
+          <div style="font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase; color: #5f80a6; margin-bottom: 8px">What the data says</div>
+          <div style="display: grid; gap: 7px">
             <sc-for list="{{ insights }}" as="i" hint-placeholder-count="4">
-              <div style="display: flex; gap: 10px; align-items: flex-start; font-size: 12px; line-height: 1.5; color: #c9d7e6">
+              <div style="display: flex; gap: 10px; align-items: flex-start; font-size: 11.5px; line-height: 1.35; color: #c9d7e6">
                 <i class="{{ i.icon }}" style="font-size: 15px; color: #ec6d25; margin-top: 1px"></i>
                 <div><span>{{ i.lead }}</span><b style="color: #f3f7fc; font-weight: 600">{{ i.value }}</b><span>{{ i.tail }}</span></div>
               </div>
@@ -224,16 +224,16 @@
       </div>
     </div>
 
-    <div style="background: #061530; border: 1px solid #1c3f6b; border-radius: 16px; padding: 22px; margin-top: 14px">
-      <div style="display: flex; align-items: baseline; gap: 8px; margin-bottom: 14px">
-        <h5 style="margin: 0; font-size: 14px; font-weight: 600">Calling frequency</h5>
-        <span style="font-size: 10.5px; color: #5f80a6">stores per cycle pattern, share of the network</span>
+    <div style="background: #061530; border: 1px solid #1c3f6b; border-radius: 16px; padding: 14px 16px; margin-top: 10px">
+      <div style="display: flex; align-items: baseline; gap: 8px; margin-bottom: 8px">
+        <h5 style="margin: 0; font-size: 13px; font-weight: 600">Calling frequency</h5>
+        <span style="font-size: 10px; color: #5f80a6">stores per cycle pattern, share of the network</span>
       </div>
-      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(124px, 1fr)); gap: 10px; align-items: start">
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(124px, 1fr)); gap: 8px; align-items: start">
         <sc-for list="{{ freqTiles }}" as="t" hint-placeholder-count="7">
-          <div style="min-width: 0; background: #0a1c3a; border: 1px solid #1c3f6b; border-radius: 10px; padding: 14px">
-            <div style="font-size: 9px; letter-spacing: 0.08em; text-transform: uppercase; color: #5f80a6; line-height: 1.35; margin-bottom: 8px; min-height: 24px">{{ t.label }}</div>
-            <div style="display: flex; align-items: baseline; gap: 8px; margin-bottom: 8px">
+          <div style="min-width: 0; background: #0a1c3a; border: 1px solid #1c3f6b; border-radius: 10px; padding: 10px 12px">
+            <div style="font-size: 9px; letter-spacing: 0.08em; text-transform: uppercase; color: #5f80a6; line-height: 1.2; margin-bottom: 5px; min-height: 18px">{{ t.label }}</div>
+            <div style="display: flex; align-items: baseline; gap: 6px; margin-bottom: 5px">
               <div style="font-size: 22px; font-weight: 600; line-height: 1">{{ t.value }}</div>
               <div style="font-size: 11px; color: #ee7f3c">{{ t.pct }}</div>
             </div>
@@ -243,12 +243,12 @@
       </div>
     </div>
 
-    <div style="display: grid; grid-template-columns: 0.72fr 0.72fr 1.56fr; gap: 14px; margin-top: 14px; align-items: stretch">
-      <div style="background: #061530; border: 1px solid #1c3f6b; border-radius: 16px; padding: 22px">
-        <div style="display: flex; align-items: baseline; gap: 8px; margin-bottom: 14px"><h5 style="margin: 0; font-size: 14px; font-weight: 600">Stores by division</h5></div>
-        <div style="display: flex; justify-content: center; margin: 8px 0 22px">
-          <div style="position: relative; width: 176px; height: 176px">
-            <svg viewBox="0 0 140 140" style="width: 176px; height: 176px; transform: rotate(-90deg)">
+    <div style="display: grid; grid-template-columns: 0.72fr 0.72fr 1.56fr; gap: 14px; margin-top: 10px; align-items: stretch">
+      <div style="background: #061530; border: 1px solid #1c3f6b; border-radius: 16px; padding: 14px 16px">
+        <div style="display: flex; align-items: baseline; gap: 8px; margin-bottom: 8px"><h5 style="margin: 0; font-size: 13px; font-weight: 600">Stores by division</h5></div>
+        <div style="display: flex; justify-content: center; margin: 4px 0 12px">
+          <div style="position: relative; width: 140px; height: 140px">
+            <svg viewBox="0 0 140 140" style="width: 140px; height: 140px; transform: rotate(-90deg)">
               <circle cx="70" cy="70" r="54" fill="none" stroke="#0a1c3a" stroke-width="17"></circle>
               <sc-for list="{{ divisionCards }}" as="d" hint-placeholder-count="3">
                 <circle cx="70" cy="70" r="54" fill="none" stroke="{{ d.color }}" stroke-width="17" stroke-dasharray="{{ d.dash }}" stroke-dashoffset="{{ d.offset }}"></circle>
@@ -917,7 +917,7 @@ class Component extends DCLogic {
         const on = page === p.k && this.state.view === 'dash';
         return { label: p.label, count: counts[p.k], icon: p.icon,
           bg: on ? 'rgba(236,109,37,0.12)' : 'transparent',
-          fg: on ? '#f3f7fc' : '#9dc4ec',
+          fg: '#f3f7fc',
           bd: on ? 'rgba(236,109,37,0.40)' : 'transparent',
           dot: on ? '#ec6d25' : '#3d5f85',
           onClick: () => this.setState({ page: p.k, view: 'dash', repName: null, storeIdx: null }) };
