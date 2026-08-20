@@ -186,7 +186,7 @@
       </div>
     </div>
 
-    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-top: 14px; align-items: start">
+    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-top: 14px; align-items: stretch">
       <div style="padding: 16px 20px 18px; background: #0b2145; border: 1px solid rgba(243,247,252,0.12); border-radius: 10px">
         <div style="display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap">
           <div style="font-size: 12.5px; font-weight: 600; color: #f3f7fc">Stores by division</div>
@@ -218,23 +218,38 @@
           </sc-for>
         </div>
       </div>
-      <div style="padding: 18px 20px 20px; background: #0b2145; border: 1px solid rgba(243,247,252,0.12); border-radius: 10px">
-        <div style="font-size: 12.5px; font-weight: 600; color: #f3f7fc">Stores covered by banner</div>
-        <div style="margin-top: 3px; font-size: 11px; color: #4f6c8e">Top 10 banners by store count</div>
-        <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 16px">
-          <sc-for list="{{ bannerBars }}" as="b" hint-placeholder-count="8">
-            <div>
-              <div style="display: flex; justify-content: space-between; font-size: 11px; color: #9dc4ec; margin-bottom: 4px">
-                <span>{{ b.label }}</span>
-                <span style="color: #5f80a6; font-variant-numeric: tabular-nums">{{ b.value }}</span>
-              </div>
-              <span style="display: block; height: 6px; background: rgba(236,109,37,0.10); border-radius: 3px; overflow: hidden">
-                <span style="display: block; height: 6px; border-radius: 3px; background: #ec6d25; width: {{ b.pct }}%"></span>
-              </span>
-            </div>
-          </sc-for>
-        </div>
+    <div style="padding: 18px 20px 20px; background: #0b2145; border: 1px solid rgba(243,247,252,0.12); border-radius: 10px">
+      <div>
+        <div style="font-size: 12.5px; font-weight: 600; color: #f3f7fc">Resourcing by rep type</div>
+        <div style="margin-top: 3px; font-size: 11px; color: #4f6c8e">Distinct reps and line managers behind each store base</div>
+        <table style="width: 100%; border-collapse: collapse; margin-top: 14px">
+          <thead>
+            <tr>
+              <th style="padding: 7px 8px; text-align: left; font-size: 9.5px; font-weight: 500; letter-spacing: 0.10em; text-transform: uppercase; color: #4f6c8e; border-bottom: 1px solid rgba(243,247,252,0.14)">Rep type</th>
+              <th style="padding: 7px 8px; text-align: right; font-size: 9.5px; font-weight: 500; letter-spacing: 0.10em; text-transform: uppercase; color: #4f6c8e; border-bottom: 1px solid rgba(243,247,252,0.14)">Reps</th>
+              <th style="padding: 7px 8px; text-align: right; font-size: 9.5px; font-weight: 500; letter-spacing: 0.10em; text-transform: uppercase; color: #4f6c8e; border-bottom: 1px solid rgba(243,247,252,0.14)">Managers</th>
+              <th style="padding: 7px 8px; text-align: right; font-size: 9.5px; font-weight: 500; letter-spacing: 0.10em; text-transform: uppercase; color: #4f6c8e; border-bottom: 1px solid rgba(243,247,252,0.14)">Stores</th>
+              <th style="padding: 7px 8px; font-size: 9.5px; font-weight: 500; letter-spacing: 0.10em; text-transform: uppercase; color: #4f6c8e; border-bottom: 1px solid rgba(243,247,252,0.14); width: 110px">Share</th>
+            </tr>
+          </thead>
+          <tbody>
+            <sc-for list="{{ repTypeRows }}" as="t" hint-placeholder-count="4">
+              <tr style="border-bottom: 1px solid rgba(243,247,252,0.06)">
+                <td style="padding: 9px 8px; font-size: 12px; color: #f3f7fc">{{ t.label }}</td>
+                <td style="padding: 9px 8px; font-size: 12px; color: #c9d7e6; text-align: right; font-variant-numeric: tabular-nums">{{ t.reps }}</td>
+                <td style="padding: 9px 8px; font-size: 12px; color: #c9d7e6; text-align: right; font-variant-numeric: tabular-nums">{{ t.mgrs }}</td>
+                <td style="padding: 9px 8px; font-size: 12px; color: #ec6d25; text-align: right; font-variant-numeric: tabular-nums">{{ t.stores }}</td>
+                <td style="padding: 9px 8px">
+                  <span style="display: block; height: 6px; background: rgba(236,109,37,0.10); border-radius: 3px; overflow: hidden">
+                    <span style="display: block; height: 6px; border-radius: 3px; background: #ec6d25; width: {{ t.pct }}%"></span>
+                  </span>
+                </td>
+              </tr>
+            </sc-for>
+          </tbody>
+        </table>
       </div>
+    </div>
       <div style="padding: 18px 20px 20px; background: #0b2145; border: 1px solid rgba(243,247,252,0.12); border-radius: 10px">
         <div style="font-size: 12.5px; font-weight: 600; color: #f3f7fc">Stores covered by channel</div>
         <div style="margin-top: 3px; font-size: 11px; color: #4f6c8e">Store count per channel</div>
@@ -310,38 +325,23 @@
 
     </div>
 
-    <div style="padding: 18px 20px 20px; background: #0b2145; border: 1px solid rgba(243,247,252,0.12); border-radius: 10px">
-      <div>
-        <div style="font-size: 12.5px; font-weight: 600; color: #f3f7fc">Resourcing by rep type</div>
-        <div style="margin-top: 3px; font-size: 11px; color: #4f6c8e">Distinct reps and line managers behind each store base</div>
-        <table style="width: 100%; border-collapse: collapse; margin-top: 14px">
-          <thead>
-            <tr>
-              <th style="padding: 7px 8px; text-align: left; font-size: 9.5px; font-weight: 500; letter-spacing: 0.10em; text-transform: uppercase; color: #4f6c8e; border-bottom: 1px solid rgba(243,247,252,0.14)">Rep type</th>
-              <th style="padding: 7px 8px; text-align: right; font-size: 9.5px; font-weight: 500; letter-spacing: 0.10em; text-transform: uppercase; color: #4f6c8e; border-bottom: 1px solid rgba(243,247,252,0.14)">Reps</th>
-              <th style="padding: 7px 8px; text-align: right; font-size: 9.5px; font-weight: 500; letter-spacing: 0.10em; text-transform: uppercase; color: #4f6c8e; border-bottom: 1px solid rgba(243,247,252,0.14)">Managers</th>
-              <th style="padding: 7px 8px; text-align: right; font-size: 9.5px; font-weight: 500; letter-spacing: 0.10em; text-transform: uppercase; color: #4f6c8e; border-bottom: 1px solid rgba(243,247,252,0.14)">Stores</th>
-              <th style="padding: 7px 8px; font-size: 9.5px; font-weight: 500; letter-spacing: 0.10em; text-transform: uppercase; color: #4f6c8e; border-bottom: 1px solid rgba(243,247,252,0.14); width: 110px">Share</th>
-            </tr>
-          </thead>
-          <tbody>
-            <sc-for list="{{ repTypeRows }}" as="t" hint-placeholder-count="4">
-              <tr style="border-bottom: 1px solid rgba(243,247,252,0.06)">
-                <td style="padding: 9px 8px; font-size: 12px; color: #f3f7fc">{{ t.label }}</td>
-                <td style="padding: 9px 8px; font-size: 12px; color: #c9d7e6; text-align: right; font-variant-numeric: tabular-nums">{{ t.reps }}</td>
-                <td style="padding: 9px 8px; font-size: 12px; color: #c9d7e6; text-align: right; font-variant-numeric: tabular-nums">{{ t.mgrs }}</td>
-                <td style="padding: 9px 8px; font-size: 12px; color: #ec6d25; text-align: right; font-variant-numeric: tabular-nums">{{ t.stores }}</td>
-                <td style="padding: 9px 8px">
-                  <span style="display: block; height: 6px; background: rgba(236,109,37,0.10); border-radius: 3px; overflow: hidden">
-                    <span style="display: block; height: 6px; border-radius: 3px; background: #ec6d25; width: {{ t.pct }}%"></span>
-                  </span>
-                </td>
-              </tr>
-            </sc-for>
-          </tbody>
-        </table>
+      <div style="padding: 18px 20px 20px; background: #0b2145; border: 1px solid rgba(243,247,252,0.12); border-radius: 10px">
+        <div style="font-size: 12.5px; font-weight: 600; color: #f3f7fc">Stores covered by banner</div>
+        <div style="margin-top: 3px; font-size: 11px; color: #4f6c8e">Top 10 banners by store count</div>
+        <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 16px">
+          <sc-for list="{{ bannerBars }}" as="b" hint-placeholder-count="8">
+            <div>
+              <div style="display: flex; justify-content: space-between; font-size: 11px; color: #9dc4ec; margin-bottom: 4px">
+                <span>{{ b.label }}</span>
+                <span style="color: #5f80a6; font-variant-numeric: tabular-nums">{{ b.value }}</span>
+              </div>
+              <span style="display: block; height: 6px; background: rgba(236,109,37,0.10); border-radius: 3px; overflow: hidden">
+                <span style="display: block; height: 6px; border-radius: 3px; background: #ec6d25; width: {{ b.pct }}%"></span>
+              </span>
+            </div>
+          </sc-for>
+        </div>
       </div>
-    </div>
     </div>
 
     </sc-if>
