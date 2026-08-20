@@ -621,35 +621,42 @@ Last updated<br><span style="color:var(--color-neutral-300);">{{ snapshot }}</sp
 
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{}">
+/* Transcribed 1:1 from the Power BI report's BannerBucket DAX measure
+   (Carin, 2026-08-20) -- keep this in sync with that measure, not the
+   other way around. */
 const CHANNEL_MAP = {
-  'BABY CITY':'Grocery','BOXER':'Grocery','CHECKERS':'Grocery','CHECKERS HYPER':'Grocery','CHECKERS LITTLE ME':'Grocery',
-  'CHECKERS OUTDOOR':'Grocery','FOODWORLD':'Grocery','GAME':'Grocery','JWAYELANI':'Grocery','KWIKSPAR':'Grocery',
-  'OK FOODS':'Grocery','OK GROCER':'Grocery','OK MINIMARK':'Grocery','OK EXPRESS':'Grocery','OK URBAN':'Grocery',
-  'PICK N PAY CORPORATE':'Grocery','PICK N PAY FAMILY':'Grocery','PICK N PAY HYPERMARKETS':'Grocery','WALMART':'Grocery',
-  'PICK N PAY LOCAL':'Grocery','PICK N PAY MINI MARKET':'Grocery','SAVEMOR':'Grocery','SHOPRITE':'Grocery',
-  'SHOPRITE MINI':'Grocery','SPAR':'Grocery','SPAR EXPRESS':'Grocery','SUPERSPAR':'Grocery','USAVE':'Grocery',
-  'CHECKERS DARK STORE':'Grocery','MAKRO':'Grocery','WOOLWORTHS':'Grocery',"FOOD LOVER'S MARKET":'Grocery',
-  'CLICKS':'Pharmacy / Health & Beauty','DISCHEM':'Pharmacy / Health & Beauty','MEDIRITE':'Pharmacy / Health & Beauty',
-  'MEDIRITE PLUS':'Pharmacy / Health & Beauty','SPAR PHARMACY':'Pharmacy / Health & Beauty',
-  'BEAUTY WORLD':'Pharmacy / Health & Beauty','BEAUTY ZONE':'Pharmacy / Health & Beauty',
-  'COSMETIC CONNECTION':'Pharmacy / Health & Beauty','COSMIX':'Pharmacy / Health & Beauty',
-  'CHECKERS LIQUORSHOP':'Liquor','PRESIDENT LIQUOR':'Liquor','SHOPRITE LIQUORSHOP':'Liquor','TOPS':'Liquor',
-  'PICK N PAY LIQUOR':'Liquor','OK LIQUOR':'Liquor','SAVEMOR LIQUORS':'Liquor',
-  'AFRICA CASH AND CARRY':'Wholesale / Cash & Carry','JUMBO':'Wholesale / Cash & Carry','KIT KAT':'Wholesale / Cash & Carry',
-  'LIQUORSHOP WHOLESALE':'Wholesale / Cash & Carry','SHOPRITE C&C':'Wholesale / Cash & Carry','UMS':'Wholesale / Cash & Carry',
-  'UNITRADE UMS':'Wholesale / Cash & Carry','SHIELD':'Wholesale / Cash & Carry','ELITE STAR':'Wholesale / Cash & Carry',
-  'SUNSHINE':'Wholesale / Cash & Carry','ICC':'Wholesale / Cash & Carry','SHOPRITE CANDC':'Wholesale / Cash & Carry',
-  'IBC':'Wholesale / Cash & Carry','ARROW CASH AND CARRY':'Wholesale / Cash & Carry',
-  'CONTINENTAL CASH & CARRY':'Wholesale / Cash & Carry','INDEPENDENT C&C':'Wholesale / Cash & Carry',
+  // Pharmacy / Healthcare
+  'BABY CITY':'Pharmacy / Healthcare','COSMETIC CONNECTION':'Pharmacy / Healthcare','CLICKS':'Pharmacy / Healthcare',
+  'DISCHEM':'Pharmacy / Healthcare','MEDIRITE':'Pharmacy / Healthcare','MEDIRITE PLUS':'Pharmacy / Healthcare',
+  'SPAR PHARMACY':'Pharmacy / Healthcare',
+  // Wholesale
+  'AFRICA CASH AND CARRY':'Wholesale','ARROW CASH AND CARRY':'Wholesale','INDEPENDENT C&C':'Wholesale','IBC':'Wholesale',
+  'BEC':'Wholesale','SHIELD':'Wholesale','UNITRADE UMS':'Wholesale','BEAUTY WORLD':'Wholesale','BEAUTY ZONE':'Wholesale',
+  'CONTINENTAL CASH & CARRY':'Wholesale','JUMBO':'Wholesale','JWAYELANI':'Wholesale','KIT KAT':'Wholesale',
+  'LIQUORSHOP WHOLESALE':'Wholesale','SUNSHINE':'Wholesale','ICC':'Wholesale','ELITE STAR':'Wholesale',
+  'COSMIX':'Wholesale','FOODZONE':'Wholesale','FOODWORLD':'Wholesale',
+  'CHECKME':'Wholesale','CHECKRITE':'Wholesale','CHECKSAVE':'Wholesale','HYPERCHECK':'Wholesale','CHECKSTAR':'Wholesale',
+  'CHECK IN':'Wholesale','RHINO':'Wholesale','CAMBRIDGE':'Wholesale','UMS':'Wholesale',
+  // Liquor
+  'CHECKERS LIQUORSHOP':'Liquor','OK LIQUOR':'Liquor','PICK N PAY LIQUOR':'Liquor','PRESIDENT LIQUOR':'Liquor',
+  'SHOPRITE LIQUORSHOP':'Liquor','SAVEMOR LIQUORS':'Liquor','TOPS':'Liquor',
+  // Appliance/Stationery
+  'HIRSCH':'Appliance','YUPPIECHEF':'Appliance','PNA':'Appliance','WALTONS':'Appliance','VAN SCHAIK':'Appliance',
+  // Forecourts
   'BP EXPRESS':'Forecourts','ENGEN':'Forecourts',
-  'BEC':'Wholesale / Cash & Carry','CHECKME':'Wholesale / Cash & Carry','CHECKRITE':'Wholesale / Cash & Carry',
-  'HYPERCHECK':'Wholesale / Cash & Carry','CHECKSAVE':'Wholesale / Cash & Carry','CHECKSTAR':'Wholesale / Cash & Carry',
+  // Grocery
+  'SPAR':'Grocery','SUPERSPAR':'Grocery','KWIKSPAR':'Grocery','SAVEMOR':'Grocery','BOXER':'Grocery',
+  'CHECKERS':'Grocery','CHECKERS HYPER':'Grocery','CHECKERS LITTLE ME':'Grocery','CHECKERS OUTDOOR':'Grocery',
+  "FOOD LOVER'S MARKET":'Grocery','GAME':'Grocery','MAKRO':'Grocery',
+  'OK EXPRESS':'Grocery','OK FOODS':'Grocery','OK GROCER':'Grocery','OK MINIMARK':'Grocery',
+  'PICK N PAY FAMILY':'Grocery','PICK N PAY CORPORATE':'Grocery',
+  'PICK N PAY HYPERMARKETS':'Grocery','PICK N PAY LOCAL':'Grocery','PICK N PAY MINI MARKET':'Grocery',
+  'SHOPRITE':'Grocery','WALMART':'Grocery','SHOPRITE C&C':'Grocery','SHOPRITE MINI':'Grocery','OK URBAN':'Grocery',
+  'SPAR EXPRESS':'Grocery','TOYSRUS':'Grocery','USAVE':'Grocery','WOOLWORTHS':'Grocery',
+  // Hardware
   'BUILDERS':'Hardware',
-  'VAN SCHAIK':'Stationery','WALTONS':'Stationery','PNA':'Stationery',
-  'YUPPIECHEF':'Specialty','TOYSRUS':'Specialty','HIRSCH':'Specialty',
-  'FOODZONE':'Retail',
 };
-const channelOf = (b) => CHANNEL_MAP[(b || '').toUpperCase()] || 'Other / unclassified';
+const channelOf = (b) => CHANNEL_MAP[(b || '').toUpperCase()] || 'Other / Unclassified';
 const key = (r) => (r.storeCode || '') + '|' + (r.storeName || '');
 const n = (v) => (v == null ? '—' : Number(v).toLocaleString('en-ZA'));
 const pct = (a, b) => (b ? (a / b * 100) : 0);
