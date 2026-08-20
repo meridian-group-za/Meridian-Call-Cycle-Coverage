@@ -186,7 +186,7 @@
       </div>
     </div>
 
-    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 14px; align-items: start">
+    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-top: 14px; align-items: start">
       <div style="padding: 16px 20px 18px; background: #0b2145; border: 1px solid rgba(243,247,252,0.12); border-radius: 10px">
         <div style="display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap">
           <div style="font-size: 12.5px; font-weight: 600; color: #f3f7fc">Stores by division</div>
@@ -218,6 +218,42 @@
           </sc-for>
         </div>
       </div>
+      <div style="padding: 18px 20px 20px; background: #0b2145; border: 1px solid rgba(243,247,252,0.12); border-radius: 10px">
+        <div style="font-size: 12.5px; font-weight: 600; color: #f3f7fc">Stores covered by banner</div>
+        <div style="margin-top: 3px; font-size: 11px; color: #4f6c8e">Top 10 banners by store count</div>
+        <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 16px">
+          <sc-for list="{{ bannerBars }}" as="b" hint-placeholder-count="8">
+            <div>
+              <div style="display: flex; justify-content: space-between; font-size: 11px; color: #9dc4ec; margin-bottom: 4px">
+                <span>{{ b.label }}</span>
+                <span style="color: #5f80a6; font-variant-numeric: tabular-nums">{{ b.value }}</span>
+              </div>
+              <span style="display: block; height: 6px; background: rgba(236,109,37,0.10); border-radius: 3px; overflow: hidden">
+                <span style="display: block; height: 6px; border-radius: 3px; background: #ec6d25; width: {{ b.pct }}%"></span>
+              </span>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+      <div style="padding: 18px 20px 20px; background: #0b2145; border: 1px solid rgba(243,247,252,0.12); border-radius: 10px">
+        <div style="font-size: 12.5px; font-weight: 600; color: #f3f7fc">Stores covered by channel</div>
+        <div style="margin-top: 3px; font-size: 11px; color: #4f6c8e">Store count per channel</div>
+        <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 16px">
+          <sc-for list="{{ channelBars }}" as="b" hint-placeholder-count="5">
+            <div>
+              <div style="display: flex; justify-content: space-between; font-size: 11px; color: #9dc4ec; margin-bottom: 4px">
+                <span>{{ b.label }}</span>
+                <span style="color: #5f80a6; font-variant-numeric: tabular-nums">{{ b.value }}</span>
+              </div>
+              <span style="display: block; height: 6px; background: rgba(236,109,37,0.10); border-radius: 3px; overflow: hidden">
+                <span style="display: block; height: 6px; border-radius: 3px; background: #ec6d25; width: {{ b.pct }}%"></span>
+              </span>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+    <div style="margin-top: 14px">
       <div style="padding: 16px 20px 18px; background: #0b2145; border: 1px solid rgba(243,247,252,0.12); border-radius: 10px">
         <div style="display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap">
           <div style="font-size: 12.5px; font-weight: 600; color: #f3f7fc">Managers by team type</div>
@@ -308,42 +344,6 @@
     </div>
     </div>
 
-    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 14px; align-items: start">
-      <div style="padding: 18px 20px 20px; background: #0b2145; border: 1px solid rgba(243,247,252,0.12); border-radius: 10px">
-        <div style="font-size: 12.5px; font-weight: 600; color: #f3f7fc">Stores covered by banner</div>
-        <div style="margin-top: 3px; font-size: 11px; color: #4f6c8e">Top 10 banners by store count</div>
-        <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 16px">
-          <sc-for list="{{ bannerBars }}" as="b" hint-placeholder-count="8">
-            <div>
-              <div style="display: flex; justify-content: space-between; font-size: 11px; color: #9dc4ec; margin-bottom: 4px">
-                <span>{{ b.label }}</span>
-                <span style="color: #5f80a6; font-variant-numeric: tabular-nums">{{ b.value }}</span>
-              </div>
-              <span style="display: block; height: 6px; background: rgba(236,109,37,0.10); border-radius: 3px; overflow: hidden">
-                <span style="display: block; height: 6px; border-radius: 3px; background: #ec6d25; width: {{ b.pct }}%"></span>
-              </span>
-            </div>
-          </sc-for>
-        </div>
-      </div>
-      <div style="padding: 18px 20px 20px; background: #0b2145; border: 1px solid rgba(243,247,252,0.12); border-radius: 10px">
-        <div style="font-size: 12.5px; font-weight: 600; color: #f3f7fc">Stores covered by channel</div>
-        <div style="margin-top: 3px; font-size: 11px; color: #4f6c8e">Store count per channel</div>
-        <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 16px">
-          <sc-for list="{{ channelBars }}" as="b" hint-placeholder-count="5">
-            <div>
-              <div style="display: flex; justify-content: space-between; font-size: 11px; color: #9dc4ec; margin-bottom: 4px">
-                <span>{{ b.label }}</span>
-                <span style="color: #5f80a6; font-variant-numeric: tabular-nums">{{ b.value }}</span>
-              </div>
-              <span style="display: block; height: 6px; background: rgba(236,109,37,0.10); border-radius: 3px; overflow: hidden">
-                <span style="display: block; height: 6px; border-radius: 3px; background: #ec6d25; width: {{ b.pct }}%"></span>
-              </span>
-            </div>
-          </sc-for>
-        </div>
-      </div>
-    </div>
     </sc-if>
 
     <sc-if value="{{ pOverview }}">
