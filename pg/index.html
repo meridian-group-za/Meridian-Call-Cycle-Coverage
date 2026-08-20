@@ -4,6 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <script src="./support.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@azure/msal-browser@2.38.3/lib/msal-browser.min.js"></script>
+<script src="./msal-auth.js"></script>
 </head>
 <body>
 <x-dc>
@@ -743,7 +745,16 @@ class Component extends DCLogic {
   };
 
   componentDidMount() {
-    try { if (localStorage.getItem('cc_authed') === '1') this.setState({ authed: true }); } catch (e) {}
+    if (isLocalDev()) {
+      this.setState({ authed: true });
+    } else {
+      const inst = getPgMsalInstance();
+      inst.handleRedirectPromise()
+        .then((result) => {
+          if (result || inst.getAllAccounts().length) this.setState({ authed: true });
+        })
+        .catch((e) => this.setState({ loginError: 'Sign-in failed: ' + e.message }));
+    }
     fetch('cycle-data.json').then(r => r.json()).then(d => {
       const rows = d.rows.map((r, i) => {
         const days = [...r[18]].map(c => c === '1');
@@ -774,8 +785,9 @@ class Component extends DCLogic {
     { k: 'FIELDMARKETER MONTHLY', label: 'Fieldmarketer monthly', c: '#c9d7e6' }
   ];
   signIn() {
-    try { localStorage.setItem('cc_authed', '1'); } catch (e) {}
-    this.setState({ authed: true, loginPass: '', loginError: '' });
+    if (isLocalDev()) { this.setState({ authed: true, loginPass: '', loginError: '' }); return; }
+    this.setState({ loginError: '' });
+    getPgMsalInstance().loginRedirect({ scopes: [] });
   }
 
   num(n) { return (n || 0).toLocaleString('en-ZA'); }
@@ -829,7 +841,10 @@ class Component extends DCLogic {
         { icon: 'ph ph-map-trifold', title: 'Full national reach', body: 'Coverage across every region and division.' }
       ],
       onLogin: () => this.signIn(),
-      onLogout: () => { try { localStorage.removeItem('cc_authed'); } catch (err) {} this.setState({ authed: false, loginPass: '' }); }
+      onLogout: () => {
+        if (isLocalDev()) { this.setState({ authed: false, loginPass: '' }); return; }
+        getPgMsalInstance().logoutRedirect();
+      }
     };
     if (!rows) return { ...auth, loading: true, showDash: false, showRep: false, showStore: false, crumb: '',
       pOverview: false, pDivisions: false, pReps: false, pStores: false,
