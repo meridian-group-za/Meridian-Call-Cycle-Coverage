@@ -770,7 +770,7 @@ Last updated<br><span style="color:var(--color-neutral-300);">{{ snapshot }}</sp
           <h5 style="margin:0 0 var(--space-3); font-size:14px;">Top managers by merchandiser count</h5>
           <div style="display:grid; gap:10px;">
             <sc-for list="{{ hierarchyTopManagers }}" as="tm" hint-placeholder-count="8">
-              <div style="display:grid; grid-template-columns:170px 1fr 70px 100px; align-items:center; gap:10px;">
+              <div onClick="{{ tm.go }}" style="cursor:pointer; display:grid; grid-template-columns:170px 1fr 70px 100px; align-items:center; gap:10px; padding:2px 4px; border-radius:6px;" style-hover="background:rgba(111,178,255,0.08);">
                 <div style="font-size:11.5px; color:var(--color-neutral-300); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{{ tm.manager }}</div>
                 <div style="height:10px; background:#1c3f6b; border-radius:3px; overflow:hidden;"><div style="height:100%; width:{{ tm.barW }}; background:#6fb2ff;"></div></div>
                 <div style="font-size:11px; text-align:right; color:var(--color-accent-300);">{{ tm.repCount }} reps</div>
@@ -789,7 +789,7 @@ Last updated<br><span style="color:var(--color-neutral-300);">{{ snapshot }}</sp
           <div style="font-size:10.5px; color:var(--color-neutral-500); margin-bottom:var(--space-3);">A merchandiser's own "manager" field is the rep they report to; that rep's manager is the real people-manager shown here. Click a manager to see their reps and each rep's merchandiser count.</div>
           <div style="max-height:640px; overflow:auto;">
             <sc-for list="{{ hierarchyRows }}" as="row" hint-placeholder-count="12">
-              <div style="border-bottom:1px solid #1c3f6b;">
+              <div id="{{ row.domId }}" style="border-bottom:1px solid #1c3f6b;">
                 <div onClick="{{ row.toggle }}" style="display:grid; grid-template-columns:22px 1fr 90px 130px; align-items:center; gap:10px; padding:9px 4px; cursor:pointer;">
                   <i class="{{ row.chevron }}" style="font-size:13px; color:var(--color-neutral-500);"></i>
                   <div style="font-size:12.5px; color:var(--color-text); font-weight:600;">{{ row.manager }}</div>
@@ -1763,6 +1763,15 @@ class Component extends DCLogic {
       const peakMerch = Math.max(1, ...topByMerch.map((r) => r.merchCount));
       out.hierarchyTopManagers = topByMerch.map((r) => ({
         manager: r.manager, repCount: n(r.repCount), merchCount: n(r.merchCount), barW: w(pct(r.merchCount, peakMerch)),
+        // Clicking a bar (or its merch count) expands that manager down in
+        // the search list below and scrolls it into view -- Carin, 2026-08-24.
+        go: () => {
+          this.set({ expandedManagers: { ...s.expandedManagers, [r.manager]: true } });
+          setTimeout(() => {
+            const el = document.getElementById('hier-mgr-' + encodeURIComponent(r.manager));
+            if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          }, 60);
+        },
       }));
       const hq = s.hierarchyQuery.trim().toLowerCase();
       const filtered = hq ? rows.filter((r) => r.manager.toLowerCase().includes(hq)
@@ -1776,6 +1785,7 @@ class Component extends DCLogic {
         const expanded = !!s.expandedManagers[row.manager];
         return {
           manager: row.manager, repCount: n(row.repCount), merchCount: n(row.merchCount),
+          domId: 'hier-mgr-' + encodeURIComponent(row.manager),
           expanded, chevron: expanded ? 'ph ph-caret-down' : 'ph ph-caret-right',
           toggle: () => this.set({ expandedManagers: { ...s.expandedManagers, [row.manager]: !expanded } }),
           reps: expanded ? row.reps.map((rp) => {
