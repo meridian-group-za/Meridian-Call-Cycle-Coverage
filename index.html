@@ -40,6 +40,21 @@
   .nx-row:hover { background: color-mix(in srgb, var(--color-accent) 7%, transparent); }
   .nx-nav:hover { background: color-mix(in srgb, var(--color-accent) 9%, transparent); }
   select.nx-in option { background:#0f2c4f; color:#e9e9ed; }
+
+  /* Team hierarchy org-chart (Carin, 2026-08-24) */
+  .org-wrap { display:flex; flex-direction:column; align-items:center; padding:24px 0 8px; overflow-x:auto; }
+  .org-node { background:#0a1c3a; border:1px solid var(--color-neutral-800); border-radius:var(--radius-md); padding:10px 16px; text-align:center; white-space:nowrap; }
+  .org-node.org-manager { border-color:var(--color-accent-700); background:color-mix(in srgb, var(--color-accent) 10%, #0a1c3a); }
+  .org-node .org-name { font-size:12.5px; font-weight:600; color:var(--color-text); }
+  .org-node .org-role { font-size:9.5px; letter-spacing:.06em; text-transform:uppercase; color:var(--color-neutral-500); margin-top:2px; }
+  .org-node .org-badge { font-size:10.5px; color:#6fb2ff; margin-top:4px; }
+  .org-stem { width:2px; height:20px; background:var(--color-neutral-800); }
+  .org-children { display:flex; gap:22px; }
+  .org-child { position:relative; padding-top:20px; }
+  .org-child::before { content:''; position:absolute; top:0; left:0; right:0; height:2px; background:var(--color-neutral-800); }
+  .org-child::after { content:''; position:absolute; top:0; left:50%; width:2px; height:20px; background:var(--color-neutral-800); }
+  .org-child:first-child::before { left:50%; }
+  .org-child:last-child::before { right:50%; }
 </style>
 </helmet>
 <div style="display:flex; min-height:100vh; background:var(--color-bg); font-family:var(--font-body); font-size:13px; color:var(--color-text);">
@@ -655,6 +670,32 @@ Last updated<br><span style="color:var(--color-neutral-300);">{{ snapshot }}</sp
 
       <!-- ══ TEAM HIERARCHY ══ -->
       <sc-if value="{{ isHierarchy }}" hint-placeholder-val="{{ false }}">
+        <div style="display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:var(--space-3); margin-bottom:var(--space-4);">
+          <sc-for list="{{ hierarchyStats }}" as="s" hint-placeholder-count="4">
+            <div style="background:var(--color-surface); border:1px solid var(--color-neutral-800); border-radius:var(--radius-md); padding:var(--space-4);">
+              <div style="display:flex; align-items:center; gap:6px; font-size:9px; letter-spacing:0.09em; text-transform:uppercase; color:var(--color-neutral-500); margin-bottom:6px;">
+                <i class="{{ s.icon }}" style="font-size:13px; color:var(--color-accent-400);"></i><span>{{ s.label }}</span>
+              </div>
+              <div style="font-family:var(--font-heading); font-size:23px; line-height:1.1;">{{ s.value }}</div>
+              <div style="font-size:10.5px; color:var(--color-neutral-500); margin-top:3px;">{{ s.sub }}</div>
+            </div>
+          </sc-for>
+        </div>
+
+        <div style="background:var(--color-surface); border:1px solid var(--color-neutral-800); border-radius:var(--radius-lg); padding:var(--space-6); margin-bottom:var(--space-4);">
+          <h5 style="margin:0 0 var(--space-3); font-size:14px;">Top managers by merchandiser count</h5>
+          <div style="display:grid; gap:10px;">
+            <sc-for list="{{ hierarchyTopManagers }}" as="tm" hint-placeholder-count="8">
+              <div style="display:grid; grid-template-columns:170px 1fr 70px 100px; align-items:center; gap:10px;">
+                <div style="font-size:11.5px; color:var(--color-neutral-300); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{{ tm.manager }}</div>
+                <div style="height:10px; background:#1c3f6b; border-radius:3px; overflow:hidden;"><div style="height:100%; width:{{ tm.barW }}; background:#6fb2ff;"></div></div>
+                <div style="font-size:11px; text-align:right; color:var(--color-accent-300);">{{ tm.repCount }} reps</div>
+                <div style="font-size:11px; text-align:right; color:#6fb2ff;">{{ tm.merchCount }} merch</div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+
         <div style="background:var(--color-surface); border:1px solid var(--color-neutral-800); border-radius:var(--radius-lg); padding:var(--space-6);">
           <div style="display:flex; align-items:center; gap:12px; margin-bottom:var(--space-3); flex-wrap:wrap;">
             <h5 style="margin:0; font-size:14px;">Manager &rarr; reps &rarr; merchandisers</h5>
@@ -671,13 +712,26 @@ Last updated<br><span style="color:var(--color-neutral-300);">{{ snapshot }}</sp
                   <div style="font-size:11.5px; text-align:right; color:var(--color-accent-300);">{{ row.repCount }} reps</div>
                   <div style="font-size:11.5px; text-align:right; color:#6fb2ff;">{{ row.merchCount }} merchandisers</div>
                 </div>
-                <sc-for list="{{ row.reps }}" as="rp" hint-placeholder-count="0">
-                  <div style="display:grid; grid-template-columns:22px 1fr 130px; align-items:center; gap:10px; padding:6px 4px 6px 20px;">
-                    <span></span>
-                    <div style="font-size:11.5px; color:var(--color-neutral-300);">{{ rp.name }}</div>
-                    <div style="font-size:11px; text-align:right; color:#6fb2ff;">{{ rp.merchCount }} merchandisers</div>
+                <sc-if value="{{ row.expanded }}" hint-placeholder-val="{{ false }}">
+                  <div class="org-wrap">
+                    <div class="org-node org-manager">
+                      <div class="org-name">{{ row.manager }}</div>
+                      <div class="org-role">Manager</div>
+                    </div>
+                    <div class="org-stem"></div>
+                    <div class="org-children">
+                      <sc-for list="{{ row.reps }}" as="rp" hint-placeholder-count="0">
+                        <div class="org-child">
+                          <div class="org-node">
+                            <div class="org-name">{{ rp.name }}</div>
+                            <div class="org-role">Rep</div>
+                            <div class="org-badge">{{ rp.merchCount }} merch</div>
+                          </div>
+                        </div>
+                      </sc-for>
+                    </div>
                   </div>
-                </sc-for>
+                </sc-if>
               </div>
             </sc-for>
           </div>
@@ -789,10 +843,10 @@ const PAGES = {
   rep: { label: 'Rep coverage', icon: 'ph ph-user-focus', title: 'Rep coverage', sub: 'Sales-rep assignments, workload and calling frequency' },
   banner: { label: 'Banner Insights', icon: 'ph ph-storefront', title: 'Banner Insights', sub: 'Every banner ranked by network size and coverage quality' },
   storelevel: { label: 'Store Level', icon: 'ph ph-table', title: 'Store Level', sub: 'Every store, rep and merchandiser assignment across the network — export-ready' },
-  gaps: { label: 'Coverage gaps', icon: 'ph ph-warning-diamond', title: 'Coverage gaps', sub: 'Stores served by only one discipline' },
   byday: { label: 'Coverage by day', icon: 'ph ph-calendar-check', title: 'Coverage by day', sub: 'How many stores are visited each weekday, by discipline' },
   hierarchy: { label: 'Team hierarchy', icon: 'ph ph-tree-structure', title: 'Team hierarchy', sub: 'Managers, the reps under them, and the merchandisers under those reps' },
   bannerresource: { label: 'Banner x resource', icon: 'ph ph-grid-nine', title: 'Banner x resource breakdown', sub: 'Resources and stores per banner and resource type, by division' },
+  gaps: { label: 'Coverage gaps', icon: 'ph ph-warning-diamond', title: 'Coverage gaps', sub: 'Stores served by only one discipline' },
 };
 const DAY_ORDER = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 const DAY_SHORT = { Monday: 'Mon', Tuesday: 'Tue', Wednesday: 'Wed', Thursday: 'Thu', Friday: 'Fri', Saturday: 'Sat', Sunday: 'Sun' };
@@ -959,12 +1013,18 @@ class Component extends DCLogic {
       repByKey.set(k, r);
     });
 
-    const merchCountByRepKey = new Map();
+    // merch is store-level rows (one row per store a merchandiser is
+    // assigned to), so a single merchandiser can appear many times here --
+    // dedupe by resourceId||resourceName per rep, not a raw row count,
+    // otherwise a merchandiser covering N stores gets counted N times
+    // (Carin flagged the totals looked inflated, 2026-08-24).
+    const merchSetByRepKey = new Map();
     merch.forEach((m) => {
       const repKey = m.managerId && repByKey.has(m.managerId) ? m.managerId
         : (repByKey.has(m.managerName) ? m.managerName : null);
       if (!repKey) return;
-      merchCountByRepKey.set(repKey, (merchCountByRepKey.get(repKey) || 0) + 1);
+      if (!merchSetByRepKey.has(repKey)) merchSetByRepKey.set(repKey, new Set());
+      merchSetByRepKey.get(repKey).add(m.resourceId || m.resourceName);
     });
 
     const managers = new Map(); // managerName -> { reps: Map(repKey -> {name, merchCount}) }
@@ -972,7 +1032,7 @@ class Component extends DCLogic {
       const mgrName = r.managerName || 'Unassigned';
       if (!managers.has(mgrName)) managers.set(mgrName, { reps: new Map() });
       managers.get(mgrName).reps.set(repKey, {
-        name: r.resourceName, merchCount: merchCountByRepKey.get(repKey) || 0,
+        name: r.resourceName, merchCount: (merchSetByRepKey.get(repKey) || new Set()).size,
       });
     });
 
@@ -985,7 +1045,13 @@ class Component extends DCLogic {
     // Merchandisers whose manager doesn't map to any rep in the current
     // filter (e.g. filtered out by region/banner, or genuinely unmatched)
     // -- surfaced separately so the totals are honest about what's shown.
-    const unmatchedMerch = merch.length - [...merchCountByRepKey.values()].reduce((a, v) => a + v, 0);
+    // Distinct-merchandiser count overall, vs. the distinct merchandisers
+    // that did map to some rep (a merchandiser matched under more than one
+    // rep is rare but would make this a slight undercount, never an over).
+    const allMerchIds = new Set(merch.map((m) => m.resourceId || m.resourceName));
+    const matchedMerchIds = new Set();
+    merchSetByRepKey.forEach((set) => set.forEach((id) => matchedMerchIds.add(id)));
+    const unmatchedMerch = allMerchIds.size - matchedMerchIds.size;
 
     return { rows, unmatchedMerch };
   }
@@ -1495,6 +1561,19 @@ class Component extends DCLogic {
 
     if (out.isHierarchy) {
       const { rows, unmatchedMerch } = this.hierarchyModel();
+      const totalRepsAll = rows.reduce((a, r) => a + r.repCount, 0);
+      const totalMerchAll = rows.reduce((a, r) => a + r.merchCount, 0);
+      out.hierarchyStats = [
+        { icon: 'ph ph-user-gear', label: 'Managers', value: n(rows.length), sub: rows.length ? p1(pct(rows.filter((r) => r.merchCount === 0).length, rows.length)) + ' with no merch' : '—' },
+        { icon: 'ph ph-user-focus', label: 'Reps', value: n(totalRepsAll), sub: rows.length ? (totalRepsAll / rows.length).toFixed(1) + ' per manager' : '—' },
+        { icon: 'ph ph-shopping-bag-open', label: 'Merchandisers', value: n(totalMerchAll), sub: totalRepsAll ? (totalMerchAll / totalRepsAll).toFixed(1) + ' per rep' : '—' },
+        { icon: 'ph ph-warning', label: 'Unmatched merch', value: n(unmatchedMerch), sub: 'no rep mapped in filter' },
+      ];
+      const topByMerch = [...rows].sort((a, b) => b.merchCount - a.merchCount).slice(0, 8);
+      const peakMerch = Math.max(1, ...topByMerch.map((r) => r.merchCount));
+      out.hierarchyTopManagers = topByMerch.map((r) => ({
+        manager: r.manager, repCount: n(r.repCount), merchCount: n(r.merchCount), barW: w(pct(r.merchCount, peakMerch)),
+      }));
       const hq = s.hierarchyQuery.trim().toLowerCase();
       const filtered = hq ? rows.filter((r) => r.manager.toLowerCase().includes(hq)
         || r.reps.some((rp) => rp.name.toLowerCase().includes(hq))) : rows;
