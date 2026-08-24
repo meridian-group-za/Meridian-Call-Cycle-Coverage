@@ -763,12 +763,19 @@ Last updated<br><span style="color:var(--color-neutral-300);">{{ snapshot }}</sp
                     <div class="org-children">
                       <sc-for list="{{ row.reps }}" as="rp" hint-placeholder-count="0">
                         <div class="org-child">
-                          <div class="org-node">
+                          <div class="org-node" onClick="{{ rp.toggle }}" style="cursor:{{ rp.hasMerch ? 'pointer' : 'default' }}; {{ rp.expanded ? 'border-color:var(--color-accent-700);' : '' }}">
                             <div class="org-name">{{ rp.name }}</div>
                             <div class="org-role">Rep</div>
-                            <div class="org-badge">{{ rp.merchCount }} merch</div>
+                            <div class="org-badge">{{ rp.merchCount }} merch<sc-if value="{{ rp.hasMerch }}" hint-placeholder-val="{{ false }}"><i class="{{ rp.expanded ? 'ph ph-caret-up' : 'ph ph-caret-down' }}" style="margin-left:4px; font-size:9px;"></i></sc-if></div>
                           </div>
                         </div>
+                        <sc-if value="{{ rp.expanded }}" hint-placeholder-val="{{ false }}">
+                          <div style="grid-column:1/-1; background:#0a1c3a; border:1px solid var(--color-neutral-800); border-radius:var(--radius-md); padding:10px 14px; display:flex; flex-wrap:wrap; gap:7px;">
+                            <sc-for list="{{ rp.merchNames }}" as="mn" hint-placeholder-count="0">
+                              <span style="font-size:11px; color:var(--color-neutral-200); background:#0f2c4f; border:1px solid var(--color-neutral-800); border-radius:999px; padding:4px 11px;">{{ mn }}</span>
+                            </sc-for>
+                          </div>
+                        </sc-if>
                       </sc-for>
                     </div>
                   </div>
@@ -899,7 +906,7 @@ class Component extends DCLogic {
     regionalManager: '', generalManager: '', headOfSyndicated: '',
     resQuery: '', bannerQuery: '', gapQuery: '', slQuery: '', hierarchyQuery: '',
     gapTab: 'repOnly', slTab: 'all', sortKey: 'stores', sortDir: -1,
-    expandedManagers: {},
+    expandedManagers: {}, expandedReps: {},
   };
 
   componentDidMount() {
@@ -1074,21 +1081,23 @@ class Component extends DCLogic {
     // dedupe by resourceId||resourceName per rep, not a raw row count,
     // otherwise a merchandiser covering N stores gets counted N times
     // (Carin flagged the totals looked inflated, 2026-08-24).
-    const merchSetByRepKey = new Map();
+    const merchSetByRepKey = new Map(); // repKey -> Map(merchId -> merchName)
     merch.forEach((m) => {
       const repKey = m.managerId && repByKey.has(m.managerId) ? m.managerId
         : (repByKey.has(m.managerName) ? m.managerName : null);
       if (!repKey) return;
-      if (!merchSetByRepKey.has(repKey)) merchSetByRepKey.set(repKey, new Set());
-      merchSetByRepKey.get(repKey).add(m.resourceId || m.resourceName);
+      if (!merchSetByRepKey.has(repKey)) merchSetByRepKey.set(repKey, new Map());
+      merchSetByRepKey.get(repKey).set(m.resourceId || m.resourceName, m.resourceName);
     });
 
-    const managers = new Map(); // managerName -> { reps: Map(repKey -> {name, merchCount}) }
+    const managers = new Map(); // managerName -> { reps: Map(repKey -> {name, merchCount, merchNames}) }
     repByKey.forEach((r, repKey) => {
       const mgrName = r.managerName || 'Unassigned';
       if (!managers.has(mgrName)) managers.set(mgrName, { reps: new Map() });
+      const merchMap = merchSetByRepKey.get(repKey) || new Map();
       managers.get(mgrName).reps.set(repKey, {
-        name: r.resourceName, merchCount: (merchSetByRepKey.get(repKey) || new Set()).size,
+        repKey, name: r.resourceName, merchCount: merchMap.size,
+        merchNames: [...merchMap.values()].sort(),
       });
     });
 
@@ -1106,7 +1115,7 @@ class Component extends DCLogic {
     // rep is rare but would make this a slight undercount, never an over).
     const allMerchIds = new Set(merch.map((m) => m.resourceId || m.resourceName));
     const matchedMerchIds = new Set();
-    merchSetByRepKey.forEach((set) => set.forEach((id) => matchedMerchIds.add(id)));
+    merchSetByRepKey.forEach((map) => map.forEach((name, id) => matchedMerchIds.add(id)));
     const unmatchedMerch = allMerchIds.size - matchedMerchIds.size;
 
     return { rows, unmatchedMerch };
@@ -1673,7 +1682,14 @@ class Component extends DCLogic {
           manager: row.manager, repCount: n(row.repCount), merchCount: n(row.merchCount),
           expanded, chevron: expanded ? 'ph ph-caret-down' : 'ph ph-caret-right',
           toggle: () => this.set({ expandedManagers: { ...s.expandedManagers, [row.manager]: !expanded } }),
-          reps: expanded ? row.reps.map((rp) => ({ name: rp.name, merchCount: n(rp.merchCount) })) : [],
+          reps: expanded ? row.reps.map((rp) => {
+            const repExpanded = !!s.expandedReps[rp.repKey];
+            return {
+              name: rp.name, merchCount: n(rp.merchCount), expanded: repExpanded, hasMerch: rp.merchCount > 0,
+              toggle: () => this.set({ expandedReps: { ...s.expandedReps, [rp.repKey]: !repExpanded } }),
+              merchNames: repExpanded ? rp.merchNames : [],
+            };
+          }) : [],
         };
       });
       out.onHierarchyQuery = (e) => this.set({ hierarchyQuery: e.target.value });
