@@ -41,20 +41,18 @@
   .nx-nav:hover { background: color-mix(in srgb, var(--color-accent) 9%, transparent); }
   select.nx-in option { background:#0f2c4f; color:#e9e9ed; }
 
-  /* Team hierarchy org-chart (Carin, 2026-08-24) */
-  .org-wrap { display:flex; flex-direction:column; align-items:center; padding:24px 0 8px; overflow-x:auto; }
-  .org-node { background:#0a1c3a; border:1px solid var(--color-neutral-800); border-radius:var(--radius-md); padding:10px 16px; text-align:center; white-space:nowrap; }
+  /* Team hierarchy org-chart (Carin, 2026-08-24) -- vertical: manager on
+     top, reps wrap into rows below (a manager can have 25+ reps, and a
+     single horizontal row forced awkward side-scrolling). */
+  .org-wrap { display:flex; flex-direction:column; align-items:center; padding:24px 0 8px; }
+  .org-node { background:#0a1c3a; border:1px solid var(--color-neutral-800); border-radius:var(--radius-md); padding:10px 16px; text-align:center; }
   .org-node.org-manager { border-color:var(--color-accent-700); background:color-mix(in srgb, var(--color-accent) 10%, #0a1c3a); }
   .org-node .org-name { font-size:12.5px; font-weight:600; color:var(--color-text); }
   .org-node .org-role { font-size:9.5px; letter-spacing:.06em; text-transform:uppercase; color:var(--color-neutral-500); margin-top:2px; }
   .org-node .org-badge { font-size:10.5px; color:#6fb2ff; margin-top:4px; }
   .org-stem { width:2px; height:20px; background:var(--color-neutral-800); }
-  .org-children { display:flex; gap:22px; }
-  .org-child { position:relative; padding-top:20px; }
-  .org-child::before { content:''; position:absolute; top:0; left:0; right:0; height:2px; background:var(--color-neutral-800); }
-  .org-child::after { content:''; position:absolute; top:0; left:50%; width:2px; height:20px; background:var(--color-neutral-800); }
-  .org-child:first-child::before { left:50%; }
-  .org-child:last-child::before { right:50%; }
+  .org-children { width:100%; display:grid; grid-template-columns:repeat(auto-fill, minmax(150px, 1fr)); gap:14px; padding-top:18px; border-top:2px solid var(--color-neutral-800); }
+  .org-child .org-node { height:100%; }
 </style>
 </helmet>
 <div style="display:flex; min-height:100vh; background:var(--color-bg); font-family:var(--font-body); font-size:13px; color:var(--color-text);">
