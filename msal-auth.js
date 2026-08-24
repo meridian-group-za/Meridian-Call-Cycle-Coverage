@@ -73,6 +73,8 @@ function normDivision(v) {
   return v.charAt(0) + v.slice(1).toLowerCase();
 }
 
+const DAY_KEYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+
 function transformCombinedMaster(raw) {
   const rep_rows = [], merch_rows = [];
   (raw.combinedMaster || []).forEach((r) => {
@@ -92,6 +94,10 @@ function transformCombinedMaster(raw) {
       frequency: r["CALLING FREQUENCY"],
       managerId: r["MANAGER EMP CODE"],
       managerName: r["LINE MANAGER"],
+      // Which weekdays this store/resource pairing is scheduled for a visit
+      // (raw sheet uses "X" for scheduled, blank otherwise) -- kept in sync
+      // with the same field added to live_data_server.py's slim().
+      days: DAY_KEYS.filter((k) => (r[k] || "").trim().toUpperCase() === "X"),
     };
     (isMerch ? merch_rows : rep_rows).push(row);
   });
