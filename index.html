@@ -642,6 +642,14 @@ Last updated<br><span style="color:var(--color-neutral-300);">{{ snapshot }}</sp
 
       <!-- ══ COVERAGE BY DAY ══ -->
       <sc-if value="{{ isByDay }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex; justify-content:flex-end; margin-bottom:var(--space-3);">
+          <div style="display:flex; background:var(--color-surface); border:1px solid var(--color-neutral-800); border-radius:var(--radius-md); padding:3px; gap:2px;">
+            <sc-for list="{{ dayViewOptions }}" as="o" hint-placeholder-count="3">
+              <div onClick="{{ o.go }}" style="cursor:pointer; padding:6px 14px; border-radius:7px; font-size:11.5px; font-weight:600; background:{{ o.bg }}; color:{{ o.fg }};">{{ o.label }}</div>
+            </sc-for>
+          </div>
+        </div>
+
         <div style="display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:var(--space-3); margin-bottom:var(--space-4);">
           <sc-for list="{{ dayKpis }}" as="k" hint-placeholder-count="4">
             <div style="background:var(--color-surface); border:1px solid var(--color-neutral-800); border-radius:var(--radius-md); padding:var(--space-4);">
@@ -657,20 +665,27 @@ Last updated<br><span style="color:var(--color-neutral-300);">{{ snapshot }}</sp
         <div style="background:var(--color-surface); border:1px solid var(--color-neutral-800); border-radius:var(--radius-lg); padding:var(--space-6); margin-bottom:var(--space-4);">
           <div style="display:flex; align-items:center; gap:12px; margin-bottom:var(--space-4); flex-wrap:wrap;">
             <h5 style="margin:0; font-size:14px;">Stores visited per weekday</h5>
-            <span style="display:flex; align-items:center; gap:6px; font-size:10.5px; color:var(--color-neutral-400);"><span style="width:10px; height:10px; border-radius:3px; background:var(--color-accent);"></span>Reps</span>
-            <span style="display:flex; align-items:center; gap:6px; font-size:10.5px; color:var(--color-neutral-400);"><span style="width:10px; height:10px; border-radius:3px; background:#6fb2ff;"></span>Merchandisers</span>
+            <sc-if value="{{ showRepBar }}" hint-placeholder-val="{{ true }}"><span style="display:flex; align-items:center; gap:6px; font-size:10.5px; color:var(--color-neutral-400);"><span style="width:10px; height:10px; border-radius:3px; background:var(--color-accent);"></span>Reps</span></sc-if>
+            <sc-if value="{{ showMerchBar }}" hint-placeholder-val="{{ true }}"><span style="display:flex; align-items:center; gap:6px; font-size:10.5px; color:var(--color-neutral-400);"><span style="width:10px; height:10px; border-radius:3px; background:#6fb2ff;"></span>Merchandisers</span></sc-if>
           </div>
           <div style="display:grid; grid-template-columns:repeat(7,1fr); gap:14px;">
             <sc-for list="{{ byDayRows }}" as="d" hint-placeholder-count="7">
               <div style="display:flex; flex-direction:column; align-items:center; gap:6px;">
                 <div style="font-size:10px; font-weight:700; color:var(--color-neutral-300); text-transform:uppercase; letter-spacing:.05em;">{{ d.day }}</div>
                 <div style="width:100%; display:flex; flex-direction:column; gap:4px; align-items:center;">
-                  <div style="font-size:13px; font-family:var(--font-heading); color:var(--color-accent);">{{ d.repStores }}</div>
-                  <div style="width:100%; height:8px; background:#1c3f6b; border-radius:3px; overflow:hidden;"><div style="height:100%; width:{{ d.repW }}; background:var(--color-accent);"></div></div>
-                  <div style="width:100%; height:8px; background:#1c3f6b; border-radius:3px; overflow:hidden; margin-top:2px;"><div style="height:100%; width:{{ d.merchW }}; background:#6fb2ff;"></div></div>
-                  <div style="font-size:13px; font-family:var(--font-heading); color:#6fb2ff;">{{ d.merchStores }}</div>
+                  <sc-if value="{{ showRepBar }}" hint-placeholder-val="{{ true }}">
+                    <div style="font-size:13px; font-family:var(--font-heading); color:var(--color-accent);">{{ d.repStores }}</div>
+                    <div style="width:100%; height:8px; background:#1c3f6b; border-radius:3px; overflow:hidden;"><div style="height:100%; width:{{ d.repW }}; background:var(--color-accent);"></div></div>
+                  </sc-if>
+                  <sc-if value="{{ showMerchBar }}" hint-placeholder-val="{{ true }}">
+                    <div style="width:100%; height:8px; background:#1c3f6b; border-radius:3px; overflow:hidden; margin-top:2px;"><div style="height:100%; width:{{ d.merchW }}; background:#6fb2ff;"></div></div>
+                    <div style="font-size:13px; font-family:var(--font-heading); color:#6fb2ff;">{{ d.merchStores }}</div>
+                  </sc-if>
                 </div>
-                <div style="font-size:9.5px; color:var(--color-neutral-600); text-align:center;">{{ d.repVisits }} rep visits<br>{{ d.merchVisits }} merch visits</div>
+                <div style="font-size:9.5px; color:var(--color-neutral-600); text-align:center;">
+                  <sc-if value="{{ showRepBar }}" hint-placeholder-val="{{ true }}">{{ d.repVisits }} rep visits<sc-if value="{{ showMerchBar }}" hint-placeholder-val="{{ true }}"><br></sc-if></sc-if>
+                  <sc-if value="{{ showMerchBar }}" hint-placeholder-val="{{ true }}">{{ d.merchVisits }} merch visits</sc-if>
+                </div>
               </div>
             </sc-for>
           </div>
@@ -706,6 +721,34 @@ Last updated<br><span style="color:var(--color-neutral-300);">{{ snapshot }}</sp
               </sc-for>
             </tbody>
           </table>
+        </div>
+
+        <div style="background:var(--color-surface); border:1px solid var(--color-neutral-800); border-radius:var(--radius-lg); padding:var(--space-6); margin-top:var(--space-4);">
+          <h5 style="margin:0 0 var(--space-4); font-size:14px;">Stores covered per weekday, by banner</h5>
+          <div style="max-height:520px; overflow:auto;">
+            <table style="width:100%; border-collapse:collapse; font-size:11.5px;">
+              <thead>
+                <tr style="position:sticky; top:0; background:var(--color-surface);">
+                  <th style="text-align:left; padding:6px 10px; border-bottom:1px solid var(--color-neutral-800); color:var(--color-neutral-400); font-weight:600;">Banner</th>
+                  <sc-for list="{{ dayDivisionDays }}" as="dd2" hint-placeholder-count="7">
+                    <th style="text-align:right; padding:6px 10px; border-bottom:1px solid var(--color-neutral-800); color:var(--color-neutral-400); font-weight:600;">{{ dd2 }}</th>
+                  </sc-for>
+                  <th style="text-align:right; padding:6px 10px; border-bottom:1px solid var(--color-neutral-800); color:var(--color-accent-300); font-weight:600;">Total</th>
+                </tr>
+              </thead>
+              <tbody>
+                <sc-for list="{{ dayBannerRows }}" as="row" hint-placeholder-count="12">
+                  <tr style="border-bottom:1px solid #142c4d;">
+                    <td style="padding:7px 10px; color:var(--color-text); font-weight:600;">{{ row.banner }}</td>
+                    <sc-for list="{{ row.cells }}" as="c" hint-placeholder-count="7">
+                      <td style="padding:7px 10px; text-align:right; color:var(--color-neutral-300);">{{ c }}</td>
+                    </sc-for>
+                    <td style="padding:7px 10px; text-align:right; color:var(--color-accent-300); font-weight:600;">{{ row.total }}</td>
+                  </tr>
+                </sc-for>
+              </tbody>
+            </table>
+          </div>
         </div>
       </sc-if>
 
@@ -906,7 +949,7 @@ class Component extends DCLogic {
     regionalManager: '', generalManager: '', headOfSyndicated: '',
     resQuery: '', bannerQuery: '', gapQuery: '', slQuery: '', hierarchyQuery: '',
     gapTab: 'repOnly', slTab: 'all', sortKey: 'stores', sortDir: -1,
-    expandedManagers: {}, expandedReps: {},
+    expandedManagers: {}, expandedReps: {}, dayView: 'both',
   };
 
   componentDidMount() {
@@ -1045,12 +1088,18 @@ class Component extends DCLogic {
     }));
   }
 
-  // Distinct stores covered (rep or merch) per division per weekday --
-  // lets Carin spot a division that's thin on a specific day.
-  dayDivisionModel() {
+  // which: 'both' | 'rep' | 'merch' -- lets the Coverage by day page toggle
+  // between combined, rep-only, or merchandiser-only counts (Carin, 2026-08-24).
+  _dayRowsFor(which) {
     const { rep, merch } = this.model();
+    return which === 'rep' ? rep : which === 'merch' ? merch : [...rep, ...merch];
+  }
+
+  // Distinct stores covered per division per weekday -- lets Carin spot a
+  // division that's thin on a specific day.
+  dayDivisionModel(which) {
+    const rows = this._dayRowsFor(which);
     const DIVS = ['Central', 'Coastal', 'Inland'];
-    const rows = [...rep, ...merch];
     return DIVS.map((div) => {
       const inDiv = rows.filter((r) => r.division === div);
       const cells = DAY_ORDER.map((day) => new Set(
@@ -1058,6 +1107,24 @@ class Component extends DCLogic {
       ).size);
       return { division: div, cells };
     });
+  }
+
+  // Same idea, by banner -- limited to the top 12 banners (by total stores
+  // covered in the current filter) plus an "Other" rollup, since there are
+  // 100+ banners and a full list wouldn't fit a table.
+  dayBannerModel(which) {
+    const rows = this._dayRowsFor(which);
+    const banners = [...new Set(rows.map((r) => r.banner || 'Unknown'))];
+    const totalFor = (banner) => new Set(rows.filter((r) => (r.banner || 'Unknown') === banner && (r.days || []).length).map((r) => key(r))).size;
+    const ranked = banners.map((b) => ({ banner: b, total: totalFor(b) })).sort((a, b) => b.total - a.total);
+    const top = ranked.slice(0, 12).map((r) => r.banner);
+    const cellsFor = (bannerSet) => DAY_ORDER.map((day) => new Set(
+      rows.filter((r) => bannerSet.has(r.banner || 'Unknown') && (r.days || []).includes(day)).map((r) => key(r))
+    ).size);
+    const result = top.map((b) => ({ banner: b, cells: cellsFor(new Set([b])) }));
+    const otherBanners = new Set(ranked.slice(12).map((r) => r.banner));
+    if (otherBanners.size) result.push({ banner: 'Other (' + otherBanners.size + ' banners)', cells: cellsFor(otherBanners) });
+    return result;
   }
 
   // ---- Team hierarchy: Manager -> Reps -> Merchandisers (Carin, 2026-08-24) ----
@@ -1610,6 +1677,17 @@ class Component extends DCLogic {
     }
 
     if (out.isByDay) {
+      out.dayViewOptions = [
+        { key: 'both', label: 'All' }, { key: 'rep', label: 'Reps only' }, { key: 'merch', label: 'Merch only' },
+      ].map((o) => ({
+        label: o.label, active: s.dayView === o.key,
+        go: () => this.set({ dayView: o.key }),
+        bg: s.dayView === o.key ? 'var(--color-accent)' : 'transparent',
+        fg: s.dayView === o.key ? '#0a1220' : 'var(--color-neutral-300)',
+      }));
+      out.showRepBar = s.dayView !== 'merch';
+      out.showMerchBar = s.dayView !== 'rep';
+
       const days = this.dayModel();
       const peakStores = Math.max(1, ...days.map((d) => Math.max(d.repStores, d.merchStores)));
       out.byDayRows = days.map((d) => ({
@@ -1646,10 +1724,15 @@ class Component extends DCLogic {
           + n(weekendTotal) + ' stores across Sat/Sun vs ' + n(weekdayTotal) + ' across Mon–Fri.'
         : '';
 
-      const divModel = this.dayDivisionModel();
+      const divModel = this.dayDivisionModel(s.dayView);
       out.dayDivisionDays = DAY_SHORT ? DAY_ORDER.map((d) => DAY_SHORT[d]) : [];
       out.dayDivisionRows = divModel.map((row) => ({
         division: row.division, cells: row.cells.map((v) => n(v)), total: n(row.cells.reduce((a, v) => a + v, 0)),
+      }));
+
+      const bannerModel = this.dayBannerModel(s.dayView);
+      out.dayBannerRows = bannerModel.map((row) => ({
+        banner: row.banner, cells: row.cells.map((v) => n(v)), total: n(row.cells.reduce((a, v) => a + v, 0)),
       }));
     }
 
