@@ -999,7 +999,7 @@ class Component extends DCLogic {
       .catch((e) => this.setState({ err: 'Could not load the Call Cycle Master from SharePoint — ' + e.message }));
   }
 
-  match(r, applyRep) {
+  match(r, applyRep, skipManager) {
     const s = this.state;
     if (s.region && r.region !== s.region) return false;
     if (s.division && r.division !== s.division) return false;
@@ -1008,7 +1008,14 @@ class Component extends DCLogic {
     if (s.rtype && r.resourceType !== s.rtype) return false;
     if (applyRep && s.rep && r.resourceName !== s.rep) return false;
     if (!applyRep && s.merchName && r.resourceName !== s.merchName) return false;
-    if (s.manager && r.managerName !== s.manager) return false;
+    // A merchandiser row's own "manager" field is actually the REP they
+    // report to, not a real people-manager (see hierarchyModel) -- so the
+    // global Manager filter must never be applied to merch rows directly,
+    // or every merchandiser gets excluded before the rep->merch chain can
+    // even be resolved (confirmed 2026-08-24: filtering Team hierarchy by
+    // manager "Gerrit Schutte" zeroed out every rep's merch count, even
+    // reps who genuinely have merchandisers).
+    if (!skipManager && s.manager && r.managerName !== s.manager) return false;
     if (s.regionalManager && r.regionalManager !== s.regionalManager) return false;
     if (s.generalManager && r.generalManager !== s.generalManager) return false;
     if (s.headOfSyndicated && r.headOfSyndicated !== s.headOfSyndicated) return false;
@@ -1134,7 +1141,13 @@ class Component extends DCLogic {
   // report to, and that rep's own manager is the real people-manager.
   // Built off this.model()'s already-filtered rep/merch arrays.
   hierarchyModel() {
-    const { rep, merch } = this.model();
+    const { rep } = this.model();
+    const s = this.state;
+    // merch is NOT taken from this.model() here -- the Manager filter would
+    // wrongly apply to merch.managerName (which holds their rep's name, not
+    // a manager) and exclude every merchandiser before the chain resolves.
+    // Every other active filter still applies; only skipManager differs.
+    const merch = this.merchRows.filter((r) => this.match(r, false, true));
 
     const repByKey = new Map(); // resourceId||resourceName -> canonical rep record
     rep.forEach((r) => {
