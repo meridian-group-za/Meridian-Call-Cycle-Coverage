@@ -642,6 +642,18 @@ Last updated<br><span style="color:var(--color-neutral-300);">{{ snapshot }}</sp
 
       <!-- ══ COVERAGE BY DAY ══ -->
       <sc-if value="{{ isByDay }}" hint-placeholder-val="{{ false }}">
+        <div style="display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:var(--space-3); margin-bottom:var(--space-4);">
+          <sc-for list="{{ dayKpis }}" as="k" hint-placeholder-count="4">
+            <div style="background:var(--color-surface); border:1px solid var(--color-neutral-800); border-radius:var(--radius-md); padding:var(--space-4);">
+              <div style="display:flex; align-items:center; gap:6px; font-size:9px; letter-spacing:0.09em; text-transform:uppercase; color:var(--color-neutral-500); margin-bottom:6px;">
+                <i class="{{ k.icon }}" style="font-size:13px; color:var(--color-accent-400);"></i><span>{{ k.label }}</span>
+              </div>
+              <div style="font-family:var(--font-heading); font-size:23px; line-height:1.1;">{{ k.value }}</div>
+              <div style="font-size:10.5px; color:var(--color-neutral-500); margin-top:3px;">{{ k.sub }}</div>
+            </div>
+          </sc-for>
+        </div>
+
         <div style="background:var(--color-surface); border:1px solid var(--color-neutral-800); border-radius:var(--radius-lg); padding:var(--space-6); margin-bottom:var(--space-4);">
           <div style="display:flex; align-items:center; gap:12px; margin-bottom:var(--space-4); flex-wrap:wrap;">
             <h5 style="margin:0; font-size:14px;">Stores visited per weekday</h5>
@@ -663,6 +675,37 @@ Last updated<br><span style="color:var(--color-neutral-300);">{{ snapshot }}</sp
             </sc-for>
           </div>
           <div style="margin-top:var(--space-4); padding-top:var(--space-3); border-top:1px solid var(--color-neutral-800); font-size:11px; color:var(--color-neutral-500);">{{ byDaySummary }}</div>
+        </div>
+
+        <div style="background:color-mix(in srgb, var(--color-accent) 8%, var(--color-surface)); border:1px solid var(--color-accent-800); border-radius:var(--radius-lg); padding:var(--space-4) var(--space-5); margin-bottom:var(--space-4); display:flex; align-items:center; gap:10px;">
+          <i class="ph ph-info" style="font-size:16px; color:var(--color-accent-400); flex:none;"></i>
+          <div style="font-size:12px; color:var(--color-neutral-200);">{{ weekendCallout }}</div>
+        </div>
+
+        <div style="background:var(--color-surface); border:1px solid var(--color-neutral-800); border-radius:var(--radius-lg); padding:var(--space-6);">
+          <h5 style="margin:0 0 var(--space-4); font-size:14px;">Stores covered per weekday, by division</h5>
+          <table style="width:100%; border-collapse:collapse; font-size:11.5px;">
+            <thead>
+              <tr>
+                <th style="text-align:left; padding:6px 10px; border-bottom:1px solid var(--color-neutral-800); color:var(--color-neutral-400); font-weight:600;">Division</th>
+                <sc-for list="{{ dayDivisionDays }}" as="dd" hint-placeholder-count="7">
+                  <th style="text-align:right; padding:6px 10px; border-bottom:1px solid var(--color-neutral-800); color:var(--color-neutral-400); font-weight:600;">{{ dd }}</th>
+                </sc-for>
+                <th style="text-align:right; padding:6px 10px; border-bottom:1px solid var(--color-neutral-800); color:var(--color-accent-300); font-weight:600;">Total</th>
+              </tr>
+            </thead>
+            <tbody>
+              <sc-for list="{{ dayDivisionRows }}" as="row" hint-placeholder-count="3">
+                <tr style="border-bottom:1px solid #142c4d;">
+                  <td style="padding:7px 10px; color:var(--color-text); font-weight:600;">{{ row.division }}</td>
+                  <sc-for list="{{ row.cells }}" as="c" hint-placeholder-count="7">
+                    <td style="padding:7px 10px; text-align:right; color:var(--color-neutral-300);">{{ c }}</td>
+                  </sc-for>
+                  <td style="padding:7px 10px; text-align:right; color:var(--color-accent-300); font-weight:600;">{{ row.total }}</td>
+                </tr>
+              </sc-for>
+            </tbody>
+          </table>
         </div>
       </sc-if>
 
@@ -993,6 +1036,21 @@ class Component extends DCLogic {
       repStores: uniqStoresOnDay(rep, day), merchStores: uniqStoresOnDay(merch, day),
       repVisits: visitsOnDay(rep, day), merchVisits: visitsOnDay(merch, day),
     }));
+  }
+
+  // Distinct stores covered (rep or merch) per division per weekday --
+  // lets Carin spot a division that's thin on a specific day.
+  dayDivisionModel() {
+    const { rep, merch } = this.model();
+    const DIVS = ['Central', 'Coastal', 'Inland'];
+    const rows = [...rep, ...merch];
+    return DIVS.map((div) => {
+      const inDiv = rows.filter((r) => r.division === div);
+      const cells = DAY_ORDER.map((day) => new Set(
+        inDiv.filter((r) => (r.days || []).includes(day)).map((r) => key(r))
+      ).size);
+      return { division: div, cells };
+    });
   }
 
   // ---- Team hierarchy: Manager -> Reps -> Merchandisers (Carin, 2026-08-24) ----
@@ -1555,6 +1613,35 @@ class Component extends DCLogic {
       const totalMerchStores = new Set(m.merch.map((r) => key(r))).size;
       out.byDaySummary = 'Across the current filter: ' + n(totalRepStores) + ' distinct stores get at least one rep visit some day, '
         + n(totalMerchStores) + ' get at least one merchandiser visit.';
+
+      const weekdays = days.filter((d) => !['Saturday', 'Sunday'].includes(d.day));
+      const weekend = days.filter((d) => ['Saturday', 'Sunday'].includes(d.day));
+      const totalActivity = (d) => d.repStores + d.merchStores;
+      const busiest = [...weekdays].sort((a, b) => totalActivity(b) - totalActivity(a))[0];
+      const quietest = [...weekdays].sort((a, b) => totalActivity(a) - totalActivity(b))[0];
+      const weekendStores = new Set([...m.rep, ...m.merch].filter((r) => (r.days || []).some((d) => ['Saturday', 'Sunday'].includes(d))).map((r) => key(r))).size;
+      const totalRepVisits = days.reduce((a, d) => a + d.repVisits, 0);
+      const totalMerchVisits = days.reduce((a, d) => a + d.merchVisits, 0);
+      out.dayKpis = [
+        { icon: 'ph ph-trend-up', label: 'Busiest weekday', value: busiest ? busiest.short : '—', sub: busiest ? n(totalActivity(busiest)) + ' stores covered' : '—' },
+        { icon: 'ph ph-trend-down', label: 'Quietest weekday', value: quietest ? quietest.short : '—', sub: quietest ? n(totalActivity(quietest)) + ' stores covered' : '—' },
+        { icon: 'ph ph-calendar-x', label: 'Weekend coverage', value: n(weekendStores), sub: 'distinct stores Sat/Sun' },
+        { icon: 'ph ph-scales', label: 'Rep : merch visits', value: totalRepVisits <= totalMerchVisits
+          ? '1 : ' + (totalRepVisits ? (totalMerchVisits / totalRepVisits).toFixed(1) : '—')
+          : (totalMerchVisits ? (totalRepVisits / totalMerchVisits).toFixed(1) : '—') + ' : 1', sub: n(totalRepVisits) + ' vs ' + n(totalMerchVisits) + ' visits' },
+      ];
+      const weekdayTotal = weekdays.reduce((a, d) => a + totalActivity(d), 0);
+      const weekendTotal = weekend.reduce((a, d) => a + totalActivity(d), 0);
+      out.weekendCallout = weekdayTotal
+        ? 'Weekends see just ' + p1(pct(weekendTotal, weekdayTotal + weekendTotal)) + ' of weekday-equivalent coverage — '
+          + n(weekendTotal) + ' stores across Sat/Sun vs ' + n(weekdayTotal) + ' across Mon–Fri.'
+        : '';
+
+      const divModel = this.dayDivisionModel();
+      out.dayDivisionDays = DAY_SHORT ? DAY_ORDER.map((d) => DAY_SHORT[d]) : [];
+      out.dayDivisionRows = divModel.map((row) => ({
+        division: row.division, cells: row.cells.map((v) => n(v)), total: n(row.cells.reduce((a, v) => a + v, 0)),
+      }));
     }
 
     if (out.isHierarchy) {
