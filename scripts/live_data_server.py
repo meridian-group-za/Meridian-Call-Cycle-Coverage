@@ -29,6 +29,9 @@ def norm_division(v):
     return v.title() if v else 'Unknown'
 
 
+DAY_KEYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
+
+
 def slim(r):
     is_merch = 'MERCHANDISER' in (r.get('RESOURCE TYPE') or '')
     return {
@@ -43,6 +46,11 @@ def slim(r):
         'frequency': r.get('CALLING FREQUENCY'),
         'managerId': r.get('MANAGER EMP CODE'),
         'managerName': r.get('LINE MANAGER'),
+        # Added for the "coverage by day" and "manager > rep > merchandiser
+        # hierarchy" pages -- days is which weekdays this store/resource
+        # pairing is actually scheduled for a visit (raw sheet uses "X" for
+        # scheduled, blank otherwise). (Carin, 2026-08-24)
+        'days': [k for k in DAY_KEYS if (r.get(k) or '').strip().upper() == 'X'],
     }, is_merch
 
 

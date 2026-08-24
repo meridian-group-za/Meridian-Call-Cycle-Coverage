@@ -627,6 +627,113 @@ Last updated<br><span style="color:var(--color-neutral-300);">{{ snapshot }}</sp
         </div>
       </sc-if>
 
+      <!-- ══ COVERAGE BY DAY ══ -->
+      <sc-if value="{{ isByDay }}" hint-placeholder-val="{{ false }}">
+        <div style="background:var(--color-surface); border:1px solid var(--color-neutral-800); border-radius:var(--radius-lg); padding:var(--space-6); margin-bottom:var(--space-4);">
+          <div style="display:flex; align-items:center; gap:12px; margin-bottom:var(--space-4); flex-wrap:wrap;">
+            <h5 style="margin:0; font-size:14px;">Stores visited per weekday</h5>
+            <span style="display:flex; align-items:center; gap:6px; font-size:10.5px; color:var(--color-neutral-400);"><span style="width:10px; height:10px; border-radius:3px; background:var(--color-accent);"></span>Reps</span>
+            <span style="display:flex; align-items:center; gap:6px; font-size:10.5px; color:var(--color-neutral-400);"><span style="width:10px; height:10px; border-radius:3px; background:#6fb2ff;"></span>Merchandisers</span>
+          </div>
+          <div style="display:grid; grid-template-columns:repeat(7,1fr); gap:14px;">
+            <sc-for list="{{ byDayRows }}" as="d" hint-placeholder-count="7">
+              <div style="display:flex; flex-direction:column; align-items:center; gap:6px;">
+                <div style="font-size:10px; font-weight:700; color:var(--color-neutral-300); text-transform:uppercase; letter-spacing:.05em;">{{ d.day }}</div>
+                <div style="width:100%; display:flex; flex-direction:column; gap:4px; align-items:center;">
+                  <div style="font-size:13px; font-family:var(--font-heading); color:var(--color-accent);">{{ d.repStores }}</div>
+                  <div style="width:100%; height:8px; background:#1c3f6b; border-radius:3px; overflow:hidden;"><div style="height:100%; width:{{ d.repW }}; background:var(--color-accent);"></div></div>
+                  <div style="width:100%; height:8px; background:#1c3f6b; border-radius:3px; overflow:hidden; margin-top:2px;"><div style="height:100%; width:{{ d.merchW }}; background:#6fb2ff;"></div></div>
+                  <div style="font-size:13px; font-family:var(--font-heading); color:#6fb2ff;">{{ d.merchStores }}</div>
+                </div>
+                <div style="font-size:9.5px; color:var(--color-neutral-600); text-align:center;">{{ d.repVisits }} rep visits<br>{{ d.merchVisits }} merch visits</div>
+              </div>
+            </sc-for>
+          </div>
+          <div style="margin-top:var(--space-4); padding-top:var(--space-3); border-top:1px solid var(--color-neutral-800); font-size:11px; color:var(--color-neutral-500);">{{ byDaySummary }}</div>
+        </div>
+      </sc-if>
+
+      <!-- ══ TEAM HIERARCHY ══ -->
+      <sc-if value="{{ isHierarchy }}" hint-placeholder-val="{{ false }}">
+        <div style="background:var(--color-surface); border:1px solid var(--color-neutral-800); border-radius:var(--radius-lg); padding:var(--space-6);">
+          <div style="display:flex; align-items:center; gap:12px; margin-bottom:var(--space-3); flex-wrap:wrap;">
+            <h5 style="margin:0; font-size:14px;">Manager &rarr; reps &rarr; merchandisers</h5>
+            <span style="font-size:10.5px; color:var(--color-neutral-500);">{{ hierarchyCount }}</span>
+            <input type="text" value="{{ hierarchyQuery }}" onChange="{{ onHierarchyQuery }}" placeholder="Search manager or rep…" style="margin-left:auto; background:#0a1c3a; border:1px solid var(--color-neutral-800); color:var(--color-text); border-radius:var(--radius-md); padding:6px 10px; font-size:12px; font-family:inherit; min-width:250px;">
+          </div>
+          <div style="font-size:10.5px; color:var(--color-neutral-500); margin-bottom:var(--space-3);">A merchandiser's own "manager" field is the rep they report to; that rep's manager is the real people-manager shown here. Click a manager to see their reps and each rep's merchandiser count.</div>
+          <div style="max-height:640px; overflow:auto;">
+            <sc-for list="{{ hierarchyRows }}" as="row" hint-placeholder-count="12">
+              <div style="border-bottom:1px solid #1c3f6b;">
+                <div onClick="{{ row.toggle }}" style="display:grid; grid-template-columns:22px 1fr 90px 130px; align-items:center; gap:10px; padding:9px 4px; cursor:pointer;">
+                  <i class="{{ row.chevron }}" style="font-size:13px; color:var(--color-neutral-500);"></i>
+                  <div style="font-size:12.5px; color:var(--color-text); font-weight:600;">{{ row.manager }}</div>
+                  <div style="font-size:11.5px; text-align:right; color:var(--color-accent-300);">{{ row.repCount }} reps</div>
+                  <div style="font-size:11.5px; text-align:right; color:#6fb2ff;">{{ row.merchCount }} merchandisers</div>
+                </div>
+                <sc-for list="{{ row.reps }}" as="rp" hint-placeholder-count="0">
+                  <div style="display:grid; grid-template-columns:22px 1fr 130px; align-items:center; gap:10px; padding:6px 4px 6px 20px;">
+                    <span></span>
+                    <div style="font-size:11.5px; color:var(--color-neutral-300);">{{ rp.name }}</div>
+                    <div style="font-size:11px; text-align:right; color:#6fb2ff;">{{ rp.merchCount }} merchandisers</div>
+                  </div>
+                </sc-for>
+              </div>
+            </sc-for>
+          </div>
+          <div style="margin-top:var(--space-3); font-size:10.5px; color:var(--color-neutral-600);">{{ hierarchyUnmatchedNote }}</div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ isBannerResource }}" hint-placeholder-val="{{ false }}">
+        <div style="background:var(--color-surface); border:1px solid var(--color-neutral-800); border-radius:var(--radius-lg); padding:var(--space-6);">
+          <div style="display:flex; align-items:center; gap:12px; margin-bottom:var(--space-3); flex-wrap:wrap;">
+            <h5 style="margin:0; font-size:14px;">Banner &times; resource type, by division</h5>
+            <span style="font-size:10.5px; color:var(--color-neutral-500);">{{ bannerResourceCount }}</span>
+            <button onClick="{{ exportBannerResource }}" style="margin-left:auto; display:flex; align-items:center; gap:7px; background:transparent; border:1px solid rgba(236,109,37,0.45); color:var(--color-accent-300); border-radius:var(--radius-md); padding:6px 13px; font-size:11.5px; font-weight:600; font-family:inherit; cursor:pointer;" style-hover="background:rgba(236,109,37,0.14); color:#f8c3a1;"><i class="ph ph-download-simple" style="font-size:14px;"></i>{{ exportBannerResourceLabel }}</button>
+          </div>
+          <div style="max-height:680px; overflow:auto;">
+            <table style="width:100%; border-collapse:collapse; font-size:11.5px;">
+              <thead>
+                <tr style="position:sticky; top:0; background:var(--color-surface);">
+                  <th style="text-align:left; padding:8px 10px; border-bottom:1px solid var(--color-neutral-800); color:var(--color-neutral-400); font-weight:600;">Banner</th>
+                  <th style="text-align:left; padding:8px 10px; border-bottom:1px solid var(--color-neutral-800); color:var(--color-neutral-400); font-weight:600;">Resource type</th>
+                  <sc-for list="{{ bannerResourceDivisions }}" as="div" hint-placeholder-count="3">
+                    <th style="text-align:right; padding:8px 10px; border-bottom:1px solid var(--color-neutral-800); color:var(--color-neutral-400); font-weight:600;" colspan="2">{{ div }}</th>
+                  </sc-for>
+                  <th style="text-align:right; padding:8px 10px; border-bottom:1px solid var(--color-neutral-800); color:var(--color-accent-300); font-weight:600;">Total resources</th>
+                  <th style="text-align:right; padding:8px 10px; border-bottom:1px solid var(--color-neutral-800); color:var(--color-accent-300); font-weight:600;">Total stores</th>
+                </tr>
+                <tr style="position:sticky; top:29px; background:var(--color-surface);">
+                  <th style="padding:0 10px 6px; border-bottom:1px solid var(--color-neutral-800);"></th>
+                  <th style="padding:0 10px 6px; border-bottom:1px solid var(--color-neutral-800);"></th>
+                  <sc-for list="{{ bannerResourceDivisions }}" as="div2" hint-placeholder-count="3">
+                    <th style="text-align:right; padding:0 10px 6px; border-bottom:1px solid var(--color-neutral-800); color:var(--color-neutral-600); font-weight:500; font-size:10px;">Resources</th>
+                    <th style="text-align:right; padding:0 10px 6px; border-bottom:1px solid var(--color-neutral-800); color:var(--color-neutral-600); font-weight:500; font-size:10px;">Stores</th>
+                  </sc-for>
+                  <th style="padding:0 10px 6px; border-bottom:1px solid var(--color-neutral-800);"></th>
+                  <th style="padding:0 10px 6px; border-bottom:1px solid var(--color-neutral-800);"></th>
+                </tr>
+              </thead>
+              <tbody>
+                <sc-for list="{{ bannerResourceRows }}" as="row" hint-placeholder-count="20">
+                  <tr style="border-bottom:1px solid #142c4d;">
+                    <td style="padding:7px 10px; color:var(--color-text); font-weight:600;">{{ row.banner }}</td>
+                    <td style="padding:7px 10px; color:var(--color-neutral-400);">{{ row.resourceType }}</td>
+                    <sc-for list="{{ row.perDiv }}" as="d" hint-placeholder-count="3">
+                      <td style="padding:7px 10px; text-align:right; color:var(--color-neutral-300);">{{ d.resources }}</td>
+                      <td style="padding:7px 10px; text-align:right; color:var(--color-neutral-300);">{{ d.stores }}</td>
+                    </sc-for>
+                    <td style="padding:7px 10px; text-align:right; color:var(--color-accent-300); font-weight:600;">{{ row.totalResources }}</td>
+                    <td style="padding:7px 10px; text-align:right; color:var(--color-accent-300); font-weight:600;">{{ row.totalStores }}</td>
+                  </tr>
+                </sc-for>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </sc-if>
+
     </div>
   </main>
 </div>
@@ -683,15 +790,21 @@ const PAGES = {
   banner: { label: 'Banner Insights', icon: 'ph ph-storefront', title: 'Banner Insights', sub: 'Every banner ranked by network size and coverage quality' },
   storelevel: { label: 'Store Level', icon: 'ph ph-table', title: 'Store Level', sub: 'Every store, rep and merchandiser assignment across the network — export-ready' },
   gaps: { label: 'Coverage gaps', icon: 'ph ph-warning-diamond', title: 'Coverage gaps', sub: 'Stores served by only one discipline' },
+  byday: { label: 'Coverage by day', icon: 'ph ph-calendar-check', title: 'Coverage by day', sub: 'How many stores are visited each weekday, by discipline' },
+  hierarchy: { label: 'Team hierarchy', icon: 'ph ph-tree-structure', title: 'Team hierarchy', sub: 'Managers, the reps under them, and the merchandisers under those reps' },
+  bannerresource: { label: 'Banner x resource', icon: 'ph ph-grid-nine', title: 'Banner x resource breakdown', sub: 'Resources and stores per banner and resource type, by division' },
 };
+const DAY_ORDER = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+const DAY_SHORT = { Monday: 'Mon', Tuesday: 'Tue', Wednesday: 'Wed', Thursday: 'Thu', Friday: 'Fri', Saturday: 'Sat', Sunday: 'Sun' };
 
 class Component extends DCLogic {
   state = {
     ready: false, err: '', page: 'overview',
     region: '', division: '', banner: '', channel: '', rep: '', merchName: '', manager: '', rtype: '',
     regionalManager: '', generalManager: '', headOfSyndicated: '',
-    resQuery: '', bannerQuery: '', gapQuery: '', slQuery: '',
+    resQuery: '', bannerQuery: '', gapQuery: '', slQuery: '', hierarchyQuery: '',
     gapTab: 'repOnly', slTab: 'all', sortKey: 'stores', sortDir: -1,
+    expandedManagers: {},
   };
 
   componentDidMount() {
@@ -813,6 +926,109 @@ class Component extends DCLogic {
     return m;
   }
 
+  // ---- Coverage by day (Carin, 2026-08-24) ----
+  // Per weekday, how many distinct stores get a rep visit vs a merchandiser
+  // visit -- built from the raw "X"-per-weekday flags already on each row
+  // (r.days), respecting whatever filters are active elsewhere.
+  dayModel() {
+    const { rep, merch } = this.model();
+    const uniqStoresOnDay = (rows, day) => new Set(
+      rows.filter((r) => (r.days || []).includes(day)).map((r) => key(r))
+    ).size;
+    const visitsOnDay = (rows, day) => rows.filter((r) => (r.days || []).includes(day)).length;
+    return DAY_ORDER.map((day) => ({
+      day, short: DAY_SHORT[day],
+      repStores: uniqStoresOnDay(rep, day), merchStores: uniqStoresOnDay(merch, day),
+      repVisits: visitsOnDay(rep, day), merchVisits: visitsOnDay(merch, day),
+    }));
+  }
+
+  // ---- Team hierarchy: Manager -> Reps -> Merchandisers (Carin, 2026-08-24) ----
+  // Confirmed 2026-08-24 against real data: ~97.5% of merchandiser rows
+  // have MANAGER EMP CODE (managerId here) equal to some rep's own
+  // resourceId -- i.e. a merchandiser's "manager" field IS the rep they
+  // report to, and that rep's own manager is the real people-manager.
+  // Built off this.model()'s already-filtered rep/merch arrays.
+  hierarchyModel() {
+    const { rep, merch } = this.model();
+
+    const repByKey = new Map(); // resourceId||resourceName -> canonical rep record
+    rep.forEach((r) => {
+      const k = r.resourceId || r.resourceName;
+      if (!k || repByKey.has(k)) return;
+      repByKey.set(k, r);
+    });
+
+    const merchCountByRepKey = new Map();
+    merch.forEach((m) => {
+      const repKey = m.managerId && repByKey.has(m.managerId) ? m.managerId
+        : (repByKey.has(m.managerName) ? m.managerName : null);
+      if (!repKey) return;
+      merchCountByRepKey.set(repKey, (merchCountByRepKey.get(repKey) || 0) + 1);
+    });
+
+    const managers = new Map(); // managerName -> { reps: Map(repKey -> {name, merchCount}) }
+    repByKey.forEach((r, repKey) => {
+      const mgrName = r.managerName || 'Unassigned';
+      if (!managers.has(mgrName)) managers.set(mgrName, { reps: new Map() });
+      managers.get(mgrName).reps.set(repKey, {
+        name: r.resourceName, merchCount: merchCountByRepKey.get(repKey) || 0,
+      });
+    });
+
+    const rows = [...managers.entries()].map(([mgrName, g]) => {
+      const reps = [...g.reps.values()].sort((a, b) => b.merchCount - a.merchCount);
+      const merchTotal = reps.reduce((a, r) => a + r.merchCount, 0);
+      return { manager: mgrName, repCount: reps.length, merchCount: merchTotal, reps };
+    }).sort((a, b) => b.repCount - a.repCount);
+
+    // Merchandisers whose manager doesn't map to any rep in the current
+    // filter (e.g. filtered out by region/banner, or genuinely unmatched)
+    // -- surfaced separately so the totals are honest about what's shown.
+    const unmatchedMerch = merch.length - [...merchCountByRepKey.values()].reduce((a, v) => a + v, 0);
+
+    return { rows, unmatchedMerch };
+  }
+
+  // ---- Banner x resource type x division breakdown (Carin, 2026-08-24) ----
+  // Matches the pivot Carin already runs in Excel: one row per banner + resource
+  // type, columns for each division's distinct resource count and distinct
+  // store count, plus row totals. Built off this.model()'s filtered rows.
+  bannerResourceModel() {
+    const { all } = this.model();
+    const DIVS = ['Central', 'Coastal', 'Inland'];
+    const groups = new Map(); // "banner||resourceType" -> { banner, resourceType, byDiv: {div -> {resources:Set, stores:Set}} }
+
+    const touch = (row, resourceName, resourceId, resourceType) => {
+      if (!resourceType) return;
+      const banner = row.banner || 'Unknown';
+      const gKey = banner + '||' + resourceType;
+      let g = groups.get(gKey);
+      if (!g) {
+        g = { banner, resourceType, byDiv: {} };
+        DIVS.forEach((d) => { g.byDiv[d] = { resources: new Set(), stores: new Set() }; });
+        g.otherResources = new Set(); g.otherStores = new Set();
+        groups.set(gKey, g);
+      }
+      const div = DIVS.includes(row.division) ? row.division : null;
+      const bucket = div ? g.byDiv[div] : { resources: g.otherResources, stores: g.otherStores };
+      bucket.resources.add(resourceId || resourceName);
+      bucket.stores.add(key(row));
+    };
+
+    this.repRows.filter((r) => this.match(r, true)).forEach((r) => touch(r, r.resourceName, r.resourceId, r.resourceType));
+    this.merchRows.filter((r) => this.match(r, false)).forEach((r) => touch(r, r.resourceName, r.resourceId, r.resourceType));
+
+    const rows = [...groups.values()].map((g) => {
+      const perDiv = DIVS.map((d) => ({ div: d, resources: g.byDiv[d].resources.size, stores: g.byDiv[d].stores.size }));
+      const totalResources = new Set([...DIVS.flatMap((d) => [...g.byDiv[d].resources]), ...g.otherResources]).size;
+      const totalStores = new Set([...DIVS.flatMap((d) => [...g.byDiv[d].stores]), ...g.otherStores]).size;
+      return { banner: g.banner, resourceType: g.resourceType, perDiv, totalResources, totalStores };
+    }).sort((a, b) => a.banner.localeCompare(b.banner) || a.resourceType.localeCompare(b.resourceType));
+
+    return { rows, divisions: DIVS };
+  }
+
   set(patch) { this.setState(patch); }
 
   exportCsv(name, cols, rows) {
@@ -872,6 +1088,7 @@ class Component extends DCLogic {
       isOverview: s.page === 'overview', isResourcePage: s.page === 'rep' || s.page === 'merch',
       isDivision: s.page === 'division', isBanner: s.page === 'banner', isGaps: s.page === 'gaps',
       isStoreLevel: s.page === 'storelevel',
+      isByDay: s.page === 'byday', isHierarchy: s.page === 'hierarchy', isBannerResource: s.page === 'bannerresource',
       fRegion: s.region, fDivision: s.division, fBanner: s.banner, fChannel: s.channel, fRep: s.rep, fMerchName: s.merchName, fManager: s.manager, fType: s.rtype,
       fRegionalManager: s.regionalManager, fGeneralManager: s.generalManager, fHeadOfSyndicated: s.headOfSyndicated,
       onRegion: (e) => this.set({ region: e.target.value }), onDivision: (e) => this.set({ division: e.target.value }),
@@ -1259,6 +1476,69 @@ class Component extends DCLogic {
         repColor: e.rep ? 'var(--color-neutral-200)' : 'var(--color-neutral-600)',
         merchColor: e.merch ? 'var(--color-neutral-200)' : 'var(--color-neutral-600)',
       }));
+    }
+
+    if (out.isByDay) {
+      const days = this.dayModel();
+      const peakStores = Math.max(1, ...days.map((d) => Math.max(d.repStores, d.merchStores)));
+      out.byDayRows = days.map((d) => ({
+        day: d.short, fullDay: d.day,
+        repStores: n(d.repStores), merchStores: n(d.merchStores),
+        repVisits: n(d.repVisits), merchVisits: n(d.merchVisits),
+        repW: w(pct(d.repStores, peakStores)), merchW: w(pct(d.merchStores, peakStores)),
+      }));
+      const totalRepStores = new Set(m.rep.map((r) => key(r))).size;
+      const totalMerchStores = new Set(m.merch.map((r) => key(r))).size;
+      out.byDaySummary = 'Across the current filter: ' + n(totalRepStores) + ' distinct stores get at least one rep visit some day, '
+        + n(totalMerchStores) + ' get at least one merchandiser visit.';
+    }
+
+    if (out.isHierarchy) {
+      const { rows, unmatchedMerch } = this.hierarchyModel();
+      const hq = s.hierarchyQuery.trim().toLowerCase();
+      const filtered = hq ? rows.filter((r) => r.manager.toLowerCase().includes(hq)
+        || r.reps.some((rp) => rp.name.toLowerCase().includes(hq))) : rows;
+      out.hierarchyCount = n(filtered.length) + ' manager' + (filtered.length === 1 ? '' : 's')
+        + ' · ' + n(rows.reduce((a, r) => a + r.repCount, 0)) + ' reps · ' + n(rows.reduce((a, r) => a + r.merchCount, 0)) + ' merchandisers';
+      out.hierarchyUnmatchedNote = unmatchedMerch > 0
+        ? n(unmatchedMerch) + ' merchandiser row(s) in the current filter don’t map to a rep shown here (filtered out elsewhere, or genuinely unassigned).'
+        : '';
+      out.hierarchyRows = filtered.map((row) => {
+        const expanded = !!s.expandedManagers[row.manager];
+        return {
+          manager: row.manager, repCount: n(row.repCount), merchCount: n(row.merchCount),
+          expanded, chevron: expanded ? 'ph ph-caret-down' : 'ph ph-caret-right',
+          toggle: () => this.set({ expandedManagers: { ...s.expandedManagers, [row.manager]: !expanded } }),
+          reps: expanded ? row.reps.map((rp) => ({ name: rp.name, merchCount: n(rp.merchCount) })) : [],
+        };
+      });
+      out.onHierarchyQuery = (e) => this.set({ hierarchyQuery: e.target.value });
+    }
+
+    if (out.isBannerResource) {
+      const { rows, divisions } = this.bannerResourceModel();
+      out.bannerResourceDivisions = divisions;
+      out.bannerResourceRows = rows.map((r) => ({
+        banner: r.banner, resourceType: r.resourceType,
+        perDiv: r.perDiv.map((d) => ({ resources: n(d.resources), stores: n(d.stores) })),
+        totalResources: n(r.totalResources), totalStores: n(r.totalStores),
+      }));
+      out.bannerResourceCount = n(rows.length) + ' banner/resource-type row' + (rows.length === 1 ? '' : 's')
+        + ' · ' + n(rows.reduce((a, r) => a + r.totalResources, 0)) + ' total resources · '
+        + n(rows.reduce((a, r) => a + r.totalStores, 0)) + ' total stores';
+      out.exportBannerResource = () => this.exportCsv(
+        'banner-resource-breakdown-' + new Date().toISOString().slice(0, 10),
+        [
+          { key: 'banner', label: 'Banner' }, { key: 'resourceType', label: 'Resource Type' },
+          ...divisions.flatMap((d) => [{ key: d + 'Resources', label: d + ' # of Resources' }, { key: d + 'Stores', label: d + ' # of Stores' }]),
+          { key: 'totalResources', label: 'Total # of Resources' }, { key: 'totalStores', label: 'Total # of Stores' },
+        ],
+        rows.map((r) => {
+          const row = { banner: r.banner, resourceType: r.resourceType, totalResources: r.totalResources, totalStores: r.totalStores };
+          r.perDiv.forEach((d) => { row[d.div + 'Resources'] = d.resources; row[d.div + 'Stores'] = d.stores; });
+          return row;
+        }));
+      out.exportBannerResourceLabel = 'Export ' + n(rows.length) + ' rows';
     }
 
     return out;
