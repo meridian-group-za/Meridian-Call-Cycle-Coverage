@@ -75,12 +75,27 @@ function normDivision(v) {
 
 const DAY_KEYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
 
+// Named individuals Carin asked to exclude entirely from the dashboard
+// (2026-08-26) -- kept in sync with the same set in
+// scripts/live_data_server.py so the local-dev and production paths never
+// disagree (the exact bug pattern that broke Coverage by day earlier).
+const EXCLUDED_RESOURCE_NAMES = new Set([
+  // under Shonesa Naidoo
+  "HENNIE VAN ZYL", "ABRAHAM MANABALA", "MYRTEL GRIFFITHS", "DUANNE KRIGE",
+  "MARISKA DU PLESSIS", "JEAN-PIERRE BOSHOFF", "CANDIDA JANSE VAN RENSBURG",
+  // under Lorato Diale
+  "STEFANIE POHL", "MUHAMMAD KAJEE", "ASHLEIGH LLOYD", "ONTHATILE KGARI", "PRASHANT SANKER",
+  // unassigned / test accounts
+  "TEST2 USER", "TEST 2 USER 2",
+]);
+
 function transformCombinedMaster(raw) {
   const rep_rows = [], merch_rows = [];
   (raw.combinedMaster || []).forEach((r) => {
     // "Office" banner is internal Meridian admin/conference-room addresses,
     // not real stores -- drop entirely rather than land in "Other / Unclassified".
     if ((r["BANNER"] || "").trim().toUpperCase() === "OFFICE") return;
+    if (EXCLUDED_RESOURCE_NAMES.has((r["RESOURCE NAME"] || "").trim().toUpperCase())) return;
     const isMerch = (r["RESOURCE TYPE"] || "").includes("MERCHANDISER");
     const row = {
       storeCode: r["GEO REP STORE CODE"] || r["STORE CODE"],

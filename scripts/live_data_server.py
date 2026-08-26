@@ -54,6 +54,27 @@ def slim(r):
     }, is_merch
 
 
+# Named individuals Carin asked to exclude entirely from the dashboard
+# (2026-08-26) -- a mix of people under Shonesa Naidoo / Lorato Diale and
+# two unassigned test accounts that should never have been in the real
+# roster. Matched against RESOURCE NAME, normalized (trim + uppercase) so
+# case/whitespace differences in the source sheet don't let one slip
+# through.
+EXCLUDED_RESOURCE_NAMES = {
+    # under Shonesa Naidoo
+    'HENNIE VAN ZYL', 'ABRAHAM MANABALA', 'MYRTEL GRIFFITHS', 'DUANNE KRIGE',
+    'MARISKA DU PLESSIS', 'JEAN-PIERRE BOSHOFF', 'CANDIDA JANSE VAN RENSBURG',
+    # under Lorato Diale
+    'STEFANIE POHL', 'MUHAMMAD KAJEE', 'ASHLEIGH LLOYD', 'ONTHATILE KGARI', 'PRASHANT SANKER',
+    # unassigned / test accounts
+    'TEST2 USER', 'TEST 2 USER 2',
+}
+
+
+def _norm_name(v):
+    return (v or '').strip().upper()
+
+
 def build_payload():
     with open(RUN_LATEST_PATH, encoding='utf-8') as f:
         d = json.load(f)
@@ -64,6 +85,8 @@ def build_payload():
         # Carin confirmed 2026-08-20 these should be dropped entirely
         # rather than land in "Other / Unclassified".
         if (raw.get('BANNER') or '').strip().upper() == 'OFFICE':
+            continue
+        if _norm_name(raw.get('RESOURCE NAME')) in EXCLUDED_RESOURCE_NAMES:
             continue
         row, is_merch = slim(raw)
         (merch_rows if is_merch else rep_rows).append(row)
