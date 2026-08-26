@@ -999,6 +999,23 @@ class Component extends DCLogic {
       .catch((e) => this.setState({ err: 'Could not load the Call Cycle Master from SharePoint — ' + e.message }));
   }
 
+  // resourceId||resourceName -> that rep's own managerName, built once from
+  // the full (unfiltered) rep list -- lets the Manager filter resolve a
+  // merchandiser up through their rep instead of only matching merch rows
+  // whose own "manager" field (which actually holds their REP's name, see
+  // below) happens to literally equal the selected manager.
+  repManagerLookup() {
+    if (!this._repMgrByKey) {
+      const map = new Map();
+      this.repRows.forEach((r) => {
+        const k = r.resourceId || r.resourceName;
+        if (k && !map.has(k)) map.set(k, r.managerName);
+      });
+      this._repMgrByKey = map;
+    }
+    return this._repMgrByKey;
+  }
+
   match(r, applyRep, skipManager) {
     const s = this.state;
     if (s.region && r.region !== s.region) return false;
@@ -1009,13 +1026,27 @@ class Component extends DCLogic {
     if (applyRep && s.rep && r.resourceName !== s.rep) return false;
     if (!applyRep && s.merchName && r.resourceName !== s.merchName) return false;
     // A merchandiser row's own "manager" field is actually the REP they
-    // report to, not a real people-manager (see hierarchyModel) -- so the
-    // global Manager filter must never be applied to merch rows directly,
-    // or every merchandiser gets excluded before the rep->merch chain can
-    // even be resolved (confirmed 2026-08-24: filtering Team hierarchy by
-    // manager "Gerrit Schutte" zeroed out every rep's merch count, even
-    // reps who genuinely have merchandisers).
-    if (!skipManager && s.manager && r.managerName !== s.manager) return false;
+    // report to, not a real people-manager (see hierarchyModel). A plain
+    // r.managerName !== s.manager check therefore excludes every
+    // merchandiser whose manager was selected one level up (confirmed
+    // 2026-08-26: filtering by "Leon Du Toit (MP)" showed 0 merchandisers
+    // even though his reps have 237 between them) -- so for merch rows,
+    // also accept a match via the rep they report to (repManagerLookup).
+    // skipManager still bypasses this entirely for hierarchyModel(), which
+    // resolves the chain itself and must see every merchandiser regardless
+    // of the top-level Manager filter (confirmed 2026-08-24: filtering by
+    // manager "Gerrit Schutte" zeroed out every rep's merch count there).
+    if (!skipManager && s.manager) {
+      if (applyRep) {
+        if (r.managerName !== s.manager) return false;
+      } else {
+        const repMgr = this.repManagerLookup();
+        const repKey = r.managerId && repMgr.has(r.managerId) ? r.managerId
+          : (repMgr.has(r.managerName) ? r.managerName : null);
+        const viaRep = repKey ? repMgr.get(repKey) : null;
+        if (r.managerName !== s.manager && viaRep !== s.manager) return false;
+      }
+    }
     if (s.regionalManager && r.regionalManager !== s.regionalManager) return false;
     if (s.generalManager && r.generalManager !== s.generalManager) return false;
     if (s.headOfSyndicated && r.headOfSyndicated !== s.headOfSyndicated) return false;
