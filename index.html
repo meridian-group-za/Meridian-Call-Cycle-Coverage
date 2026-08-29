@@ -1567,7 +1567,15 @@ class Component extends DCLogic {
         if (!e) { e = { reps: new Set(), merch: new Set(), managers: new Set(), repManagers: new Set() }; regAgg.set(r, e); }
         return e;
       };
-      m.rep.forEach((r) => { const e = ensureR(r.region || 'Unknown'); e.reps.add(r.resourceId || r.resourceName); if (r.managerId || r.managerName) { e.managers.add(r.managerId || r.managerName); e.repManagers.add(r.managerId || r.managerName); } });
+      // Sanele Pato is East London-based but roves to PE/SWD stores (Charl's
+      // request, 2026-08-29): those stores must keep their own real region
+      // for coverage purposes (his store rows below are untouched), but he
+      // must only count toward EL's rep headcount here, not PE/SWD's too.
+      // No "home region" field exists in the source data to key this off,
+      // so it's this one explicit, named exception -- not a general rule.
+      const REP_HOME_REGION_OVERRIDES = { 'SANELE PATO': 'East London' };
+      const repHeadcountRegion = (r) => REP_HOME_REGION_OVERRIDES[(r.resourceName || '').trim().toUpperCase()] || (r.region || 'Unknown');
+      m.rep.forEach((r) => { const e = ensureR(repHeadcountRegion(r)); e.reps.add(r.resourceId || r.resourceName); if (r.managerId || r.managerName) { e.managers.add(r.managerId || r.managerName); e.repManagers.add(r.managerId || r.managerName); } });
       m.merch.forEach((r) => { const e = ensureR(r.region || 'Unknown'); e.merch.add(r.resourceId || r.resourceName); if (r.managerId || r.managerName) e.managers.add(r.managerId || r.managerName); });
       const divOfRegion = new Map();
       m.all.forEach((e) => { if (!divOfRegion.has(e.region)) divOfRegion.set(e.region, e.division); });
