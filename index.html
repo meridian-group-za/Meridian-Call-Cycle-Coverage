@@ -1180,11 +1180,26 @@ class Component extends DCLogic {
     // Every other active filter still applies; only skipManager differs.
     const merch = this.merchRows.filter((r) => this.match(r, false, true));
 
-    const repByKey = new Map(); // resourceId||resourceName -> canonical rep record
+    const repByKey = new Map(); // filtered -- resourceId||resourceName -> canonical rep record, used to build the visible manager/rep/merch tree
     rep.forEach((r) => {
       const k = r.resourceId || r.resourceName;
       if (!k || repByKey.has(k)) return;
       repByKey.set(k, r);
+    });
+
+    // Company-wide rep lookup, ignoring the current filter entirely -- used
+    // only to decide whether "Unmatched" is real. Confirmed 2026-08-29
+    // (Sanele Khumalo/Lindokuhle P&G Zungu/Masiza Mawonga/Sithembiso Ndlela,
+    // flagged via Nakita): these merchandisers all have a genuine manager on
+    // file who's simply based in a different region -- not a data error, so
+    // they shouldn't count as unmatched just because their manager isn't in
+    // the region currently filtered to. Only flag a merchandiser as
+    // unmatched if their manager doesn't exist as a rep ANYWHERE at all.
+    const repByKeyAll = new Map();
+    this.repRows.forEach((r) => {
+      const k = r.resourceId || r.resourceName;
+      if (!k || repByKeyAll.has(k)) return;
+      repByKeyAll.set(k, r);
     });
 
     // merch is store-level rows (one row per store a merchandiser is
@@ -1218,16 +1233,17 @@ class Component extends DCLogic {
       return { manager: mgrName, repCount: reps.length, merchCount: merchTotal, reps };
     }).sort((a, b) => b.repCount - a.repCount);
 
-    // Merchandisers whose manager doesn't map to any rep in the current
-    // filter (e.g. filtered out by region/banner, or genuinely unmatched)
-    // -- surfaced separately so the totals are honest about what's shown.
-    // Distinct-merchandiser count overall, vs. the distinct merchandisers
-    // that did map to some rep (a merchandiser matched under more than one
-    // rep is rare but would make this a slight undercount, never an over).
-    const allMerchIds = new Set(merch.map((m) => m.resourceId || m.resourceName));
-    const matchedMerchIds = new Set();
-    merchSetByRepKey.forEach((map) => map.forEach((name, id) => matchedMerchIds.add(id)));
-    const unmatchedMerch = allMerchIds.size - matchedMerchIds.size;
+    // Merchandisers whose manager doesn't exist as a rep ANYWHERE in the
+    // whole dataset -- a real data problem, unlike a manager who exists but
+    // is simply outside the current region/banner filter (see repByKeyAll
+    // above). Distinct-merchandiser count, not a raw row count, for the
+    // same reason merchSetByRepKey dedupes above.
+    const genuinelyUnmatchedMerchIds = new Set();
+    merch.forEach((m) => {
+      const hasRepAnywhere = (m.managerId && repByKeyAll.has(m.managerId)) || repByKeyAll.has(m.managerName);
+      if (!hasRepAnywhere) genuinelyUnmatchedMerchIds.add(m.resourceId || m.resourceName);
+    });
+    const unmatchedMerch = genuinelyUnmatchedMerchIds.size;
 
     return { rows, unmatchedMerch };
   }
@@ -1796,7 +1812,7 @@ class Component extends DCLogic {
         { icon: 'ph ph-user-gear', label: 'Managers', value: n(rows.length), sub: rows.length ? p1(pct(rows.filter((r) => r.merchCount === 0).length, rows.length)) + ' with no merch' : '—' },
         { icon: 'ph ph-user-focus', label: 'Reps', value: n(totalRepsAll), sub: rows.length ? (totalRepsAll / rows.length).toFixed(1) + ' per manager' : '—' },
         { icon: 'ph ph-shopping-bag-open', label: 'Merchandisers', value: n(totalMerchAll), sub: totalRepsAll ? (totalMerchAll / totalRepsAll).toFixed(1) + ' per rep' : '—' },
-        { icon: 'ph ph-warning', label: 'Unmatched merch', value: n(unmatchedMerch), sub: 'no rep mapped in filter' },
+        { icon: 'ph ph-warning', label: 'Unmatched merch', value: n(unmatchedMerch), sub: 'no rep found anywhere' },
       ];
       const topByMerch = [...rows].sort((a, b) => b.merchCount - a.merchCount).slice(0, 8);
       const peakMerch = Math.max(1, ...topByMerch.map((r) => r.merchCount));
