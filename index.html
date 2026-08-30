@@ -983,6 +983,13 @@ class Component extends DCLogic {
     const normKey = (s) => (s || '').toUpperCase().trim().replace(/\s+/g, ' ');
     const hierarchyReady = fetch('hierarchy.json').then((r) => r.ok ? r.json() : {}).catch(() => ({}));
 
+    // Les Van Dyk and his team removed from this dashboard entirely (Carin,
+    // 2026-08-30, from the bulk role-cleanup email). No merchandisers report
+    // to any of them (checked 2026-08-30), so excluding the reps alone is
+    // enough -- nothing is left dangling as unmatched merch.
+    const EXCLUDED_RESOURCES = new Set(['LES VAN DYK', 'ADRIAN MYBURGH', 'TYRIQUE MYBURGH', 'KEANU MYBURGH', 'CULES VAN DYK']);
+    const isExcluded = (r) => EXCLUDED_RESOURCES.has(normKey(r.resourceName)) || EXCLUDED_RESOURCES.has(normKey(r.managerName));
+
     const applyPayload = (raw) => {
       hierarchyReady.then((hierarchyMap) => {
         this.hierarchyMap = hierarchyMap;
@@ -993,8 +1000,8 @@ class Component extends DCLogic {
             regionalManager: h.regionalManager, manager2: h.manager2,
           }) : r;
         });
-        this.repRows = withHierarchy(raw.rep_rows || []);
-        this.merchRows = withHierarchy(raw.merch_rows || []);
+        this.repRows = withHierarchy((raw.rep_rows || []).filter((r) => !isExcluded(r)));
+        this.merchRows = withHierarchy((raw.merch_rows || []).filter((r) => !isExcluded(r)));
         this.ts = raw.timestamp;
         this.setState({ ready: true });
       });
