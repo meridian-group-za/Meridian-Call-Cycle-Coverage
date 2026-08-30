@@ -983,12 +983,18 @@ class Component extends DCLogic {
     const normKey = (s) => (s || '').toUpperCase().trim().replace(/\s+/g, ' ');
     const hierarchyReady = fetch('hierarchy.json').then((r) => r.ok ? r.json() : {}).catch(() => ({}));
 
-    // Les Van Dyk and his team removed from this dashboard entirely (Carin,
-    // 2026-08-30, from the bulk role-cleanup email). No merchandisers report
-    // to any of them (checked 2026-08-30), so excluding the reps alone is
-    // enough -- nothing is left dangling as unmatched merch.
+    // Les Van Dyk and his team removed as PEOPLE from this dashboard (Carin,
+    // 2026-08-30, from the bulk role-cleanup email) -- but their 278 stores
+    // are exclusively theirs with no other rep assigned anywhere in this
+    // data (checked 2026-08-30), so dropping their rows outright would make
+    // those stores vanish from Stores in View / coverage entirely instead of
+    // showing up as unstaffed (Carin: "will this mean his stores also dont
+    // reflect" -- confirmed yes, so reassign the stores to an "Unassigned"
+    // placeholder rep instead of deleting the rows).
     const EXCLUDED_RESOURCES = new Set(['LES VAN DYK', 'ADRIAN MYBURGH', 'TYRIQUE MYBURGH', 'KEANU MYBURGH', 'CULES VAN DYK']);
     const isExcluded = (r) => EXCLUDED_RESOURCES.has(normKey(r.resourceName)) || EXCLUDED_RESOURCES.has(normKey(r.managerName));
+    const UNASSIGNED_PLACEHOLDER = { resourceId: 'UNASSIGNED-LVD', resourceName: 'Unassigned (Les Van Dyk team removed)', managerName: 'Unassigned', managerId: null };
+    const reassignExcluded = (r) => isExcluded(r) ? Object.assign({}, r, UNASSIGNED_PLACEHOLDER) : r;
 
     const applyPayload = (raw) => {
       hierarchyReady.then((hierarchyMap) => {
@@ -1000,8 +1006,8 @@ class Component extends DCLogic {
             regionalManager: h.regionalManager, manager2: h.manager2,
           }) : r;
         });
-        this.repRows = withHierarchy((raw.rep_rows || []).filter((r) => !isExcluded(r)));
-        this.merchRows = withHierarchy((raw.merch_rows || []).filter((r) => !isExcluded(r)));
+        this.repRows = withHierarchy((raw.rep_rows || []).map(reassignExcluded));
+        this.merchRows = withHierarchy((raw.merch_rows || []).map(reassignExcluded));
         this.ts = raw.timestamp;
         this.setState({ ready: true });
       });
