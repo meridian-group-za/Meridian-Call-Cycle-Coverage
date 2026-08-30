@@ -1245,15 +1245,61 @@ class Component extends DCLogic {
       merchSetByRepKey.get(repKey).set(m.resourceId || m.resourceName, m.resourceName);
     });
 
-    const managers = new Map(); // managerName -> { reps: Map(repKey -> {name, merchCount, merchNames}) }
+    // Keyed by UPPERCASED manager name -- every lookup below (isManager,
+    // buildSubtree, isNestedElsewhere) compares against .toUpperCase(), so
+    // storing the map key in its original case (e.g. "Anton Wilson") made
+    // every one of those lookups silently miss and no subtree ever attached
+    // (Carin, 2026-08-30: "not seeing him" -- Gerhard Fourie -> Anton Wilson
+    // never nested because of this). Display name is preserved separately.
+    const managers = new Map(); // managerNameUpper -> { displayName, reps: Map(repKey -> {name, merchCount, merchNames}) }
     repByKey.forEach((r, repKey) => {
       const mgrName = r.managerName || 'Unassigned';
-      if (!managers.has(mgrName)) managers.set(mgrName, { reps: new Map() });
+      const mgrKey = mgrName.toUpperCase();
+      if (!managers.has(mgrKey)) managers.set(mgrKey, { displayName: mgrName, reps: new Map() });
       const merchMap = merchSetByRepKey.get(repKey) || new Map();
-      managers.get(mgrName).reps.set(repKey, {
+      managers.get(mgrKey).reps.set(repKey, {
         repKey, name: r.resourceName, merchCount: merchMap.size,
         merchNames: [...merchMap.values()].sort(),
       });
+    });
+
+    // Channel/Regional Managers per the Organograms (e.g. Gerhard Fourie
+    // managing Anton Wilson) don't exist anywhere in the call-cycle rep_rows
+    // -- Anton Wilson has 8 reps whose managerName says "Anton Wilson", but
+    // no rep row's managerName is ever "Gerhard Fourie", so that link can't
+    // come from repByKey at all (Carin, 2026-08-30: "should be linked to
+    // their respective FSMs as per the Organograms sent"). componentDidMount
+    // already stamps every rep row with headOfSyndicated/generalManager/
+    // regionalManager/manager2 from hierarchy.json (the Organogram export),
+    // where manager2 is that rep's direct manager (matches managerName) and
+    // regionalManager/generalManager/headOfSyndicated are the real chain
+    // above them. Use that chain to synthesize the missing links, but only
+    // for a name that's already a genuine people-manager in this view --
+    // otherwise this would inject disconnected single-node stubs for every
+    // random name in the Organogram export.
+    const managerAbove = new Map(); // belowKeyUpper -> { name, key: aboveKeyUpper }
+    const linkAbove = (belowName, aboveName) => {
+      if (!belowName || !aboveName) return;
+      const belowKey = belowName.toUpperCase();
+      const aboveKey = aboveName.toUpperCase();
+      if (belowKey === aboveKey || managerAbove.has(belowKey)) return;
+      managerAbove.set(belowKey, { name: aboveName, key: aboveKey });
+    };
+    repByKey.forEach((r) => {
+      linkAbove(r.manager2, r.regionalManager);
+      linkAbove(r.regionalManager, r.generalManager);
+      linkAbove(r.generalManager, r.headOfSyndicated);
+    });
+    managerAbove.forEach(({ name: aboveName, key: aboveKey }, belowKey) => {
+      if (!managers.has(belowKey)) return; // only link real people-managers visible in this data
+      if (!managers.has(aboveKey)) managers.set(aboveKey, { displayName: aboveName, reps: new Map() });
+      const aboveGroup = managers.get(aboveKey);
+      const syntheticKey = 'org:' + belowKey;
+      if (!aboveGroup.reps.has(syntheticKey)) {
+        aboveGroup.reps.set(syntheticKey, {
+          repKey: syntheticKey, name: managers.get(belowKey).displayName, merchCount: 0, merchNames: [],
+        });
+      }
     });
 
     // A rep who is ALSO someone else's manager (e.g. Anton Wilson, who
@@ -1287,19 +1333,17 @@ class Component extends DCLogic {
     // Root managers only -- a manager whose own name matches some OTHER
     // manager's rep in this same filtered set is nested under that parent
     // via buildSubtree() above, not shown again as a disconnected root.
-    const allManagerKeysUpper = new Set([...managers.keys()].map((k) => (k || '').toUpperCase()));
-    const isNestedElsewhere = (mgrName) => {
-      const key = (mgrName || '').toUpperCase();
-      for (const [otherMgr, g] of managers) {
-        if ((otherMgr || '').toUpperCase() === key) continue;
+    const isNestedElsewhere = (mgrKey) => {
+      for (const [otherMgrKey, g] of managers) {
+        if (otherMgrKey === mgrKey) continue;
         for (const rp of g.reps.values()) {
-          if ((rp.name || '').toUpperCase() === key) return true;
+          if ((rp.name || '').toUpperCase() === mgrKey) return true;
         }
       }
       return false;
     };
 
-    const rows = [...managers.entries()].filter(([mgrName]) => !isNestedElsewhere(mgrName)).map(([mgrName, g]) => {
+    const rows = [...managers.entries()].filter(([mgrKey]) => !isNestedElsewhere(mgrKey)).map(([mgrKey, g]) => {
       const directReps = [...g.reps.values()].sort((a, b) => b.merchCount - a.merchCount).map((rp) => {
         const isManager = managers.has((rp.name || '').toUpperCase());
         const subtree = isManager ? buildSubtree((rp.name || '').toUpperCase(), rp.repKey, 1) : [];
@@ -1310,7 +1354,7 @@ class Component extends DCLogic {
       // now honestly reflects everything underneath them, including
       // merchandisers that sit two or three management levels down.
       const merchTotal = directReps.reduce((a, r) => a + r.merchCount + r.subtree.reduce((b, s) => b + s.merchCount, 0), 0);
-      return { manager: mgrName, repCount: directReps.length, merchCount: merchTotal, reps: directReps };
+      return { manager: g.displayName, repCount: directReps.length, merchCount: merchTotal, reps: directReps };
     }).sort((a, b) => b.repCount - a.repCount);
 
     // Merchandisers whose manager doesn't exist as a rep ANYWHERE in the
