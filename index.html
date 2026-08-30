@@ -1292,8 +1292,16 @@ class Component extends DCLogic {
       if (!managers.has(belowKey)) return; // only link real people-managers visible in this data
       if (!managers.has(aboveKey)) managers.set(aboveKey, { displayName: aboveName, reps: new Map() });
       const aboveGroup = managers.get(aboveKey);
+      // A manager can ALREADY be a real direct rep of this same boss via
+      // managerName (e.g. Louis Jordaan reports to Given Rangata AND the
+      // Organogram separately says Louis Jordaan's own manager is also
+      // "Given Rangata") -- without this check they'd get a second,
+      // synthetic "org:" entry alongside their real one, showing up twice
+      // in the list with identical numbers (Carin, 2026-08-30: "duplicated
+      // -- why?").
+      const alreadyDirectRep = [...aboveGroup.reps.values()].some((rp) => (rp.name || '').toUpperCase() === belowKey);
       const syntheticKey = 'org:' + belowKey;
-      if (!aboveGroup.reps.has(syntheticKey)) {
+      if (!alreadyDirectRep && !aboveGroup.reps.has(syntheticKey)) {
         aboveGroup.reps.set(syntheticKey, {
           repKey: syntheticKey, name: managers.get(belowKey).displayName, merchCount: 0, merchNames: [],
         });
