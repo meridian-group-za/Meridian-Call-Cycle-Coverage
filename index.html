@@ -796,24 +796,24 @@ Last updated<br><span style="color:var(--color-neutral-300);">{{ snapshot }}</sp
                   <div style="font-size:11.5px; text-align:right; color:var(--color-accent-300);">{{ row.repCount }} reps</div>
                   <div style="font-size:11.5px; text-align:right; color:#6fb2ff;">{{ row.merchCount }} merchandisers</div>
                 </div>
+                <!-- Flat, indented outline instead of the old box+connector
+                     org-chart (Carin, 2026-08-30: "the looks shit") -- that
+                     layout was designed for one flat row of direct reps and
+                     didn't cope with a manager-rep's own multi-level chain
+                     (e.g. Gerhard Fourie -> Anton Wilson -> Anton's 8 reps)
+                     rendering as isolated bordered boxes stacked in a single
+                     column instead of a readable tree. -->
                 <sc-if value="{{ row.expanded }}" hint-placeholder-val="{{ false }}">
-                  <div class="org-wrap">
-                    <div class="org-node org-manager">
-                      <div class="org-name">{{ row.manager }}</div>
-                      <div class="org-role">Manager</div>
-                    </div>
-                    <div class="org-stem"></div>
-                    <div class="org-children">
-                      <sc-for list="{{ row.reps }}" as="rp" hint-placeholder-count="0">
-                        <div class="org-child">
-                          <div class="org-node" onClick="{{ rp.toggle }}" style="cursor:{{ rp.hasMerch ? 'pointer' : 'default' }}; {{ rp.expanded ? 'border-color:var(--color-accent-700);' : '' }}">
-                            <div class="org-name">{{ rp.name }}</div>
-                            <div class="org-role">{{ rp.roleLabel }}</div>
-                            <div class="org-badge">{{ rp.merchCount }} merch<sc-if value="{{ rp.hasMerch }}" hint-placeholder-val="{{ false }}"><i class="{{ rp.expanded ? 'ph ph-caret-up' : 'ph ph-caret-down' }}" style="margin-left:4px; font-size:9px;"></i></sc-if></div>
-                          </div>
+                  <div style="display:flex; flex-direction:column; gap:2px; padding:4px 4px 14px 32px;">
+                    <sc-for list="{{ row.reps }}" as="rp" hint-placeholder-count="0">
+                      <div>
+                        <div onClick="{{ rp.toggle }}" style="display:flex; align-items:center; gap:10px; padding:7px 10px; border-radius:var(--radius-md); cursor:{{ rp.hasMerch ? 'pointer' : 'default' }}; background:{{ rp.expanded ? 'color-mix(in srgb, var(--color-accent) 8%, transparent)' : 'transparent' }};">
+                          <span style="font-size:12px; font-weight:600; color:var(--color-text);">{{ rp.name }}</span>
+                          <span style="font-size:9px; letter-spacing:.06em; text-transform:uppercase; color:{{ rp.isManager ? 'var(--color-accent-300)' : 'var(--color-neutral-500)' }}; border:1px solid {{ rp.isManager ? 'var(--color-accent-700)' : 'var(--color-neutral-800)' }}; border-radius:999px; padding:1px 7px;">{{ rp.roleLabel }}</span>
+                          <span style="margin-left:auto; font-size:11.5px; color:#6fb2ff; white-space:nowrap;">{{ rp.merchCount }} merch<sc-if value="{{ rp.hasMerch }}" hint-placeholder-val="{{ false }}"><i class="{{ rp.expanded ? 'ph ph-caret-up' : 'ph ph-caret-down' }}" style="margin-left:6px; font-size:9px;"></i></sc-if></span>
                         </div>
                         <sc-if value="{{ rp.expanded }}" hint-placeholder-val="{{ false }}">
-                          <div style="grid-column:1/-1; background:#0a1c3a; border:1px solid var(--color-neutral-800); border-radius:var(--radius-md); padding:10px 14px; display:flex; flex-wrap:wrap; gap:7px;">
+                          <div style="margin:2px 0 6px 10px; background:#0a1c3a; border:1px solid var(--color-neutral-800); border-radius:var(--radius-md); padding:10px 14px; display:flex; flex-wrap:wrap; gap:7px;">
                             <sc-for list="{{ rp.merchNames }}" as="mn" hint-placeholder-count="0">
                               <span style="font-size:11px; color:var(--color-neutral-200); background:#0f2c4f; border:1px solid var(--color-neutral-800); border-radius:999px; padding:4px 11px;">{{ mn }}</span>
                             </sc-for>
@@ -829,27 +829,25 @@ Last updated<br><span style="color:var(--color-neutral-300);">{{ snapshot }}</sp
                              whole chain regardless of how many management
                              levels deep it actually goes. -->
                         <sc-if value="{{ rp.isManager }}" hint-placeholder-val="{{ false }}">
-                          <div style="grid-column:1/-1; display:flex; flex-direction:column; gap:6px; padding:8px 0 2px;">
-                            <sc-for list="{{ rp.subtree }}" as="sub" hint-placeholder-count="0">
-                              <div style="margin-left:{{ sub.indent }};">
-                                <div class="org-node" onClick="{{ sub.toggle }}" style="cursor:{{ sub.hasMerch ? 'pointer' : 'default' }}; display:inline-flex; {{ sub.expanded ? 'border-color:var(--color-accent-700);' : '' }}">
-                                  <div class="org-name">{{ sub.name }}</div>
-                                  <div class="org-role">{{ sub.roleLabel }}</div>
-                                  <div class="org-badge">{{ sub.merchCount }} merch<sc-if value="{{ sub.hasMerch }}" hint-placeholder-val="{{ false }}"><i class="{{ sub.expanded ? 'ph ph-caret-up' : 'ph ph-caret-down' }}" style="margin-left:4px; font-size:9px;"></i></sc-if></div>
-                                </div>
-                                <sc-if value="{{ sub.expanded }}" hint-placeholder-val="{{ false }}">
-                                  <div style="background:#0a1c3a; border:1px solid var(--color-neutral-800); border-radius:var(--radius-md); padding:8px 12px; margin-top:4px; display:flex; flex-wrap:wrap; gap:6px;">
-                                    <sc-for list="{{ sub.merchNames }}" as="mn" hint-placeholder-count="0">
-                                      <span style="font-size:10.5px; color:var(--color-neutral-200); background:#0f2c4f; border:1px solid var(--color-neutral-800); border-radius:999px; padding:3px 10px;">{{ mn }}</span>
-                                    </sc-for>
-                                  </div>
-                                </sc-if>
+                          <sc-for list="{{ rp.subtree }}" as="sub" hint-placeholder-count="0">
+                            <div style="margin-left:{{ sub.indent }};">
+                              <div onClick="{{ sub.toggle }}" style="display:flex; align-items:center; gap:10px; padding:7px 10px; border-radius:var(--radius-md); cursor:{{ sub.hasMerch ? 'pointer' : 'default' }}; background:{{ sub.expanded ? 'color-mix(in srgb, var(--color-accent) 8%, transparent)' : 'transparent' }};">
+                                <span style="font-size:12px; font-weight:600; color:var(--color-text);">{{ sub.name }}</span>
+                                <span style="font-size:9px; letter-spacing:.06em; text-transform:uppercase; color:{{ sub.isManager ? 'var(--color-accent-300)' : 'var(--color-neutral-500)' }}; border:1px solid {{ sub.isManager ? 'var(--color-accent-700)' : 'var(--color-neutral-800)' }}; border-radius:999px; padding:1px 7px;">{{ sub.roleLabel }}</span>
+                                <span style="margin-left:auto; font-size:11.5px; color:#6fb2ff; white-space:nowrap;">{{ sub.merchCount }} merch<sc-if value="{{ sub.hasMerch }}" hint-placeholder-val="{{ false }}"><i class="{{ sub.expanded ? 'ph ph-caret-up' : 'ph ph-caret-down' }}" style="margin-left:6px; font-size:9px;"></i></sc-if></span>
                               </div>
-                            </sc-for>
-                          </div>
+                              <sc-if value="{{ sub.expanded }}" hint-placeholder-val="{{ false }}">
+                                <div style="margin:2px 0 6px 10px; background:#0a1c3a; border:1px solid var(--color-neutral-800); border-radius:var(--radius-md); padding:8px 12px; display:flex; flex-wrap:wrap; gap:6px;">
+                                  <sc-for list="{{ sub.merchNames }}" as="mn" hint-placeholder-count="0">
+                                    <span style="font-size:10.5px; color:var(--color-neutral-200); background:#0f2c4f; border:1px solid var(--color-neutral-800); border-radius:999px; padding:3px 10px;">{{ mn }}</span>
+                                  </sc-for>
+                                </div>
+                              </sc-if>
+                            </div>
+                          </sc-for>
                         </sc-if>
-                      </sc-for>
-                    </div>
+                      </div>
+                    </sc-for>
                   </div>
                 </sc-if>
               </div>
@@ -1330,20 +1328,19 @@ class Component extends DCLogic {
       return out;
     };
 
-    // Root managers only -- a manager whose own name matches some OTHER
-    // manager's rep in this same filtered set is nested under that parent
-    // via buildSubtree() above, not shown again as a disconnected root.
-    const isNestedElsewhere = (mgrKey) => {
-      for (const [otherMgrKey, g] of managers) {
-        if (otherMgrKey === mgrKey) continue;
-        for (const rp of g.reps.values()) {
-          if ((rp.name || '').toUpperCase() === mgrKey) return true;
-        }
-      }
-      return false;
-    };
-
-    const rows = [...managers.entries()].filter(([mgrKey]) => !isNestedElsewhere(mgrKey)).map(([mgrKey, g]) => {
+    // Every manager gets its own row -- previously a manager who was ALSO
+    // someone else's rep (e.g. Gerhard Fourie, who reports to Ferdie Senekal
+    // who reports to Louis Jansen Van Rensburg) was hidden from the top-level
+    // list entirely, only reachable by manually expanding 3 levels of a
+    // completely different manager's row first, and the search box only
+    // ever matched top-level rows -- so a real manager with real reps could
+    // be functionally unfindable (Carin, 2026-08-30: "all managers who have
+    // someone reporting to them must be in this Team hierarchy table").
+    // Expanding a manager's row still shows their own descendant chain via
+    // buildSubtree() below, so the full nested organogram is still visible
+    // from any manager's own row -- it's just no longer the ONLY place they
+    // can be found.
+    const rows = [...managers.entries()].map(([mgrKey, g]) => {
       const directReps = [...g.reps.values()].sort((a, b) => b.merchCount - a.merchCount).map((rp) => {
         const isManager = managers.has((rp.name || '').toUpperCase());
         const subtree = isManager ? buildSubtree((rp.name || '').toUpperCase(), rp.repKey, 1) : [];
