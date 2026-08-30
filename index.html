@@ -808,7 +808,7 @@ Last updated<br><span style="color:var(--color-neutral-300);">{{ snapshot }}</sp
                         <div class="org-child">
                           <div class="org-node" onClick="{{ rp.toggle }}" style="cursor:{{ rp.hasMerch ? 'pointer' : 'default' }}; {{ rp.expanded ? 'border-color:var(--color-accent-700);' : '' }}">
                             <div class="org-name">{{ rp.name }}</div>
-                            <div class="org-role">Rep</div>
+                            <div class="org-role">{{ rp.roleLabel }}</div>
                             <div class="org-badge">{{ rp.merchCount }} merch<sc-if value="{{ rp.hasMerch }}" hint-placeholder-val="{{ false }}"><i class="{{ rp.expanded ? 'ph ph-caret-up' : 'ph ph-caret-down' }}" style="margin-left:4px; font-size:9px;"></i></sc-if></div>
                           </div>
                         </div>
@@ -816,6 +816,35 @@ Last updated<br><span style="color:var(--color-neutral-300);">{{ snapshot }}</sp
                           <div style="grid-column:1/-1; background:#0a1c3a; border:1px solid var(--color-neutral-800); border-radius:var(--radius-md); padding:10px 14px; display:flex; flex-wrap:wrap; gap:7px;">
                             <sc-for list="{{ rp.merchNames }}" as="mn" hint-placeholder-count="0">
                               <span style="font-size:11px; color:var(--color-neutral-200); background:#0f2c4f; border:1px solid var(--color-neutral-800); border-radius:999px; padding:4px 11px;">{{ mn }}</span>
+                            </sc-for>
+                          </div>
+                        </sc-if>
+                        <!-- A manager-rep's real reporting chain (e.g. Anton
+                             Wilson's own 8 reps, and THEIR merchandisers)
+                             shown here directly, no extra click needed --
+                             Carin, 2026-08-30: "gerhard - Anton - antons
+                             reps - antons reps merchandisers". Already
+                             flattened depth-first in JS (buildSubtree), so
+                             one flat list with per-row indent renders the
+                             whole chain regardless of how many management
+                             levels deep it actually goes. -->
+                        <sc-if value="{{ rp.isManager }}" hint-placeholder-val="{{ false }}">
+                          <div style="grid-column:1/-1; display:flex; flex-direction:column; gap:6px; padding:8px 0 2px;">
+                            <sc-for list="{{ rp.subtree }}" as="sub" hint-placeholder-count="0">
+                              <div style="margin-left:{{ sub.indent }};">
+                                <div class="org-node" onClick="{{ sub.toggle }}" style="cursor:{{ sub.hasMerch ? 'pointer' : 'default' }}; display:inline-flex; {{ sub.expanded ? 'border-color:var(--color-accent-700);' : '' }}">
+                                  <div class="org-name">{{ sub.name }}</div>
+                                  <div class="org-role">{{ sub.roleLabel }}</div>
+                                  <div class="org-badge">{{ sub.merchCount }} merch<sc-if value="{{ sub.hasMerch }}" hint-placeholder-val="{{ false }}"><i class="{{ sub.expanded ? 'ph ph-caret-up' : 'ph ph-caret-down' }}" style="margin-left:4px; font-size:9px;"></i></sc-if></div>
+                                </div>
+                                <sc-if value="{{ sub.expanded }}" hint-placeholder-val="{{ false }}">
+                                  <div style="background:#0a1c3a; border:1px solid var(--color-neutral-800); border-radius:var(--radius-md); padding:8px 12px; margin-top:4px; display:flex; flex-wrap:wrap; gap:6px;">
+                                    <sc-for list="{{ sub.merchNames }}" as="mn" hint-placeholder-count="0">
+                                      <span style="font-size:10.5px; color:var(--color-neutral-200); background:#0f2c4f; border:1px solid var(--color-neutral-800); border-radius:999px; padding:3px 10px;">{{ mn }}</span>
+                                    </sc-for>
+                                  </div>
+                                </sc-if>
+                              </div>
                             </sc-for>
                           </div>
                         </sc-if>
@@ -1227,10 +1256,61 @@ class Component extends DCLogic {
       });
     });
 
-    const rows = [...managers.entries()].map(([mgrName, g]) => {
-      const reps = [...g.reps.values()].sort((a, b) => b.merchCount - a.merchCount);
-      const merchTotal = reps.reduce((a, r) => a + r.merchCount, 0);
-      return { manager: mgrName, repCount: reps.length, merchCount: merchTotal, reps };
+    // A rep who is ALSO someone else's manager (e.g. Anton Wilson, who
+    // reports to Gerhard Fourie AND has 8 reps + 158 merchandisers of his
+    // own) previously only ever showed up in ONE of those two roles at a
+    // time, in a flat, single-level list -- so Gerhard Fourie's row showed
+    // Anton with "0 merchandisers" (his own direct count, which is
+    // genuinely zero -- he's a manager, not a rep with stores) while his
+    // real 158 sat completely disconnected as Anton's own separate
+    // top-level entry (Carin, 2026-08-30: "we need to see that full
+    // hierarchy organogram"). buildSubtree() resolves this by recursively
+    // flattening a manager-who-is-also-a-rep's entire descendant chain
+    // (confirmed real depth in this data: up to 4 management levels) into
+    // one indented list, nested directly under them wherever they appear
+    // as someone's rep -- not a second disconnected top-level row.
+    const MAX_DEPTH = 8; // safety cap only -- confirmed real max is 4
+    const buildSubtree = (mgrNameUpper, path, depth) => {
+      if (depth > MAX_DEPTH) return [];
+      const group = managers.get(mgrNameUpper);
+      if (!group) return [];
+      const out = [];
+      [...group.reps.values()].sort((a, b) => b.merchCount - a.merchCount).forEach((rp) => {
+        const rpPath = path + '>' + rp.repKey;
+        const isManager = managers.has((rp.name || '').toUpperCase());
+        out.push({ ...rp, depth, path: rpPath, isManager, hasMerch: rp.merchCount > 0 });
+        if (isManager) out.push(...buildSubtree((rp.name || '').toUpperCase(), rpPath, depth + 1));
+      });
+      return out;
+    };
+
+    // Root managers only -- a manager whose own name matches some OTHER
+    // manager's rep in this same filtered set is nested under that parent
+    // via buildSubtree() above, not shown again as a disconnected root.
+    const allManagerKeysUpper = new Set([...managers.keys()].map((k) => (k || '').toUpperCase()));
+    const isNestedElsewhere = (mgrName) => {
+      const key = (mgrName || '').toUpperCase();
+      for (const [otherMgr, g] of managers) {
+        if ((otherMgr || '').toUpperCase() === key) continue;
+        for (const rp of g.reps.values()) {
+          if ((rp.name || '').toUpperCase() === key) return true;
+        }
+      }
+      return false;
+    };
+
+    const rows = [...managers.entries()].filter(([mgrName]) => !isNestedElsewhere(mgrName)).map(([mgrName, g]) => {
+      const directReps = [...g.reps.values()].sort((a, b) => b.merchCount - a.merchCount).map((rp) => {
+        const isManager = managers.has((rp.name || '').toUpperCase());
+        const subtree = isManager ? buildSubtree((rp.name || '').toUpperCase(), rp.repKey, 1) : [];
+        return { ...rp, isManager, hasMerch: rp.merchCount > 0, subtree };
+      });
+      // Totals recurse through nested managers too -- a manager's own repCount
+      // (direct reports only) stays as-is for the header row, but merchCount
+      // now honestly reflects everything underneath them, including
+      // merchandisers that sit two or three management levels down.
+      const merchTotal = directReps.reduce((a, r) => a + r.merchCount + r.subtree.reduce((b, s) => b + s.merchCount, 0), 0);
+      return { manager: mgrName, repCount: directReps.length, merchCount: merchTotal, reps: directReps };
     }).sort((a, b) => b.repCount - a.repCount);
 
     // Merchandisers whose manager doesn't exist as a rep ANYWHERE in the
@@ -1843,12 +1923,39 @@ class Component extends DCLogic {
           domId: 'hier-mgr-' + encodeURIComponent(row.manager),
           expanded, chevron: expanded ? 'ph ph-caret-down' : 'ph ph-caret-right',
           toggle: () => this.set({ expandedManagers: { ...s.expandedManagers, [row.manager]: !expanded } }),
+          // A rep who is also a manager (rp.isManager, e.g. Anton Wilson
+          // under Gerhard Fourie) always shows their full nested subtree --
+          // no extra click needed to reveal it, since it's the whole point
+          // of this view (Carin, 2026-08-30: "if anton has reps we need to
+          // show that in the hierarchy in this view"). A plain leaf rep
+          // still needs a click to reveal their merchandiser names, same
+          // as before -- keyed by path now (unique per position in the
+          // tree), not just repKey, since the same person could in theory
+          // appear nested under more than one path.
           reps: expanded ? row.reps.map((rp) => {
             const repExpanded = !!s.expandedReps[rp.repKey];
+            // A manager-rep's OWN merchCount is genuinely 0 (they're a
+            // people-manager, not a rep with store visits) -- show the
+            // total across their whole nested subtree instead, or the
+            // badge would misleadingly read "0 merch" right above a
+            // subtree that plainly isn't empty.
+            const nestedMerchTotal = (rp.subtree || []).reduce((a, sub) => a + sub.merchCount, 0);
             return {
-              name: rp.name, merchCount: n(rp.merchCount), expanded: repExpanded, hasMerch: rp.merchCount > 0,
+              name: rp.name, merchCount: n(rp.isManager ? nestedMerchTotal : rp.merchCount),
+              expanded: repExpanded, hasMerch: rp.merchCount > 0,
+              isManager: rp.isManager, roleLabel: rp.isManager ? 'FSM' : 'Rep',
               toggle: () => this.set({ expandedReps: { ...s.expandedReps, [rp.repKey]: !repExpanded } }),
               merchNames: repExpanded ? rp.merchNames : [],
+              subtree: (rp.subtree || []).map((sub) => {
+                const subExpanded = !!s.expandedReps[sub.path];
+                return {
+                  name: sub.name, merchCount: n(sub.merchCount), depth: sub.depth, isManager: sub.isManager,
+                  roleLabel: sub.isManager ? 'FSM' : 'Rep', indent: (sub.depth * 20) + 'px',
+                  expanded: subExpanded, hasMerch: sub.merchCount > 0,
+                  toggle: () => this.set({ expandedReps: { ...s.expandedReps, [sub.path]: !subExpanded } }),
+                  merchNames: subExpanded ? sub.merchNames : [],
+                };
+              }),
             };
           }) : [],
         };
