@@ -1250,9 +1250,21 @@ class Component extends DCLogic {
     const merch = this.merchRows.filter((r) => this.match(r, false, true));
 
     const repByKey = new Map(); // filtered -- resourceId||resourceName -> canonical rep record, used to build the visible manager/rep/merch tree
+    // A rep's real RESOURCE TYPE ("SYNDICATED REP", "SEMI DEDICATED REP",
+    // "SODASTREAM DEDICATED REP"...) for the hierarchy badge, which used to
+    // read a flat "Rep" for everyone (Carin, 2026-09-01: "show the resource
+    // type and not rep"). Collected as a set rather than taken off the
+    // canonical row, because repByKey is first-row-wins and a rep can appear
+    // under more than one type.
+    const repTypesByKey = new Map();
     rep.forEach((r) => {
       const k = r.resourceId || r.resourceName;
-      if (!k || repByKey.has(k)) return;
+      if (!k) return;
+      if (r.resourceType) {
+        if (!repTypesByKey.has(k)) repTypesByKey.set(k, new Set());
+        repTypesByKey.get(k).add(r.resourceType);
+      }
+      if (repByKey.has(k)) return;
       repByKey.set(k, r);
     });
 
@@ -1299,6 +1311,7 @@ class Component extends DCLogic {
       const merchMap = merchSetByRepKey.get(repKey) || new Map();
       managers.get(mgrKey).reps.set(repKey, {
         repKey, name: r.resourceName, merchCount: merchMap.size,
+        resourceType: [...(repTypesByKey.get(repKey) || [])].sort().join(' / '),
         merchNames: [...merchMap.values()].sort(),
       });
     });
@@ -2284,14 +2297,16 @@ class Component extends DCLogic {
             return {
               name: rp.name, merchCount: n(rp.isManager ? nestedMerchTotal : rp.merchCount),
               expanded: repExpanded, hasMerch: rp.merchCount > 0,
-              isManager: rp.isManager, roleLabel: rp.isManager ? 'FSM' : 'Rep',
+              // Real resource type where we have one. Synthetic organogram-only
+              // nodes have no call-cycle rows at all, so they keep 'FSM'.
+              isManager: rp.isManager, roleLabel: rp.resourceType || (rp.isManager ? 'FSM' : 'Rep'),
               toggle: () => this.set({ expandedReps: { ...s.expandedReps, [rp.repKey]: !repExpanded } }),
               merchNames: repExpanded ? rp.merchNames : [],
               subtree: (rp.subtree || []).map((sub) => {
                 const subExpanded = !!s.expandedReps[sub.path];
                 return {
                   name: sub.name, merchCount: n(sub.merchCount), depth: sub.depth, isManager: sub.isManager,
-                  roleLabel: sub.isManager ? 'FSM' : 'Rep', indent: (sub.depth * 20) + 'px',
+                  roleLabel: sub.resourceType || (sub.isManager ? 'FSM' : 'Rep'), indent: (sub.depth * 20) + 'px',
                   expanded: subExpanded, hasMerch: sub.merchCount > 0,
                   toggle: () => this.set({ expandedReps: { ...s.expandedReps, [sub.path]: !subExpanded } }),
                   merchNames: subExpanded ? sub.merchNames : [],
