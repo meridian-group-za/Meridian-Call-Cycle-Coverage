@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <script src="./support.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@azure/msal-browser@2.38.3/lib/msal-browser.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <script src="./msal-auth.js"></script>
 </head>
 <body>
@@ -96,51 +97,31 @@ Last updated<br><span style="color:var(--color-neutral-300);">{{ snapshot }}</sp
 
       <div style="height:1px; background:linear-gradient(90deg, transparent, var(--color-neutral-800) 48px, var(--color-neutral-800) calc(100% - 48px), transparent); margin-bottom:var(--space-6);"></div>
 
-      <div style="display:flex; gap:6px; flex-wrap:wrap; align-items:center; margin-bottom:var(--space-6);">
-        <select class="nx-in" value="{{ fRegion }}" onChange="{{ onRegion }}" style="background:#0a1c3a; border:1px solid var(--color-neutral-800); color:var(--color-text); border-radius:var(--radius-md); padding:6px 8px; font-size:11.5px; font-family:inherit; width:110px; flex:none;">
-          <option value="">All regions</option>
-          <sc-for list="{{ regionOptions }}" as="o" hint-placeholder-count="4"><option value="{{ o }}">{{ o }}</option></sc-for>
-        </select>
-        <select class="nx-in" value="{{ fDivision }}" onChange="{{ onDivision }}" style="background:#0a1c3a; border:1px solid var(--color-neutral-800); color:var(--color-text); border-radius:var(--radius-md); padding:6px 8px; font-size:11.5px; font-family:inherit; width:110px; flex:none;">
-          <option value="">All divisions</option>
-          <sc-for list="{{ divisionOptions }}" as="o" hint-placeholder-count="3"><option value="{{ o }}">{{ o }}</option></sc-for>
-        </select>
-        <select class="nx-in" value="{{ fBanner }}" onChange="{{ onBanner }}" style="background:#0a1c3a; border:1px solid var(--color-neutral-800); color:var(--color-text); border-radius:var(--radius-md); padding:6px 8px; font-size:11.5px; font-family:inherit; width:110px; flex:none;">
-          <option value="">All banners</option>
-          <sc-for list="{{ bannerOptions }}" as="o" hint-placeholder-count="6"><option value="{{ o }}">{{ o }}</option></sc-for>
-        </select>
-        <select class="nx-in" value="{{ fChannel }}" onChange="{{ onChannel }}" style="background:#0a1c3a; border:1px solid var(--color-neutral-800); color:var(--color-text); border-radius:var(--radius-md); padding:6px 8px; font-size:11.5px; font-family:inherit; width:110px; flex:none;">
-          <option value="">All channels</option>
-          <sc-for list="{{ channelOptions }}" as="o" hint-placeholder-count="5"><option value="{{ o }}">{{ o }}</option></sc-for>
-        </select>
-        <select class="nx-in" value="{{ fType }}" onChange="{{ onType }}" style="background:#0a1c3a; border:1px solid var(--color-neutral-800); color:var(--color-text); border-radius:var(--radius-md); padding:6px 8px; font-size:11.5px; font-family:inherit; width:135px; flex:none;">
-          <option value="">All resource types</option>
-          <sc-for list="{{ typeOptions }}" as="o" hint-placeholder-count="4"><option value="{{ o }}">{{ o }}</option></sc-for>
-        </select>
-        <select class="nx-in" value="{{ fRep }}" onChange="{{ onRep }}" style="background:#0a1c3a; border:1px solid var(--color-neutral-800); color:var(--color-text); border-radius:var(--radius-md); padding:6px 8px; font-size:11.5px; font-family:inherit; width:150px; flex:none;">
-          <option value="">All reps</option>
-          <sc-for list="{{ repOptions }}" as="o" hint-placeholder-count="6"><option value="{{ o }}">{{ o }}</option></sc-for>
-        </select>
-        <select class="nx-in" value="{{ fMerchName }}" onChange="{{ onMerchName }}" style="background:#0a1c3a; border:1px solid var(--color-neutral-800); color:var(--color-text); border-radius:var(--radius-md); padding:6px 8px; font-size:11.5px; font-family:inherit; width:150px; flex:none;">
-          <option value="">All merchandisers</option>
-          <sc-for list="{{ merchOptions }}" as="o" hint-placeholder-count="6"><option value="{{ o }}">{{ o }}</option></sc-for>
-        </select>
-        <select class="nx-in" value="{{ fManager }}" onChange="{{ onManager }}" style="background:#0a1c3a; border:1px solid var(--color-neutral-800); color:var(--color-text); border-radius:var(--radius-md); padding:6px 8px; font-size:11.5px; font-family:inherit; width:150px; flex:none;">
-          <option value="">All managers</option>
-          <sc-for list="{{ managerOptions }}" as="o" hint-placeholder-count="6"><option value="{{ o }}">{{ o }}</option></sc-for>
-        </select>
-        <select class="nx-in" value="{{ fRegionalManager }}" onChange="{{ onRegionalManager }}" style="background:#0a1c3a; border:1px solid var(--color-neutral-800); color:var(--color-text); border-radius:var(--radius-md); padding:6px 8px; font-size:11.5px; font-family:inherit; width:170px; flex:none;">
-          <option value="">All regional managers</option>
-          <sc-for list="{{ regionalManagerOptions }}" as="o" hint-placeholder-count="6"><option value="{{ o }}">{{ o }}</option></sc-for>
-        </select>
-        <select class="nx-in" value="{{ fGeneralManager }}" onChange="{{ onGeneralManager }}" style="background:#0a1c3a; border:1px solid var(--color-neutral-800); color:var(--color-text); border-radius:var(--radius-md); padding:6px 8px; font-size:11.5px; font-family:inherit; width:170px; flex:none;">
-          <option value="">All general managers</option>
-          <sc-for list="{{ generalManagerOptions }}" as="o" hint-placeholder-count="6"><option value="{{ o }}">{{ o }}</option></sc-for>
-        </select>
-        <select class="nx-in" value="{{ fHeadOfSyndicated }}" onChange="{{ onHeadOfSyndicated }}" style="background:#0a1c3a; border:1px solid var(--color-neutral-800); color:var(--color-text); border-radius:var(--radius-md); padding:6px 8px; font-size:11.5px; font-family:inherit; width:190px; flex:none;">
-          <option value="">All heads of syndicated</option>
-          <sc-for list="{{ headOfSyndicatedOptions }}" as="o" hint-placeholder-count="6"><option value="{{ o }}">{{ o }}</option></sc-for>
-        </select>
+      <div data-filter-bar style="display:flex; gap:6px; flex-wrap:wrap; align-items:center; margin-bottom:var(--space-6); position:relative; z-index:40;">
+        <sc-for list="{{ filterBar }}" as="f" hint-placeholder-count="11">
+          <div style="position:relative; flex:none;">
+            <button onClick="{{ f.toggle }}" style="display:flex; align-items:center; gap:6px; justify-content:space-between; background:#0a1c3a; border:1px solid {{ f.borderColor }}; color:{{ f.labelColor }}; border-radius:var(--radius-md); padding:6px 8px; font-size:11.5px; font-family:inherit; width:{{ f.width }}; cursor:pointer; text-align:left;">
+              <span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">{{ f.label }}</span>
+              <i class="{{ f.caret }}" style="font-size:12px; flex:none; color:var(--color-neutral-500);"></i>
+            </button>
+            <div style="display:{{ f.panelDisplay }}; position:absolute; top:calc(100% + 5px); left:0; width:270px; background:#0a1c3a; border:1px solid var(--color-neutral-800); border-radius:var(--radius-md); box-shadow:0 14px 34px rgba(0,0,0,0.55); padding:8px; z-index:80;">
+              <input type="text" value="{{ f.search }}" onChange="{{ f.onSearch }}" placeholder="Search…" style="width:100%; box-sizing:border-box; background:#061530; border:1px solid var(--color-neutral-800); color:var(--color-text); border-radius:var(--radius-md); padding:5px 8px; font-size:11.5px; font-family:inherit;">
+              <div style="display:flex; gap:10px; align-items:center; margin:7px 2px 6px;">
+                <span onClick="{{ f.selectAll }}" style="font-size:10.5px; color:var(--color-accent-300); cursor:pointer;">{{ f.selectAllLabel }}</span>
+                <span onClick="{{ f.clear }}" style="font-size:10.5px; color:var(--color-neutral-400); cursor:pointer;">Clear</span>
+              </div>
+              <div style="max-height:250px; overflow:auto;">
+                <sc-for list="{{ f.options }}" as="o" hint-placeholder-count="6">
+                  <div onClick="{{ o.toggle }}" class="nx-row" style="display:flex; align-items:center; gap:8px; padding:4px 6px; border-radius:6px; cursor:pointer; font-size:11.5px; background:{{ o.bg }};">
+                    <span style="flex:none; width:13px; height:13px; border:1px solid {{ o.bd }}; background:{{ o.fill }}; border-radius:3px; color:#000C21; font-size:10px; line-height:13px; text-align:center; font-weight:700;">{{ o.tick }}</span>
+                    <span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">{{ o.label }}</span>
+                  </div>
+                </sc-for>
+              </div>
+              <div style="margin:7px 2px 1px; font-size:9.5px; color:var(--color-neutral-500);">{{ f.countNote }}</div>
+            </div>
+          </div>
+        </sc-for>
         <button onClick="{{ onReset }}" style="background:transparent; border:1px solid var(--color-neutral-800); color:var(--color-neutral-400); border-radius:var(--radius-md); padding:6px 12px; font-size:11px; font-family:inherit; cursor:pointer; flex:none; white-space:nowrap;" style-hover="border-color:var(--color-accent-700); color:var(--color-accent-300);">Reset</button>
       </div>
 
@@ -504,8 +485,13 @@ Last updated<br><span style="color:var(--color-neutral-300);">{{ snapshot }}</sp
           <div style="display:flex; align-items:center; gap:var(--space-3); margin-bottom:var(--space-4); flex-wrap:wrap;">
             <h5 style="margin:0; font-size:14px;">Banner coverage</h5>
             <span style="font-size:10.5px; color:var(--color-neutral-500);">{{ bannerTableCount }}</span>
+            <span style="font-size:10.5px; color:var(--color-neutral-500); border-left:1px solid var(--color-neutral-800); padding-left:10px;">Click any number to see the rows behind it</span>
             <input type="text" value="{{ bannerQuery }}" onChange="{{ onBannerQuery }}" placeholder="Search banner or channel…" style="margin-left:auto; background:#0a1c3a; border:1px solid var(--color-neutral-800); color:var(--color-text); border-radius:var(--radius-md); padding:6px 10px; font-size:12px; font-family:inherit; min-width:240px;">
             <button onClick="{{ exportBanners }}" style="display:flex; align-items:center; gap:7px; background:transparent; border:1px solid rgba(236,109,37,0.45); color:var(--color-accent-300); border-radius:var(--radius-md); padding:6px 13px; font-size:11.5px; font-weight:600; font-family:inherit; cursor:pointer;" style-hover="background:rgba(236,109,37,0.14); color:#f8c3a1;"><i class="ph ph-download-simple" style="font-size:14px;"></i>{{ exportBannerLabel }}</button>
+          </div>
+          <div style="font-size:10.5px; color:var(--color-neutral-500); line-height:1.65; margin-bottom:var(--space-4); padding:9px 11px; border:1px solid var(--color-neutral-800); border-radius:var(--radius-md); background:rgba(157,196,236,0.04);">
+            <b style="color:var(--color-neutral-300);">Dual coverage</b> — the share of this banner's stores that have <i>both</i> a rep and a merchandiser assigned. A store with only one of the two is not dual-covered.
+            <b style="color:var(--color-neutral-300); margin-left:8px;">Status</b> — a plain band on that same percentage, nothing more: <b>Dual 60%+</b> (well covered), <b>Dual 25-60%</b>, <b>Dual under 25%</b> (thin). Both respect the filters above.
           </div>
           <div style="max-height:calc(100vh - 250px); overflow:auto;">
             <table style="width:100%; border-collapse:collapse; font-size:11.5px;">
@@ -519,10 +505,10 @@ Last updated<br><span style="color:var(--color-neutral-300);">{{ snapshot }}</sp
                   <tr class="nx-row">
                     <td style="padding:7px 8px; border-bottom:1px solid #1c3f6b; color:var(--color-text);">{{ r.banner }}</td>
                     <td style="padding:7px 8px; border-bottom:1px solid #1c3f6b; color:var(--color-neutral-400);">{{ r.channel }}</td>
-                    <td style="padding:7px 8px; border-bottom:1px solid #1c3f6b; text-align:right; font-family:var(--font-heading);">{{ r.stores }}</td>
-                    <td style="padding:7px 8px; border-bottom:1px solid #1c3f6b; text-align:right; color:var(--color-neutral-300);">{{ r.reps }}</td>
-                    <td style="padding:7px 8px; border-bottom:1px solid #1c3f6b; text-align:right; color:var(--color-neutral-300);">{{ r.merch }}</td>
-                    <td style="padding:7px 8px; border-bottom:1px solid #1c3f6b; text-align:right; color:var(--color-neutral-400);">{{ r.managers }}</td>
+                    <td onClick="{{ r.openStores }}" title="Show the stores behind this number" style="padding:7px 8px; border-bottom:1px solid #1c3f6b; text-align:right; font-family:var(--font-heading); color:var(--color-accent-300); cursor:pointer; text-decoration:underline; text-decoration-color:rgba(236,109,37,0.45); text-underline-offset:3px;">{{ r.stores }}</td>
+                    <td onClick="{{ r.openReps }}" title="Show these reps" style="padding:7px 8px; border-bottom:1px solid #1c3f6b; text-align:right; color:var(--color-accent-300); cursor:pointer; text-decoration:underline; text-decoration-color:rgba(236,109,37,0.45); text-underline-offset:3px;">{{ r.reps }}</td>
+                    <td onClick="{{ r.openMerch }}" title="Show these merchandisers" style="padding:7px 8px; border-bottom:1px solid #1c3f6b; text-align:right; color:var(--color-accent-300); cursor:pointer; text-decoration:underline; text-decoration-color:rgba(236,109,37,0.45); text-underline-offset:3px;">{{ r.merch }}</td>
+                    <td onClick="{{ r.openManagers }}" title="Show these line managers" style="padding:7px 8px; border-bottom:1px solid #1c3f6b; text-align:right; color:var(--color-accent-300); cursor:pointer; text-decoration:underline; text-decoration-color:rgba(236,109,37,0.45); text-underline-offset:3px;">{{ r.managers }}</td>
                     <td style="padding:7px 8px; border-bottom:1px solid #1c3f6b; text-align:right; color:var(--color-neutral-400);">{{ r.dualPct }}</td>
                     <td style="padding:7px 8px; border-bottom:1px solid #1c3f6b; text-align:right;"><span style="display:inline-block; padding:1px 8px; border-radius:20px; font-size:10.5px; font-weight:600; color:{{ r.gapFg }}; background:{{ r.gapBg }}; border:1px solid {{ r.gapBd }};">{{ r.gapLabel }}</span></td>
                   </tr>
@@ -908,6 +894,43 @@ Last updated<br><span style="color:var(--color-neutral-300);">{{ snapshot }}</sp
 
     </div>
   </main>
+
+  <!-- Drill-down panel: opened by clicking any count in the Banner Insights
+       table, showing the exact rows that make up that number. -->
+  <sc-if value="{{ drillOpen }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed; inset:0; background:rgba(0,6,18,0.72); z-index:200; display:flex; align-items:center; justify-content:center; padding:32px;">
+      <div style="background:var(--color-surface); border:1px solid var(--color-neutral-800); border-radius:var(--radius-lg); width:min(1100px, 100%); max-height:100%; display:flex; flex-direction:column; box-shadow:0 24px 70px rgba(0,0,0,0.6);">
+        <div style="display:flex; align-items:center; gap:var(--space-3); padding:var(--space-5) var(--space-6); border-bottom:1px solid var(--color-neutral-800); flex-wrap:wrap;">
+          <div style="min-width:0;">
+            <h5 style="margin:0; font-size:14px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">{{ drillTitle }}</h5>
+            <div style="font-size:10.5px; color:var(--color-neutral-500); margin-top:2px;">{{ drillSubtitle }}</div>
+          </div>
+          <input type="text" value="{{ drillQuery }}" onChange="{{ onDrillQuery }}" placeholder="Search this list…" style="margin-left:auto; background:#0a1c3a; border:1px solid var(--color-neutral-800); color:var(--color-text); border-radius:var(--radius-md); padding:6px 10px; font-size:12px; font-family:inherit; min-width:230px;">
+          <button onClick="{{ exportDrill }}" style="display:flex; align-items:center; gap:7px; background:transparent; border:1px solid rgba(236,109,37,0.45); color:var(--color-accent-300); border-radius:var(--radius-md); padding:6px 13px; font-size:11.5px; font-weight:600; font-family:inherit; cursor:pointer;" style-hover="background:rgba(236,109,37,0.14); color:#f8c3a1;"><i class="ph ph-download-simple" style="font-size:14px;"></i>{{ exportDrillLabel }}</button>
+          <button onClick="{{ closeDrill }}" style="background:transparent; border:1px solid var(--color-neutral-800); color:var(--color-neutral-400); border-radius:var(--radius-md); padding:6px 11px; font-size:11px; font-family:inherit; cursor:pointer;" style-hover="border-color:var(--color-accent-700); color:var(--color-accent-300);">Close</button>
+        </div>
+        <div style="overflow:auto; padding:0 var(--space-6) var(--space-5);">
+          <table style="width:100%; border-collapse:collapse; font-size:11.5px;">
+            <thead><tr>
+              <sc-for list="{{ drillCols }}" as="c" hint-placeholder-count="7">
+                <th style="position:sticky; top:0; background:var(--color-surface); text-align:left; padding:8px; font-size:9px; letter-spacing:0.07em; text-transform:uppercase; color:var(--color-neutral-500); border-bottom:1px solid var(--color-neutral-800); white-space:nowrap;">{{ c.label }}</th>
+              </sc-for>
+            </tr></thead>
+            <tbody>
+              <sc-for list="{{ drillRows }}" as="r" hint-placeholder-count="12">
+                <tr class="nx-row">
+                  <sc-for list="{{ r.cells }}" as="cell" hint-placeholder-count="7">
+                    <td style="padding:7px 8px; border-bottom:1px solid #1c3f6b; color:var(--color-neutral-200);">{{ cell.v }}</td>
+                  </sc-for>
+                </tr>
+              </sc-for>
+            </tbody>
+          </table>
+        </div>
+        <div style="padding:var(--space-3) var(--space-6) var(--space-5); font-size:10.5px; color:var(--color-neutral-500); border-top:1px solid var(--color-neutral-800);">{{ drillCount }}</div>
+      </div>
+    </div>
+  </sc-if>
 </div>
 
 </x-dc>
@@ -948,6 +971,8 @@ const CHANNEL_MAP = {
   'BUILDERS':'Hardware',
 };
 const channelOf = (b) => CHANNEL_MAP[(b || '').toUpperCase()] || 'Other / Unclassified';
+// An empty selection array means "no filter on this field", so every row passes.
+const inSel = (arr, v) => !arr || arr.length === 0 || arr.indexOf(v) !== -1;
 const key = (r) => (r.storeCode || '') + '|' + (r.storeName || '');
 const n = (v) => (v == null ? '—' : Number(v).toLocaleString('en-ZA'));
 const pct = (a, b) => (b ? (a / b * 100) : 0);
@@ -972,14 +997,27 @@ const DAY_SHORT = { Monday: 'Mon', Tuesday: 'Tue', Wednesday: 'Wed', Thursday: '
 class Component extends DCLogic {
   state = {
     ready: false, err: '', page: 'overview',
-    region: '', division: '', banner: '', channel: '', rep: '', merchName: '', manager: '', rtype: '',
-    regionalManager: '', generalManager: '', headOfSyndicated: '',
+    // Every filter holds an ARRAY of selected values (empty = no filter).
+    // Multi-select was added 2026-09-01 (Douglas: "select all PNP banners")
+    // -- match() treats an empty array as "all", so a single selection
+    // behaves exactly like the old single-select did.
+    region: [], division: [], banner: [], channel: [], rep: [], merchName: [], manager: [], rtype: [],
+    regionalManager: [], generalManager: [], headOfSyndicated: [],
+    openFilter: '', fSearch: {}, drill: null, drillQuery: '',
     resQuery: '', bannerQuery: '', gapQuery: '', slQuery: '', hierarchyQuery: '',
     gapTab: 'repOnly', slTab: 'all', sortKey: 'stores', sortDir: -1,
     expandedManagers: {}, expandedReps: {}, dayView: 'both',
   };
 
   componentDidMount() {
+    // Close an open filter dropdown when the click lands anywhere outside the
+    // filter bar. Clicks inside it are handled by the panel's own handlers.
+    this._closeFilters = (e) => {
+      if (!this.state.openFilter) return;
+      if (e.target.closest && e.target.closest('[data-filter-bar]')) return;
+      this.set({ openFilter: '' });
+    };
+    document.addEventListener('mousedown', this._closeFilters);
     const normKey = (s) => (s || '').toUpperCase().trim().replace(/\s+/g, ' ');
     const hierarchyReady = fetch('hierarchy.json').then((r) => r.ok ? r.json() : {}).catch(() => ({}));
 
@@ -1026,6 +1064,10 @@ class Component extends DCLogic {
       .catch((e) => this.setState({ err: 'Could not load the Call Cycle Master from SharePoint — ' + e.message }));
   }
 
+  componentWillUnmount() {
+    if (this._closeFilters) document.removeEventListener('mousedown', this._closeFilters);
+  }
+
   // resourceId||resourceName -> that rep's own managerName, built once from
   // the full (unfiltered) rep list -- lets the Manager filter resolve a
   // merchandiser up through their rep instead of only matching merch rows
@@ -1045,13 +1087,13 @@ class Component extends DCLogic {
 
   match(r, applyRep, skipManager) {
     const s = this.state;
-    if (s.region && r.region !== s.region) return false;
-    if (s.division && r.division !== s.division) return false;
-    if (s.banner && r.banner !== s.banner) return false;
-    if (s.channel && channelOf(r.banner) !== s.channel) return false;
-    if (s.rtype && r.resourceType !== s.rtype) return false;
-    if (applyRep && s.rep && r.resourceName !== s.rep) return false;
-    if (!applyRep && s.merchName && r.resourceName !== s.merchName) return false;
+    if (!inSel(s.region, r.region)) return false;
+    if (!inSel(s.division, r.division)) return false;
+    if (!inSel(s.banner, r.banner)) return false;
+    if (!inSel(s.channel, channelOf(r.banner))) return false;
+    if (!inSel(s.rtype, r.resourceType)) return false;
+    if (applyRep && !inSel(s.rep, r.resourceName)) return false;
+    if (!applyRep && !inSel(s.merchName, r.resourceName)) return false;
     // A merchandiser row's own "manager" field is actually the REP they
     // report to, not a real people-manager (see hierarchyModel). A plain
     // r.managerName !== s.manager check therefore excludes every
@@ -1063,26 +1105,26 @@ class Component extends DCLogic {
     // resolves the chain itself and must see every merchandiser regardless
     // of the top-level Manager filter (confirmed 2026-08-24: filtering by
     // manager "Gerrit Schutte" zeroed out every rep's merch count there).
-    if (!skipManager && s.manager) {
+    if (!skipManager && s.manager.length) {
       if (applyRep) {
-        if (r.managerName !== s.manager) return false;
+        if (!inSel(s.manager, r.managerName)) return false;
       } else {
         const repMgr = this.repManagerLookup();
         const repKey = r.managerId && repMgr.has(r.managerId) ? r.managerId
           : (repMgr.has(r.managerName) ? r.managerName : null);
         const viaRep = repKey ? repMgr.get(repKey) : null;
-        if (r.managerName !== s.manager && viaRep !== s.manager) return false;
+        if (!inSel(s.manager, r.managerName) && !inSel(s.manager, viaRep)) return false;
       }
     }
-    if (s.regionalManager && r.regionalManager !== s.regionalManager) return false;
-    if (s.generalManager && r.generalManager !== s.generalManager) return false;
-    if (s.headOfSyndicated && r.headOfSyndicated !== s.headOfSyndicated) return false;
+    if (!inSel(s.regionalManager, r.regionalManager)) return false;
+    if (!inSel(s.generalManager, r.generalManager)) return false;
+    if (!inSel(s.headOfSyndicated, r.headOfSyndicated)) return false;
     return true;
   }
 
   model() {
     const s = this.state;
-    const sig = [s.region, s.division, s.banner, s.channel, s.rep, s.merchName, s.manager, s.rtype, s.regionalManager, s.generalManager, s.headOfSyndicated].join('§');
+    const sig = JSON.stringify([s.region, s.division, s.banner, s.channel, s.rep, s.merchName, s.manager, s.rtype, s.regionalManager, s.generalManager, s.headOfSyndicated]);
     if (this._sig === sig && this._m) return this._m;
     const rep = this.repRows.filter((r) => this.match(r, true));
     const merch = this.merchRows.filter((r) => this.match(r, false));
@@ -1091,7 +1133,7 @@ class Component extends DCLogic {
     const touch = (r, which) => {
       const k = key(r);
       let e = stores.get(k);
-      if (!e) { e = { storeName: r.storeName, banner: r.banner || 'Unknown', region: r.region || 'Unknown', division: r.division || 'Unknown', channel: channelOf(r.banner), rep: null, merch: null }; stores.set(k, e); }
+      if (!e) { e = { k, storeCode: r.storeCode || '', storeName: r.storeName, banner: r.banner || 'Unknown', region: r.region || 'Unknown', division: r.division || 'Unknown', channel: channelOf(r.banner), rep: null, merch: null }; stores.set(k, e); }
       if (!e[which]) e[which] = r.resourceName || '—';
     };
     rep.forEach((r) => touch(r, 'rep'));
@@ -1418,13 +1460,142 @@ class Component extends DCLogic {
 
   set(patch) { this.setState(patch); }
 
-  exportCsv(name, cols, rows) {
-    const esc = (v) => {
-      const s = v == null ? '' : String(v);
-      return /[",\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
+  // Opens the drill-down panel over whatever page you're on. Rows are already
+  // resolved by the caller, so the panel itself stays generic -- any table in
+  // the report can hand it a column spec and a row list.
+  openDrill(title, subtitle, cols, rows) {
+    this.set({ drill: { title, subtitle, cols, rows }, drillQuery: '' });
+  }
+
+  // ---- Multi-select filter plumbing (2026-09-01) ----
+  // Adds/removes one value from a filter's selection array. Every drill-down
+  // in the report ("click a banner in a chart to filter by it") routes through
+  // here too, so clicking a second banner now ADDS it rather than replacing
+  // the first -- clicking an already-selected one still removes it.
+  toggleFilter(field, value) {
+    const cur = this.state[field] || [];
+    const next = cur.indexOf(value) === -1 ? cur.concat([value]) : cur.filter((v) => v !== value);
+    this.set({ [field]: next });
+  }
+
+  // Builds the whole filter bar declaratively -- one entry per filter, each
+  // with its own search box and checkbox list, so the template is a single
+  // <sc-for> instead of eleven near-identical <select> blocks.
+  buildFilterBar(opts) {
+    const s = this.state;
+    const DEFS = [
+      { key: 'region', all: 'All regions', noun: 'Regions', opts: 'regionOptions', width: 120 },
+      { key: 'division', all: 'All divisions', noun: 'Divisions', opts: 'divisionOptions', width: 120 },
+      { key: 'banner', all: 'All banners', noun: 'Banners', opts: 'bannerOptions', width: 130 },
+      { key: 'channel', all: 'All channels', noun: 'Channels', opts: 'channelOptions', width: 130 },
+      { key: 'rtype', all: 'All resource types', noun: 'Resource types', opts: 'typeOptions', width: 150 },
+      { key: 'rep', all: 'All reps', noun: 'Reps', opts: 'repOptions', width: 150 },
+      { key: 'merchName', all: 'All merchandisers', noun: 'Merchandisers', opts: 'merchOptions', width: 160 },
+      { key: 'manager', all: 'All managers', noun: 'Managers', opts: 'managerOptions', width: 150 },
+      { key: 'regionalManager', all: 'All regional managers', noun: 'Regional mgrs', opts: 'regionalManagerOptions', width: 175 },
+      { key: 'generalManager', all: 'All general managers', noun: 'General mgrs', opts: 'generalManagerOptions', width: 175 },
+      { key: 'headOfSyndicated', all: 'All heads of syndicated', noun: 'Heads of synd.', opts: 'headOfSyndicatedOptions', width: 190 },
+    ];
+    // Long lists (merchandisers run to four figures) are capped so opening a
+    // dropdown never renders thousands of rows -- the search box is how you
+    // reach anything past the cap.
+    const CAP = 200;
+    return DEFS.map((d) => {
+      const sel = s[d.key] || [];
+      const all = opts[d.opts] || [];
+      const q = (s.fSearch[d.key] || '').trim().toLowerCase();
+      const matching = q ? all.filter((o) => String(o).toLowerCase().includes(q)) : all;
+      const shown = matching.slice(0, CAP);
+      const open = s.openFilter === d.key;
+      return {
+        key: d.key,
+        label: sel.length === 0 ? d.all : sel.length === 1 ? sel[0] : d.noun + ' (' + sel.length + ')',
+        labelColor: sel.length ? 'var(--color-accent-300)' : 'var(--color-text)',
+        borderColor: sel.length ? 'rgba(236,109,37,0.55)' : 'var(--color-neutral-800)',
+        caret: open ? 'ph ph-caret-up' : 'ph ph-caret-down',
+        width: d.width + 'px',
+        panelDisplay: open ? 'block' : 'none',
+        toggle: () => this.set({ openFilter: open ? '' : d.key }),
+        search: s.fSearch[d.key] || '',
+        onSearch: (e) => this.set({ fSearch: Object.assign({}, s.fSearch, { [d.key]: e.target.value }) }),
+        // "Select all" honours the search box, so typing "PICK N PAY" and
+        // hitting Select all picks up every PNP banner in one go -- the
+        // exact thing Douglas asked for.
+        selectAllLabel: q ? 'Select all ' + matching.length + ' matching' : 'Select all',
+        selectAll: () => this.set({ [d.key]: [...new Set(sel.concat(matching))] }),
+        clear: () => this.set({ [d.key]: [] }),
+        countNote: matching.length > CAP
+          ? 'Showing first ' + CAP + ' of ' + matching.length + ' — keep typing to narrow'
+          : matching.length + (matching.length === 1 ? ' option' : ' options') + (sel.length ? ' · ' + sel.length + ' selected' : ''),
+        options: shown.map((o) => {
+          const on = sel.indexOf(o) !== -1;
+          return {
+            label: o, tick: on ? '✓' : '', bg: on ? 'rgba(236,109,37,0.12)' : 'transparent',
+            bd: on ? 'var(--color-accent-500)' : 'var(--color-neutral-700)',
+            fill: on ? 'var(--color-accent-500)' : 'transparent',
+            toggle: () => this.toggleFilter(d.key, o),
+          };
+        }),
+      };
+    });
+  }
+
+  // Every "Export to Excel" button used to write a comma-separated .csv. On a
+  // South African Windows locale Excel's list separator is a semicolon, so it
+  // opened every row into a single cell (Carin, 2026-09-01: "the information
+  // is pulling into one cell"). This writes a genuine .xlsx workbook instead,
+  // with real columns and real numeric cells -- so counts sort and total like
+  // numbers rather than text, and percentages carry a percent format.
+  exportSheet(name, cols, rows) {
+    // Values arrive pre-formatted for the screen ("1,234", "62.5%"). Turn
+    // those back into real numbers so the sheet is usable, and leave anything
+    // else as text.
+    const cell = (v) => {
+      if (v == null || v === '' || v === '—') return { t: 's', v: '' };
+      if (typeof v === 'number') return { t: 'n', v };
+      const str = String(v).trim();
+      if (/^-?[\d ,\s]+$/.test(str) && /\d/.test(str)) {
+        const num = Number(str.replace(/[ ,\s]/g, ''));
+        if (Number.isFinite(num)) return { t: 'n', v: num };
+      }
+      const m = /^(-?[\d ,\s]*\.?\d+)\s*%$/.exec(str);
+      if (m) {
+        const num = Number(m[1].replace(/[ ,\s]/g, ''));
+        if (Number.isFinite(num)) return { t: 'n', v: num / 100, z: '0.0%' };
+      }
+      return { t: 's', v: str };
     };
-    const lines = [cols.map((c) => esc(c.label)).join(',')];
-    rows.forEach((r) => lines.push(cols.map((c) => esc(r[c.key])).join(',')));
+
+    if (typeof XLSX === 'undefined') { this.exportSheetFallback(name, cols, rows); return; }
+    const ws = XLSX.utils.aoa_to_sheet([cols.map((c) => c.label)]);
+    rows.forEach((r, ri) => cols.forEach((c, ci) => {
+      ws[XLSX.utils.encode_cell({ r: ri + 1, c: ci })] = cell(r[c.key]);
+    }));
+    ws['!ref'] = XLSX.utils.encode_range({ s: { r: 0, c: 0 }, e: { r: rows.length, c: Math.max(0, cols.length - 1) } });
+    // Column widths from the widest value in each column, so nothing lands
+    // as "####" or a truncated store name on open.
+    ws['!cols'] = cols.map((c) => {
+      const widest = rows.reduce((a, r) => Math.max(a, String(r[c.key] == null ? '' : r[c.key]).length), c.label.length);
+      return { wch: Math.min(42, Math.max(9, widest + 2)) };
+    });
+    ws['!autofilter'] = { ref: ws['!ref'] };
+    const wb = XLSX.utils.book_new();
+    // Excel rejects sheet names longer than 31 chars, or containing any of
+    // []:*?/\\
+    XLSX.utils.book_append_sheet(wb, ws, name.replace(/[\[\]:*?\/\\]/g, '-').slice(0, 31));
+    XLSX.writeFile(wb, name + '.xlsx');
+  }
+
+  // Only reached if the SheetJS CDN is blocked. Semicolon-delimited with an
+  // explicit "sep=" hint, which Excel honours on any locale -- so even the
+  // fallback splits into columns.
+  exportSheetFallback(name, cols, rows) {
+    const esc = (v) => {
+      const t = v == null ? '' : String(v);
+      return /[";\n]/.test(t) ? '"' + t.replace(/"/g, '""') + '"' : t;
+    };
+    const lines = ['sep=;', cols.map((c) => esc(c.label)).join(';')];
+    rows.forEach((r) => lines.push(cols.map((c) => esc(r[c.key])).join(';')));
     const blob = new Blob(['\ufeff' + lines.join('\r\n')], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -1441,7 +1612,7 @@ class Component extends DCLogic {
     return groups.slice(0, limit).map((g) => ({
       label: g.label, value: n(g.value), bothPct: p1(pct(g.both, g.value)),
       bothW: w(pct(g.both, peak)), restW: w(pct(g.value - g.both, peak)),
-      go: field ? () => this.set({ [field]: this.state[field] === g.label ? '' : g.label }) : undefined,
+      go: field ? () => this.toggleFilter(field, g.label) : undefined,
     }));
   }
 
@@ -1449,8 +1620,27 @@ class Component extends DCLogic {
     const peak = pairs.length ? pairs[0][1] : 1;
     return pairs.slice(0, limit).map(([label, value]) => ({
       label, value: n(value), w: w(pct(value, peak)),
-      go: field ? () => this.set({ [field]: this.state[field] === label ? '' : label }) : undefined,
+      go: field ? () => this.toggleFilter(field, label) : undefined,
     }));
+  }
+
+  // The drill-down panel's own search + export + row cap. Kept out of
+  // renderVals() so it stays readable; rows are capped on screen but the
+  // export always writes the full filtered list.
+  drillVals() {
+    const s = this.state;
+    if (!s.drill) return { drillCols: [], drillRows: [], drillCount: '', exportDrill: () => {}, exportDrillLabel: '' };
+    const { title, cols, rows } = s.drill;
+    const q = s.drillQuery.trim().toLowerCase();
+    const list = q ? rows.filter((r) => cols.some((c) => String(r[c.key] == null ? '' : r[c.key]).toLowerCase().includes(q))) : rows;
+    const CAP = 500;
+    return {
+      drillCols: cols.map((c) => ({ label: c.label })),
+      drillRows: list.slice(0, CAP).map((r) => ({ cells: cols.map((c) => ({ v: r[c.key] == null || r[c.key] === '' ? '—' : String(r[c.key]) })) })),
+      drillCount: n(list.length) + ' rows' + (list.length > CAP ? ' — showing first ' + CAP : ''),
+      exportDrill: () => this.exportSheet(title.replace(/[^A-Za-z0-9]+/g, '-').replace(/^-|-$/g, '').toLowerCase() + '-' + new Date().toISOString().slice(0, 10), cols, list),
+      exportDrillLabel: 'Export ' + n(list.length) + ' rows',
+    };
   }
 
   renderVals() {
@@ -1458,7 +1648,7 @@ class Component extends DCLogic {
     const P = PAGES[s.page];
     const base = {
       navItems: Object.keys(PAGES).map((k) => ({
-        label: PAGES[k].label, icon: PAGES[k].icon, go: () => this.set({ page: k, rtype: '' }),
+        label: PAGES[k].label, icon: PAGES[k].icon, go: () => this.set({ page: k, rtype: [], openFilter: '' }),
         bg: k === s.page ? 'color-mix(in srgb, var(--color-accent) 14%, transparent)' : 'transparent',
         fg: k === s.page ? 'var(--color-neutral-100)' : 'var(--color-neutral-100)',
         mark: k === s.page ? 'var(--color-accent)' : 'transparent',
@@ -1476,29 +1666,32 @@ class Component extends DCLogic {
       isDivision: s.page === 'division', isBanner: s.page === 'banner', isGaps: s.page === 'gaps',
       isStoreLevel: s.page === 'storelevel',
       isByDay: s.page === 'byday', isHierarchy: s.page === 'hierarchy', isBannerResource: s.page === 'bannerresource',
-      fRegion: s.region, fDivision: s.division, fBanner: s.banner, fChannel: s.channel, fRep: s.rep, fMerchName: s.merchName, fManager: s.manager, fType: s.rtype,
-      fRegionalManager: s.regionalManager, fGeneralManager: s.generalManager, fHeadOfSyndicated: s.headOfSyndicated,
-      onRegion: (e) => this.set({ region: e.target.value }), onDivision: (e) => this.set({ division: e.target.value }),
-      onBanner: (e) => this.set({ banner: e.target.value }), onChannel: (e) => this.set({ channel: e.target.value }),
-      onRep: (e) => this.set({ rep: e.target.value }),
-      onMerchName: (e) => this.set({ merchName: e.target.value }),
-      onManager: (e) => this.set({ manager: e.target.value }),
-      onRegionalManager: (e) => this.set({ regionalManager: e.target.value }),
-      onGeneralManager: (e) => this.set({ generalManager: e.target.value }),
-      onHeadOfSyndicated: (e) => this.set({ headOfSyndicated: e.target.value }),
-      onType: (e) => this.set({ rtype: e.target.value }),
-      onReset: () => this.set({ region: '', division: '', banner: '', channel: '', rep: '', merchName: '', manager: '', rtype: '', regionalManager: '', generalManager: '', headOfSyndicated: '' }),
+      onReset: () => this.set({ region: [], division: [], banner: [], channel: [], rep: [], merchName: [], manager: [], rtype: [], regionalManager: [], generalManager: [], headOfSyndicated: [], openFilter: '', fSearch: {} }),
       onResQuery: (e) => this.set({ resQuery: e.target.value }),
       onBannerQuery: (e) => this.set({ bannerQuery: e.target.value }),
       onGapQuery: (e) => this.set({ gapQuery: e.target.value }),
       onSlQuery: (e) => this.set({ slQuery: e.target.value }),
       resQuery: s.resQuery, bannerQuery: s.bannerQuery, gapQuery: s.gapQuery,
+      // slQuery / hierarchyQuery were never exposed to the template, so their
+      // inputs rendered as permanently-empty controlled fields -- the Store Level
+      // and Team hierarchy search boxes simply would not accept typing
+      // (Carin, 2026-09-01: "the search bar is not allowing us to type").
+      filterBar: [],
+      drillOpen: !!s.drill,
+      drillTitle: s.drill ? s.drill.title : '',
+      drillSubtitle: s.drill ? s.drill.subtitle : '',
+      drillQuery: s.drillQuery,
+      onDrillQuery: (e) => this.set({ drillQuery: e.target.value }),
+      closeDrill: () => this.set({ drill: null, drillQuery: '' }),
+      ...this.drillVals(),
+      slQuery: s.slQuery, hierarchyQuery: s.hierarchyQuery,
+      onHierarchyQuery: (e) => this.set({ hierarchyQuery: e.target.value }),
     };
     if (!s.ready) return Object.assign(base, { storesInView: '—', assignmentsInView: '—', filterSummary: s.err ? '' : 'Loading call cycle master…' });
 
     const m = this.model();
     const total = m.all.length;
-    const activeFilters = ['region', 'division', 'banner', 'channel', 'rep', 'merchName', 'manager', 'rtype', 'regionalManager', 'generalManager', 'headOfSyndicated'].filter((k) => s[k]);
+    const activeFilters = ['region', 'division', 'banner', 'channel', 'rep', 'merchName', 'manager', 'rtype', 'regionalManager', 'generalManager', 'headOfSyndicated'].filter((k) => s[k].length);
 
     if (!this._opts) {
       const rs = new Set(), ds = new Set(), bs = new Set(), cs = new Set(), ms = new Set(), rns = new Set(), mns = new Set();
@@ -1532,6 +1725,9 @@ class Component extends DCLogic {
       typeOptions: s.page === 'rep' ? this._repTypes : s.page === 'merch' ? this._merchTypes : this._allTypes,
       filterSummary: activeFilters.length ? activeFilters.length + ' filter' + (activeFilters.length > 1 ? 's' : '') + ' applied' : 'Full network — no filters',
     });
+    // Built last: the resource-type list depends on which page is open, so it
+    // only exists once `out` above has been assembled.
+    out.filterBar = this.buildFilterBar(out);
 
     if (out.isOverview) {
       out.totalStores = n(total);
@@ -1635,7 +1831,7 @@ class Component extends DCLogic {
       const filtered = q ? rows.filter((r) => ((r.storeName || '') + (r.banner || '') + (r.region || '') + (r.resourceName || '') + (r.managerName || '')).toLowerCase().includes(q)) : rows;
       out.resTableTitle = isRep ? 'Rep assignments' : 'Merchandiser assignments';
       out.resTableCount = n(filtered.length) + ' rows' + (filtered.length > 250 ? ' — showing first 250' : '');
-      out.exportRes = () => this.exportCsv(
+      out.exportRes = () => this.exportSheet(
         (isRep ? 'rep-assignments' : 'merchandiser-assignments') + '-' + new Date().toISOString().slice(0, 10),
         [
           { key: 'storeCode', label: 'Store code' }, { key: 'storeName', label: 'Store' },
@@ -1701,7 +1897,7 @@ class Component extends DCLogic {
           ],
           topRegions: [...x.regions.entries()].sort((a, b) => b[1] - a[1]).slice(0, 4).map(([label, v]) => ({
             label, value: n(v), w: w(pct(v, g.value)),
-            go: () => this.set({ region: this.state.region === label ? '' : label }),
+            go: () => this.toggleFilter('region', label),
           })),
         };
       });
@@ -1742,11 +1938,11 @@ class Component extends DCLogic {
           gap: n(gapByRegion.get(g.label) || 0),
           dualPct: p1(dual), dualW: w(dual),
           dualColor: dual >= 50 ? 'var(--color-accent)' : dual >= 35 ? '#ee7f3c' : '#6fb2ff',
-          goRegion: () => this.set({ region: this.state.region === g.label ? '' : g.label }),
-          goDivision: divLabel !== '—' ? () => this.set({ division: this.state.division === divLabel ? '' : divLabel }) : undefined,
+          goRegion: () => this.toggleFilter('region', g.label),
+          goDivision: divLabel !== '—' ? () => this.toggleFilter('division', divLabel) : undefined,
         };
       });
-      out.exportRegions = () => this.exportCsv('region-scorecard-' + new Date().toISOString().slice(0, 10),
+      out.exportRegions = () => this.exportSheet('region-scorecard-' + new Date().toISOString().slice(0, 10),
         [{ key: 'region', label: 'Region' }, { key: 'division', label: 'Division' }, { key: 'stores', label: 'Stores' },
          { key: 'reps', label: 'Reps' }, { key: 'merch', label: 'Merchandisers' }, { key: 'managers', label: 'Rep Managers' },
          { key: 'load', label: 'Stores per rep' }, { key: 'gap', label: 'Rep-only stores' }, { key: 'dualPct', label: 'Dual coverage' }],
@@ -1763,6 +1959,60 @@ class Component extends DCLogic {
       m.all.forEach(() => {});
       m.rep.forEach((r) => { const e = ensure(r.banner || 'Unknown'); e.stores.add(key(r)); e.reps.add(r.resourceId || r.resourceName); if (r.managerId || r.managerName) e.managers.add(r.managerId || r.managerName); });
       m.merch.forEach((r) => { const e = ensure(r.banner || 'Unknown'); e.stores.add(key(r)); e.merch.add(r.resourceId || r.resourceName); if (r.managerId || r.managerName) e.managers.add(r.managerId || r.managerName); });
+      // Every count in this table is clickable and opens the exact rows behind
+      // it (Carin, 2026-09-01: "when clicking on the number, can this pull
+      // through the full list of stores making up that number?"). Built from
+      // the same already-filtered m.* arrays the counts came from, so the list
+      // can never disagree with the number that opened it.
+      const drillStores = (banner) => {
+        const rows = m.all.filter((e) => (e.banner || 'Unknown') === banner)
+          .sort((a, b) => String(a.storeName || '').localeCompare(String(b.storeName || '')));
+        this.openDrill(banner + ' — stores', n(rows.length) + ' stores in the current filter',
+          [{ key: 'storeCode', label: 'Store code' }, { key: 'storeName', label: 'Store' },
+           { key: 'region', label: 'Region' }, { key: 'division', label: 'Division' },
+           { key: 'channel', label: 'Channel' }, { key: 'rep', label: 'Rep' }, { key: 'merch', label: 'Merchandiser' },
+           { key: 'coverage', label: 'Coverage' }],
+          rows.map((e) => ({
+            storeCode: e.storeCode || '', storeName: e.storeName || '', region: e.region, division: e.division,
+            channel: e.channel, rep: e.rep || 'None assigned', merch: e.merch || 'None assigned',
+            coverage: e.rep && e.merch ? 'Rep + merchandiser' : e.rep ? 'Rep only' : 'Merchandiser only',
+          })));
+      };
+      // One row per person, with the stores they cover in this banner.
+      const drillPeople = (banner, which) => {
+        const src = which === 'merch' ? m.merch : m.rep;
+        const by = new Map();
+        src.filter((r) => (r.banner || 'Unknown') === banner).forEach((r) => {
+          const k = r.resourceId || r.resourceName;
+          let e = by.get(k);
+          if (!e) { e = { id: r.resourceId || '', name: r.resourceName || '', type: r.resourceType || '', frequency: r.frequency || '', manager: r.managerName || '', stores: new Set() }; by.set(k, e); }
+          e.stores.add(key(r));
+        });
+        const rows = [...by.values()].sort((a, b) => b.stores.size - a.stores.size).map((e) => ({
+          id: e.id, name: e.name, type: e.type, frequency: e.frequency, manager: e.manager, storeCount: e.stores.size,
+        }));
+        const noun = which === 'merch' ? 'merchandisers' : 'reps';
+        this.openDrill(banner + ' — ' + noun, n(rows.length) + ' ' + noun + ' in the current filter',
+          [{ key: 'id', label: 'Emp ID' }, { key: 'name', label: 'Name' }, { key: 'type', label: 'Resource type' },
+           { key: 'frequency', label: 'Calling frequency' }, { key: 'manager', label: 'Line manager' },
+           { key: 'storeCount', label: 'Stores in banner' }], rows);
+      };
+      const drillManagers = (banner) => {
+        const by = new Map();
+        [...m.rep, ...m.merch].filter((r) => (r.banner || 'Unknown') === banner).forEach((r) => {
+          const k = r.managerId || r.managerName;
+          if (!k) return;
+          let e = by.get(k);
+          if (!e) { e = { id: r.managerId || '', name: r.managerName || '', people: new Set(), stores: new Set() }; by.set(k, e); }
+          e.people.add(r.resourceId || r.resourceName); e.stores.add(key(r));
+        });
+        const rows = [...by.values()].sort((a, b) => b.stores.size - a.stores.size).map((e) => ({
+          id: e.id, name: e.name, people: e.people.size, storeCount: e.stores.size,
+        }));
+        this.openDrill(banner + ' — line managers', n(rows.length) + ' managers in the current filter',
+          [{ key: 'id', label: 'Manager emp code' }, { key: 'name', label: 'Line manager' },
+           { key: 'people', label: 'Resources' }, { key: 'storeCount', label: 'Stores in banner' }], rows);
+      };
       const dualByBanner = new Map();
       m.byBanner.forEach((g) => dualByBanner.set(g.label, pct(g.both, g.value)));
       let rows = [...agg.values()].map((e) => {
@@ -1772,6 +2022,10 @@ class Component extends DCLogic {
           banner: e.banner, channel: e.channel, storesRaw: e.stores.size, stores: n(e.stores.size),
           repsRaw: e.reps.size, reps: n(e.reps.size), merchRaw: e.merch.size, merch: n(e.merch.size),
           managersRaw: e.managers.size, managers: n(e.managers.size), dualRaw: dual, dualPct: p1(dual),
+          openStores: () => drillStores(e.banner),
+          openReps: () => drillPeople(e.banner, 'rep'),
+          openMerch: () => drillPeople(e.banner, 'merch'),
+          openManagers: () => drillManagers(e.banner),
           gapLabel: strong ? 'Dual 60%+' : weak ? 'Dual under 25%' : 'Dual 25-60%',
           gapFg: strong ? '#f2955c' : weak ? '#9dc4ec' : '#c9d7e6',
           gapBg: strong ? 'rgba(236,109,37,0.14)' : weak ? 'rgba(157,196,236,0.1)' : 'rgba(157,196,236,0.06)',
@@ -1785,7 +2039,7 @@ class Component extends DCLogic {
       rows.sort((a, b) => (a[sk] > b[sk] ? 1 : a[sk] < b[sk] ? -1 : 0) * s.sortDir);
       out.bannerTableRows = rows;
       out.bannerTableCount = n(rows.length) + ' banners';
-      out.exportBanners = () => this.exportCsv('banner-coverage-' + new Date().toISOString().slice(0, 10),
+      out.exportBanners = () => this.exportSheet('banner-coverage-' + new Date().toISOString().slice(0, 10),
         [{ key: 'banner', label: 'Banner' }, { key: 'channel', label: 'Channel' }, { key: 'stores', label: 'Stores' },
          { key: 'reps', label: 'Reps' }, { key: 'merch', label: 'Merchandisers' }, { key: 'managers', label: 'Managers' },
          { key: 'dualPct', label: 'Dual coverage' }, { key: 'gapLabel', label: 'Status' }], rows);
@@ -1811,7 +2065,7 @@ class Component extends DCLogic {
         const peak = arr.length ? arr[0][1] : 1;
         return arr.map(([label, value]) => ({
           label, value: n(value), w: w(pct(value, peak)), pct: p1(pct(value, totals.get(label) || value)),
-          go: field ? () => this.set({ [field]: this.state[field] === label ? '' : label }) : undefined,
+          go: field ? () => this.toggleFilter(field, label) : undefined,
         }));
       };
       out.gapBannerRows = gapRows(gapBanner, bannerTotals, 10, 'banner');
@@ -1830,7 +2084,7 @@ class Component extends DCLogic {
       if (q) list = list.filter((e) => ((e.storeName || '') + e.banner + e.region + e.division).toLowerCase().includes(q));
       out.gapTitle = titles[s.gapTab];
       out.gapCount = n(list.length) + ' stores' + (list.length > 250 ? ' — showing first 250' : '');
-      out.exportGaps = () => this.exportCsv((s.gapTab === 'repOnly' ? 'rep-only-stores' : s.gapTab === 'merchOnly' ? 'merch-only-stores' : 'dual-covered-stores') + '-' + new Date().toISOString().slice(0, 10),
+      out.exportGaps = () => this.exportSheet((s.gapTab === 'repOnly' ? 'rep-only-stores' : s.gapTab === 'merchOnly' ? 'merch-only-stores' : 'dual-covered-stores') + '-' + new Date().toISOString().slice(0, 10),
         [{ key: 'storeName', label: 'Store' }, { key: 'banner', label: 'Banner' }, { key: 'channel', label: 'Channel' },
          { key: 'region', label: 'Region' }, { key: 'division', label: 'Division' },
          { key: 'rep', label: 'Rep' }, { key: 'merch', label: 'Merchandiser' }],
@@ -1859,12 +2113,50 @@ class Component extends DCLogic {
       if (slq) slList = slList.filter((e) => ((e.storeName || '') + e.banner + e.region + e.division + e.channel).toLowerCase().includes(slq));
       out.slTitle = slTitles[s.slTab];
       out.slCount = n(slList.length) + ' stores' + (slList.length > 250 ? ' — showing first 250' : '');
-      out.exportSl = () => this.exportCsv('store-level-' + s.slTab + '-' + new Date().toISOString().slice(0, 10),
-        [{ key: 'storeName', label: 'Store' }, { key: 'banner', label: 'Banner' }, { key: 'channel', label: 'Channel' },
-         { key: 'region', label: 'Region' }, { key: 'division', label: 'Division' },
-         { key: 'rep', label: 'Rep' }, { key: 'merch', label: 'Merchandiser' }],
-        slList.map((e) => ({ storeName: e.storeName || '', banner: e.banner, channel: e.channel, region: e.region, division: e.division, rep: e.rep || 'None assigned', merch: e.merch || 'None assigned' })));
-      out.exportSlLabel = 'Export ' + n(slList.length) + ' stores';
+      // The Store Level export mirrors the Call Cycle Master's own layout --
+      // one row per store x resource assignment, Master column headers, day
+      // and week flags as "X" (Carin, 2026-09-01: "follow the same format as
+      // the Meridian Master"). The on-screen table stays one-row-per-store;
+      // only the export is assignment-level, which is why its button counts
+      // rows rather than stores.
+      const slKeys = new Set(slList.map((e) => e.k));
+      const masterRows = [...m.rep, ...m.merch]
+        .filter((r) => slKeys.has(key(r)))
+        .sort((a, b) => String(a.storeName || '').localeCompare(String(b.storeName || ''))
+          || String(a.resourceName || '').localeCompare(String(b.resourceName || '')))
+        .map((r) => {
+          const days = r.days || [], weeks = r.weeks || [];
+          return {
+            storeCode: r.masterStoreCode || '', storeName: r.storeName || '', geoCode: r.storeCode || '',
+            banner: r.banner || '', active: r.active || '', division: r.division || '',
+            channel: channelOf(r.banner), region: r.region || '',
+            resourceId: r.resourceId || '', resourceName: r.resourceName || '',
+            resourceType: r.resourceType || '', email: r.email || '', frequency: r.frequency || '',
+            managerId: r.managerId || '', managerName: r.managerName || '', dupCheck: r.dupCheck || '',
+            Monday: days.includes('Monday') ? 'X' : '', Tuesday: days.includes('Tuesday') ? 'X' : '',
+            Wednesday: days.includes('Wednesday') ? 'X' : '', Thursday: days.includes('Thursday') ? 'X' : '',
+            Friday: days.includes('Friday') ? 'X' : '', Saturday: days.includes('Saturday') ? 'X' : '',
+            Sunday: days.includes('Sunday') ? 'X' : '',
+            WK1: weeks.includes('WK1') ? 'X' : '', WK2: weeks.includes('WK2') ? 'X' : '',
+            WK3: weeks.includes('WK3') ? 'X' : '', WK4: weeks.includes('WK4') ? 'X' : '',
+          };
+        });
+      const MASTER_COLS = [
+        { key: 'storeCode', label: 'STORE CODE' }, { key: 'storeName', label: 'STORE NAME' },
+        { key: 'geoCode', label: 'GEO REP STORE CODE' }, { key: 'banner', label: 'BANNER' },
+        { key: 'active', label: 'ACTIVE' }, { key: 'division', label: 'DIVISION' },
+        { key: 'channel', label: 'CHANNEL' }, { key: 'region', label: 'REGION' },
+        { key: 'resourceId', label: 'RESOURCE EMP ID' }, { key: 'resourceName', label: 'RESOURCE NAME' },
+        { key: 'resourceType', label: 'RESOURCE TYPE' }, { key: 'email', label: 'EMAIL' },
+        { key: 'frequency', label: 'CALLING FREQUENCY' }, { key: 'managerId', label: 'MANAGER EMP CODE' },
+        { key: 'managerName', label: 'LINE MANAGER' }, { key: 'dupCheck', label: 'DUPLICATED CHECK' },
+        { key: 'Monday', label: 'Monday' }, { key: 'Tuesday', label: 'Tuesday' }, { key: 'Wednesday', label: 'Wednesday' },
+        { key: 'Thursday', label: 'Thursday' }, { key: 'Friday', label: 'Friday' }, { key: 'Saturday', label: 'Saturday' },
+        { key: 'Sunday', label: 'Sunday' },
+        { key: 'WK1', label: 'WK1' }, { key: 'WK2', label: 'WK2' }, { key: 'WK3', label: 'WK3' }, { key: 'WK4', label: 'WK4' },
+      ];
+      out.exportSl = () => this.exportSheet('call-cycle-' + s.slTab + '-' + new Date().toISOString().slice(0, 10), MASTER_COLS, masterRows);
+      out.exportSlLabel = 'Export ' + n(masterRows.length) + ' rows';
       out.slRows = slList.slice(0, 250).map((e) => ({
         storeName: e.storeName || '—', banner: e.banner, channel: e.channel, region: e.region, division: e.division,
         rep: e.rep || 'None assigned', merch: e.merch || 'None assigned',
@@ -2023,7 +2315,7 @@ class Component extends DCLogic {
       out.bannerResourceCount = n(rows.length) + ' banner/resource-type row' + (rows.length === 1 ? '' : 's')
         + ' · ' + n(rows.reduce((a, r) => a + r.totalResources, 0)) + ' total resources · '
         + n(rows.reduce((a, r) => a + r.totalStores, 0)) + ' total stores';
-      out.exportBannerResource = () => this.exportCsv(
+      out.exportBannerResource = () => this.exportSheet(
         'banner-resource-breakdown-' + new Date().toISOString().slice(0, 10),
         [
           { key: 'banner', label: 'Banner' }, { key: 'resourceType', label: 'Resource Type' },

@@ -89,6 +89,10 @@ const EXCLUDED_RESOURCE_NAMES = new Set([
   "TEST2 USER", "TEST 2 USER 2",
 ]);
 
+// The Master's week columns are literally named " WK1".." WK4" -- leading
+// space included. Kept verbatim so the lookup matches the raw sheet.
+const WEEK_KEYS = [" WK1", " WK2", " WK3", " WK4"];
+
 function transformCombinedMaster(raw) {
   const rep_rows = [], merch_rows = [];
   (raw.combinedMaster || []).forEach((r) => {
@@ -113,6 +117,15 @@ function transformCombinedMaster(raw) {
       // (raw sheet uses "X" for scheduled, blank otherwise) -- kept in sync
       // with the same field added to live_data_server.py's slim().
       days: DAY_KEYS.filter((k) => (r[k] || "").trim().toUpperCase() === "X"),
+      // Remaining Call Cycle Master columns, carried through purely so the
+      // dashboard's Store Level export can reproduce the Master's own layout
+      // 1:1 (Carin, 2026-09-01: "export should follow the same format as the
+      // Meridian Master"). Nothing on screen reads these.
+      masterStoreCode: r["STORE CODE"],
+      active: r["ACTIVE"],
+      email: r["EMAIL"],
+      dupCheck: r["DUPLICATED CHECK"],
+      weeks: WEEK_KEYS.filter((k) => (r[k] || "").trim().toUpperCase() === "X").map((k) => k.trim()),
     };
     (isMerch ? merch_rows : rep_rows).push(row);
   });

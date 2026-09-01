@@ -30,6 +30,9 @@ def norm_division(v):
 
 
 DAY_KEYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
+# The Master's week columns are literally named ' WK1'..' WK4' -- leading
+# space included. Kept verbatim so the lookup matches the raw sheet.
+WEEK_KEYS = [' WK1', ' WK2', ' WK3', ' WK4']
 
 
 def slim(r):
@@ -51,6 +54,15 @@ def slim(r):
         # pairing is actually scheduled for a visit (raw sheet uses "X" for
         # scheduled, blank otherwise). (Carin, 2026-08-24)
         'days': [k for k in DAY_KEYS if (r.get(k) or '').strip().upper() == 'X'],
+        # Remaining Call Cycle Master columns, carried through purely so the
+        # dashboard's Store Level export can reproduce the Master's own layout
+        # 1:1 (Carin, 2026-09-01). Nothing on screen reads these. Kept in sync
+        # with the same fields in msal-auth.js's transformCombinedMaster().
+        'masterStoreCode': r.get('STORE CODE'),
+        'active': r.get('ACTIVE'),
+        'email': r.get('EMAIL'),
+        'dupCheck': r.get('DUPLICATED CHECK'),
+        'weeks': [k.strip() for k in WEEK_KEYS if (r.get(k) or '').strip().upper() == 'X'],
     }, is_merch
 
 
