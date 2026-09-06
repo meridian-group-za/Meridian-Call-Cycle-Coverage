@@ -1733,7 +1733,11 @@ class Component extends DCLogic {
       const typesOf = (rows) => [...new Set(rows.map((r) => r.resourceType).filter(Boolean))].sort();
       this._repTypes = typesOf(this.repRows);
       this._merchTypes = typesOf(this.merchRows);
-      this._allTypes = typesOf([...this.repRows, ...this.merchRows]);
+      // Was only built from repRows+merchRows, so Team Leader / Activation /
+      // manager types etc. never appeared as filter options anywhere, even
+      // though those rows are on-screen (Carin, 2026-09-06).
+      this._otherTypes = typesOf(this.otherRows || []);
+      this._allTypes = typesOf([...this.repRows, ...this.merchRows, ...(this.otherRows || [])]);
       const sorted = (x) => [...x].sort();
       this._opts = {
         regionOptions: sorted(rs), divisionOptions: sorted(ds), bannerOptions: sorted(bs), channelOptions: sorted(cs),
