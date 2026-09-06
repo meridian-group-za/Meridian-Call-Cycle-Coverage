@@ -984,6 +984,7 @@ const PAGES = {
   division: { label: 'Divisional coverage', icon: 'ph ph-map-trifold', title: 'Divisional coverage', sub: 'Stores, resources and dual-coverage rate per division' },
   merch: { label: 'Merch coverage', icon: 'ph ph-shopping-bag-open', title: 'Merchandiser coverage', sub: 'Merchandiser assignments, workload and calling frequency' },
   rep: { label: 'Rep coverage', icon: 'ph ph-user-focus', title: 'Rep coverage', sub: 'Sales-rep assignments, workload and calling frequency' },
+  other: { label: 'Other resources', icon: 'ph ph-users', title: 'Other resource coverage', sub: 'Team Leaders, Activation and other non-rep/non-merchandiser assignments, by their own real resource type' },
   banner: { label: 'Banner Insights', icon: 'ph ph-storefront', title: 'Banner Insights', sub: 'Every banner ranked by network size and coverage quality' },
   storelevel: { label: 'Store Level', icon: 'ph ph-table', title: 'Store Level', sub: 'Every store, rep and merchandiser assignment across the network — export-ready' },
   byday: { label: 'Coverage by day', icon: 'ph ph-calendar-check', title: 'Coverage by day', sub: 'How many stores are visited each weekday, by discipline' },
@@ -1179,9 +1180,9 @@ class Component extends DCLogic {
       mgrCount: uniq([...rep, ...merch], (r) => r.managerId || r.managerName),
       repMgrCount: uniq(rep, (r) => r.managerId || r.managerName),
       merchMgrCount: uniq(merch, (r) => r.managerId || r.managerName),
-      repFreq: count(rep, 'frequency'), merchFreq: count(merch, 'frequency'),
-      repType: count(rep, 'resourceType'), merchType: count(merch, 'resourceType'),
-      repBanner: count(rep, 'banner'), merchBanner: count(merch, 'banner'),
+      repFreq: count(rep, 'frequency'), merchFreq: count(merch, 'frequency'), otherFreq: count(other, 'frequency'),
+      repType: count(rep, 'resourceType'), merchType: count(merch, 'resourceType'), otherType: count(other, 'resourceType'),
+      repBanner: count(rep, 'banner'), merchBanner: count(merch, 'banner'), otherBanner: count(other, 'banner'),
       top5Share: pct(bannerGroups.slice(0, 5).reduce((a, g) => a + g.value, 0), all.length),
     };
     this._sig = sig; this._m = m;
@@ -1470,6 +1471,10 @@ class Component extends DCLogic {
 
     this.repRows.filter((r) => this.match(r, true)).forEach((r) => touch(r, r.resourceName, r.resourceId, r.resourceType));
     this.merchRows.filter((r) => this.match(r, false)).forEach((r) => touch(r, r.resourceName, r.resourceId, r.resourceType));
+    // Other-bucket rows (Team Leader, Activation, etc.) group by their own
+    // real resourceType string, same as everyone else -- no generic "Other"
+    // label anywhere in this breakdown (Carin, 2026-09-06).
+    (this.otherRows || []).filter((r) => this.match(r, true)).forEach((r) => touch(r, r.resourceName, r.resourceId, r.resourceType));
 
     const rows = [...groups.values()].map((g) => {
       const perDiv = DIVS.map((d) => ({ div: d, resources: g.byDiv[d].resources.size, stores: g.byDiv[d].stores.size }));
@@ -1685,7 +1690,7 @@ class Component extends DCLogic {
         const account = inst.getAllAccounts()[0];
         inst.logoutRedirect({ account, postLogoutRedirectUri: MSAL_CONFIG.redirectUri });
       },
-      isOverview: s.page === 'overview', isResourcePage: s.page === 'rep' || s.page === 'merch',
+      isOverview: s.page === 'overview', isResourcePage: s.page === 'rep' || s.page === 'merch' || s.page === 'other',
       isDivision: s.page === 'division', isBanner: s.page === 'banner', isGaps: s.page === 'gaps',
       isStoreLevel: s.page === 'storelevel',
       isByDay: s.page === 'byday', isHierarchy: s.page === 'hierarchy', isBannerResource: s.page === 'bannerresource',
@@ -1749,7 +1754,7 @@ class Component extends DCLogic {
     const out = Object.assign(base, this._opts, {
       storesInView: n(total),
       assignmentsInView: n(m.rep.length + m.merch.length),
-      typeOptions: s.page === 'rep' ? this._repTypes : s.page === 'merch' ? this._merchTypes : this._allTypes,
+      typeOptions: s.page === 'rep' ? this._repTypes : s.page === 'merch' ? this._merchTypes : s.page === 'other' ? this._otherTypes : this._allTypes,
       filterSummary: activeFilters.length ? activeFilters.length + ' filter' + (activeFilters.length > 1 ? 's' : '') + ' applied' : 'Full network — no filters',
     });
     // Built last: the resource-type list depends on which page is open, so it
@@ -1770,7 +1775,7 @@ class Component extends DCLogic {
         // Team Leaders, Activation, District Managers, etc. -- real people in
         // the roster but neither a field rep nor a merchandiser, so they get
         // their own card instead of being folded into Reps (Carin, 2026-09-06).
-        { icon: 'ph ph-users', label: 'Other Resources', value: n(m.otherCount), sub: (m.otherCount ? (m.other.length / m.otherCount).toFixed(1) : '—') + ' calls each' },
+        { icon: 'ph ph-users', label: 'Other', value: n(m.otherCount), sub: (m.otherCount ? (m.other.length / m.otherCount).toFixed(1) : '—') + ' calls each' },
         { icon: 'ph ph-user-focus', label: 'Rep Mgrs', value: n(m.repMgrCount), sub: (m.repMgrCount ? (m.repCount / m.repMgrCount).toFixed(1) : '—') + ' reps each' },
         { icon: 'ph ph-shopping-bag-open', label: 'Merch Mgrs', value: n(m.merchMgrCount), sub: (m.merchMgrCount ? (m.merchCount / m.merchMgrCount).toFixed(1) : '—') + ' merch each' },
         { icon: 'ph ph-storefront', label: 'Banners', value: n(m.byBanner.length), sub: m.byChannel.length + ' channels' },
@@ -1825,20 +1830,30 @@ class Component extends DCLogic {
     }
 
     if (out.isResourcePage) {
-      const isRep = s.page === 'rep';
-      const rows = isRep ? m.rep : m.merch;
-      const distinct = isRep ? m.repCount : m.merchCount;
+      // Was isRep-only (Rep vs Merchandiser) -- generalised to a 3-way kind
+      // so the Other Resources page (Team Leader, Activation, District
+      // Manager, etc.) reuses the exact same stats/donut/table treatment
+      // instead of needing its own duplicated block (Carin, 2026-09-06).
+      const kind = s.page === 'rep' ? 'rep' : s.page === 'merch' ? 'merch' : 'other';
+      const isRep = kind === 'rep';
+      const rows = kind === 'rep' ? m.rep : kind === 'merch' ? m.merch : m.other;
+      const distinct = kind === 'rep' ? m.repCount : kind === 'merch' ? m.merchCount : m.otherCount;
+      const kindBanner = kind === 'rep' ? m.repBanner : kind === 'merch' ? m.merchBanner : m.otherBanner;
+      const kindFreq = kind === 'rep' ? m.repFreq : kind === 'merch' ? m.merchFreq : m.otherFreq;
+      const kindType = kind === 'rep' ? m.repType : kind === 'merch' ? m.merchType : m.otherType;
+      const kindIcon = kind === 'rep' ? 'ph ph-user-focus' : kind === 'merch' ? 'ph ph-shopping-bag-open' : 'ph ph-users';
+      const kindNoun = kind === 'rep' ? 'reps' : kind === 'merch' ? 'merchandisers' : 'other resources';
       const covered = new Set(rows.map(key)).size;
       out.resStats = [
         { icon: 'ph ph-list-checks', label: 'Assignments', value: n(rows.length), sub: 'store visits per cycle' },
-        { icon: isRep ? 'ph ph-user-focus' : 'ph ph-shopping-bag-open', label: isRep ? 'Distinct reps' : 'Distinct merchandisers', value: n(distinct), sub: (distinct ? (rows.length / distinct).toFixed(1) : '—') + ' calls each' },
+        { icon: kindIcon, label: 'Distinct ' + kindNoun, value: n(distinct), sub: (distinct ? (rows.length / distinct).toFixed(1) : '—') + ' calls each' },
         { icon: 'ph ph-storefront', label: 'Stores reached', value: n(covered), sub: p1(pct(covered, m.all.length)) + ' of covered network' },
         { icon: 'ph ph-users-three', label: 'Managers', value: n(new Set(rows.map((r) => r.managerId || r.managerName).filter(Boolean)).size), sub: 'reporting lines' },
-        { icon: 'ph ph-tag', label: 'Banners', value: n((isRep ? m.repBanner : m.merchBanner).length), sub: 'served' },
+        { icon: 'ph ph-tag', label: 'Banners', value: n(kindBanner.length), sub: 'served' },
       ];
-      out.resBannerRows = this.plainRows(isRep ? m.repBanner : m.merchBanner, 14, 'banner');
-      out.resFreqTiles = (isRep ? m.repFreq : m.merchFreq).slice(0, 8).map(([label, value]) => ({ label, value: n(value) }));
-      out.resTypeTiles = (isRep ? m.repType : m.merchType).slice(0, 8).map(([label, value]) => ({ label, value: n(value) }));
+      out.resBannerRows = this.plainRows(kindBanner, 14, 'banner');
+      out.resFreqTiles = kindFreq.slice(0, 8).map(([label, value]) => ({ label, value: n(value) }));
+      out.resTypeTiles = kindType.slice(0, 8).map(([label, value]) => ({ label, value: n(value) }));
       const peopleByType = new Map();
       rows.forEach((r) => {
         const k = r.resourceType || 'Unknown';
@@ -1860,10 +1875,10 @@ class Component extends DCLogic {
       out.resTypeTotal = n(typeTotal);
       const q = s.resQuery.trim().toLowerCase();
       const filtered = q ? rows.filter((r) => ((r.storeName || '') + (r.banner || '') + (r.region || '') + (r.resourceName || '') + (r.managerName || '')).toLowerCase().includes(q)) : rows;
-      out.resTableTitle = isRep ? 'Rep assignments' : 'Merchandiser assignments';
+      out.resTableTitle = kind === 'rep' ? 'Rep assignments' : kind === 'merch' ? 'Merchandiser assignments' : 'Other resource assignments';
       out.resTableCount = n(filtered.length) + ' rows' + (filtered.length > 250 ? ' — showing first 250' : '');
       out.exportRes = () => this.exportSheet(
-        (isRep ? 'rep-assignments' : 'merchandiser-assignments') + '-' + new Date().toISOString().slice(0, 10),
+        (kind === 'rep' ? 'rep-assignments' : kind === 'merch' ? 'merchandiser-assignments' : 'other-resource-assignments') + '-' + new Date().toISOString().slice(0, 10),
         [
           { key: 'storeCode', label: 'Store code' }, { key: 'storeName', label: 'Store' },
           { key: 'banner', label: 'Banner' }, { key: 'channel', label: 'Channel' },
@@ -1920,7 +1935,7 @@ class Component extends DCLogic {
           metrics: [
             { label: 'Reps', value: n(e.reps.size) },
             { label: 'Merchandisers', value: n(e.merch.size) },
-            { label: 'Other Resources', value: n(e.other.size) },
+            { label: 'Other', value: n(e.other.size) },
             { label: 'Rep Managers', value: n(e.repManagers.size) },
             { label: 'Banners', value: n(e.banners.size) },
             { label: 'Stores / rep', value: e.reps.size ? (g.value / e.reps.size).toFixed(1) : '—' },
