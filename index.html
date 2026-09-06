@@ -166,8 +166,8 @@ Last updated<br><span style="color:var(--color-neutral-300);">{{ snapshot }}</sp
           </div>
 
           <div style="display:grid; gap:var(--space-4);">
-            <div style="display:grid; grid-template-columns:repeat(6,minmax(0,1fr)); gap:var(--space-3);">
-              <sc-for list="{{ headlineStats }}" as="s" hint-placeholder-count="6">
+            <div style="display:grid; grid-template-columns:repeat(7,minmax(0,1fr)); gap:var(--space-3);">
+              <sc-for list="{{ headlineStats }}" as="s" hint-placeholder-count="7">
                 <div style="background:var(--color-surface); border:1px solid var(--color-neutral-800); border-radius:var(--radius-md); padding:var(--space-4) var(--space-4) var(--space-4);">
                   <div style="display:flex; align-items:center; gap:6px; font-size:9px; letter-spacing:0.09em; text-transform:uppercase; color:var(--color-neutral-500); margin-bottom:6px;">
                     <i class="{{ s.icon }}" style="font-size:13px; color:var(--color-accent-400);"></i><span>{{ s.label }}</span>
