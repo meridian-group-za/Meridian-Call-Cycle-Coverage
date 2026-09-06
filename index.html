@@ -1033,6 +1033,11 @@ class Component extends DCLogic {
         });
         this.repRows = withHierarchy(raw.rep_rows || []);
         this.merchRows = withHierarchy(raw.merch_rows || []);
+        // Resources whose type is neither a real Rep nor a Merchandiser
+        // (Team Leader, Activation, District Manager, etc.) -- previously
+        // silently folded into repRows, inflating every Reps count
+        // dashboard-wide (Carin, 2026-09-06). Own bucket now.
+        this.otherRows = withHierarchy(raw.other_rows || []);
         this.ts = raw.timestamp;
         this.setState({ ready: true });
       });
@@ -1128,6 +1133,10 @@ class Component extends DCLogic {
     if (this._sig === sig && this._m) return this._m;
     const rep = this.repRows.filter((r) => this.match(r, true));
     const merch = this.merchRows.filter((r) => this.match(r, false));
+    // Team Leader / Activation / District Manager / etc. -- real resources,
+    // but neither a field rep nor a merchandiser, so they get their own
+    // bucket rather than being folded into `rep` (Carin, 2026-09-06).
+    const other = (this.otherRows || []).filter((r) => this.match(r, true));
 
     const stores = new Map();
     const touch = (r, which) => {
@@ -1162,10 +1171,11 @@ class Component extends DCLogic {
 
     const bannerGroups = group(all, 'banner');
     const m = {
-      rep, merch, all, both, repOnly, merchOnly,
+      rep, merch, other, all, both, repOnly, merchOnly,
       byRegion: group(all, 'region'), byChannel: group(all, 'channel'), byDivision: group(all, 'division'), byBanner: bannerGroups,
       repCount: uniq(rep, (r) => r.resourceId || r.resourceName),
       merchCount: uniq(merch, (r) => r.resourceId || r.resourceName),
+      otherCount: uniq(other, (r) => r.resourceId || r.resourceName),
       mgrCount: uniq([...rep, ...merch], (r) => r.managerId || r.managerName),
       repMgrCount: uniq(rep, (r) => r.managerId || r.managerName),
       merchMgrCount: uniq(merch, (r) => r.managerId || r.managerName),
@@ -1753,6 +1763,10 @@ class Component extends DCLogic {
       out.headlineStats = [
         { icon: 'ph ph-user-focus', label: 'Reps', value: n(m.repCount), sub: (m.repCount ? (m.rep.length / m.repCount).toFixed(1) : '—') + ' calls each' },
         { icon: 'ph ph-shopping-bag-open', label: 'Merchandisers', value: n(m.merchCount), sub: (m.merchCount ? (m.merch.length / m.merchCount).toFixed(1) : '—') + ' calls each' },
+        // Team Leaders, Activation, District Managers, etc. -- real people in
+        // the roster but neither a field rep nor a merchandiser, so they get
+        // their own card instead of being folded into Reps (Carin, 2026-09-06).
+        { icon: 'ph ph-users', label: 'Other Resources', value: n(m.otherCount), sub: (m.otherCount ? (m.other.length / m.otherCount).toFixed(1) : '—') + ' calls each' },
         { icon: 'ph ph-user-focus', label: 'Rep Mgrs', value: n(m.repMgrCount), sub: (m.repMgrCount ? (m.repCount / m.repMgrCount).toFixed(1) : '—') + ' reps each' },
         { icon: 'ph ph-shopping-bag-open', label: 'Merch Mgrs', value: n(m.merchMgrCount), sub: (m.merchMgrCount ? (m.merchCount / m.merchMgrCount).toFixed(1) : '—') + ' merch each' },
         { icon: 'ph ph-storefront', label: 'Banners', value: n(m.byBanner.length), sub: m.byChannel.length + ' channels' },
@@ -1866,11 +1880,12 @@ class Component extends DCLogic {
       const agg = new Map();
       const ensure = (d) => {
         let e = agg.get(d);
-        if (!e) { e = { division: d, reps: new Set(), merch: new Set(), managers: new Set(), repManagers: new Set(), banners: new Set() }; agg.set(d, e); }
+        if (!e) { e = { division: d, reps: new Set(), merch: new Set(), other: new Set(), managers: new Set(), repManagers: new Set(), banners: new Set() }; agg.set(d, e); }
         return e;
       };
       m.rep.forEach((r) => { const e = ensure(r.division || 'Unknown'); e.reps.add(r.resourceId || r.resourceName); e.calls = (e.calls || 0) + 1; if (r.managerId || r.managerName) { e.managers.add(r.managerId || r.managerName); e.repManagers.add(r.managerId || r.managerName); } if (r.banner) e.banners.add(r.banner); });
       m.merch.forEach((r) => { const e = ensure(r.division || 'Unknown'); e.merch.add(r.resourceId || r.resourceName); e.calls = (e.calls || 0) + 1; if (r.managerId || r.managerName) e.managers.add(r.managerId || r.managerName); if (r.banner) e.banners.add(r.banner); });
+      m.other.forEach((r) => { const e = ensure(r.division || 'Unknown'); e.other.add(r.resourceId || r.resourceName); if (r.banner) e.banners.add(r.banner); });
       const mix = new Map();
       m.all.forEach((e) => {
         let x = mix.get(e.division);
@@ -1901,6 +1916,7 @@ class Component extends DCLogic {
           metrics: [
             { label: 'Reps', value: n(e.reps.size) },
             { label: 'Merchandisers', value: n(e.merch.size) },
+            { label: 'Other Resources', value: n(e.other.size) },
             { label: 'Rep Managers', value: n(e.repManagers.size) },
             { label: 'Banners', value: n(e.banners.size) },
             { label: 'Stores / rep', value: e.reps.size ? (g.value / e.reps.size).toFixed(1) : '—' },
@@ -1908,7 +1924,11 @@ class Component extends DCLogic {
             { label: 'Calls per cycle', value: n(e.calls || 0) },
             { label: 'Rep managers span', value: e.repManagers.size ? (e.reps.size / e.repManagers.size).toFixed(1) : '—' },
           ],
-          topRegions: [...x.regions.entries()].sort((a, b) => b[1] - a[1]).slice(0, 4).map(([label, v]) => ({
+          // Show every region, not just a top-N cut -- a truncated top-4 list
+          // made smaller regions (e.g. SWD) look absent from their division
+          // entirely, when they were actually counted correctly all along
+          // (Carin, 2026-09-06).
+          topRegions: [...x.regions.entries()].sort((a, b) => b[1] - a[1]).map(([label, v]) => ({
             label, value: n(v), w: w(pct(v, g.value)),
             go: () => this.toggleFilter('region', label),
           })),

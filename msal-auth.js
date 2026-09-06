@@ -94,13 +94,23 @@ const EXCLUDED_RESOURCE_NAMES = new Set([
 const WEEK_KEYS = [" WK1", " WK2", " WK3", " WK4"];
 
 function transformCombinedMaster(raw) {
-  const rep_rows = [], merch_rows = [];
+  const rep_rows = [], merch_rows = [], other_rows = [];
   (raw.combinedMaster || []).forEach((r) => {
     // "Office" banner is internal Meridian admin/conference-room addresses,
     // not real stores -- drop entirely rather than land in "Other / Unclassified".
     if ((r["BANNER"] || "").trim().toUpperCase() === "OFFICE") return;
     if (EXCLUDED_RESOURCE_NAMES.has((r["RESOURCE NAME"] || "").trim().toUpperCase())) return;
-    const isMerch = (r["RESOURCE TYPE"] || "").includes("MERCHANDISER");
+    // RESOURCE TYPE is built as "[CLIENT] [CATEGORY] [BUCKET]" by the Control
+    // Centre Portal's resourceTypeLabel() -- BUCKET is the last word, and is
+    // exactly "REP"/"MERCHANDISER" for real reps/merchandisers, or the raw
+    // Role text (Team Leader, Activation, District Manager, etc.) for
+    // everyone else. A plain .includes("MERCHANDISER") check with everything
+    // else falling into rep_rows was silently counting every Team
+    // Leader/Activation/manager/etc. as a "Rep" dashboard-wide (Carin,
+    // 2026-09-06) -- these now get their own other_rows bucket instead.
+    const rt = (r["RESOURCE TYPE"] || "").trim().toUpperCase();
+    const isMerch = rt.includes("MERCHANDISER");
+    const isRep = !isMerch && /(^|\s)REP$/.test(rt);
     const row = {
       storeCode: r["GEO REP STORE CODE"] || r["STORE CODE"],
       storeName: r["STORE NAME"],
@@ -127,7 +137,7 @@ function transformCombinedMaster(raw) {
       dupCheck: r["DUPLICATED CHECK"],
       weeks: WEEK_KEYS.filter((k) => (r[k] || "").trim().toUpperCase() === "X").map((k) => k.trim()),
     };
-    (isMerch ? merch_rows : rep_rows).push(row);
+    (isMerch ? merch_rows : (isRep ? rep_rows : other_rows)).push(row);
   });
-  return { timestamp: raw.timestamp, processedBy: raw.processedBy, rep_rows, merch_rows };
+  return { timestamp: raw.timestamp, processedBy: raw.processedBy, rep_rows, merch_rows, other_rows };
 }
