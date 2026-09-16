@@ -31,10 +31,34 @@ function getMsalInstance() {
   if (!msalInstance) {
     msalInstance = new msal.PublicClientApplication({
       auth: { clientId: MSAL_CONFIG.clientId, authority: `https://login.microsoftonline.com/${MSAL_CONFIG.tenantId}`, redirectUri: MSAL_CONFIG.redirectUri },
-      cache: { cacheLocation: "sessionStorage" },
+      // localStorage, not sessionStorage: the portal opens this dashboard in
+      // a new tab, where sessionStorage is empty by definition, so the
+      // sign-in never carried over and it asked again every time.
+      cache: { cacheLocation: "localStorage" },
     });
   }
   return msalInstance;
+}
+
+// Resolves to a signed-in account, or null if the caller should send the
+// browser to login.html.
+//
+// An empty cache does not mean signed out: MSAL caches per app registration
+// and per origin. ssoSilent asks Entra to reuse the session it already has,
+// in a hidden iframe with no prompt. It fails in ordinary circumstances -- no
+// session, several accounts, a browser blocking third-party cookies -- so the
+// login page stays the fallback rather than being replaced by it.
+async function ensureAccount() {
+  const inst = getMsalInstance();
+  try { await inst.handleRedirectPromise(); } catch (e) { /* not a redirect */ }
+  const existing = inst.getAllAccounts()[0];
+  if (existing) return existing;
+  try {
+    const sso = await inst.ssoSilent({ scopes: GRAPH_SCOPES });
+    return (sso && sso.account) || null;
+  } catch (e) {
+    return null;
+  }
 }
 
 async function getGraphToken() {
