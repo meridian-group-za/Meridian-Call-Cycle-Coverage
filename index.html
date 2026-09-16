@@ -1063,11 +1063,13 @@ class Component extends DCLogic {
 
     // Deployed (GitHub Pages): requires a real Microsoft sign-in, then reads
     // run-latest.json straight from SharePoint via Graph -- see msal-auth.js.
-    const inst = getMsalInstance();
-    if (!inst.getAllAccounts().length) { window.location.href = 'login.html'; return; }
-    fetchCallCycleMasterFromGraph()
-      .then((payload) => { if (payload) applyPayload(payload); })
-      .catch((e) => this.setState({ err: 'Could not load the Call Cycle Master from SharePoint — ' + e.message }));
+    // ensureAccount() tries the existing Entra session before giving up, so
+    // arriving from the portal in a fresh tab no longer means a login screen.
+    ensureAccount().then((account) => {
+      if (!account) { window.location.href = 'login.html'; return; }
+      return fetchCallCycleMasterFromGraph()
+        .then((payload) => { if (payload) applyPayload(payload); });
+    }).catch((e) => this.setState({ err: 'Could not load the Call Cycle Master from SharePoint — ' + e.message }));
   }
 
   componentWillUnmount() {
