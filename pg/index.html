@@ -101,6 +101,7 @@
       <div>
         <div style="font-size: 19px; font-weight: 600; letter-spacing: -0.015em; line-height: 1.2">Call Cycle</div>
         <div style="margin-top: 3px; font-size: 12px; color: #9dc4ec">Smart Sell Master</div>
+        <div style="margin-top: 2px; font-size: 10.5px; color: #4f6c8e; font-variant-numeric: tabular-nums">{{ sourceLine }}</div>
       </div>
     </div>
     <div style="padding: 20px 20px 8px; font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: #4f6c8e">Pages</div>
@@ -767,7 +768,7 @@ const OFF = { bg: 'rgba(243,247,252,0.05)', fg: '#2a4568' };
 
 class Component extends DCLogic {
   state = {
-    rows: null, authed: false, loginEmail: '', loginPass: '', loginError: '',
+    rows: null, sourceLine: '', authed: false, loginEmail: '', loginPass: '', loginError: '',
     view: 'dash', page: 'overview', repName: null, storeIdx: null,
     group: 'REGION', sort: 'acv', query: '',
     f: { division: 'All', region: 'All', channel: 'All', banner: 'All', repType: 'All', freq: 'All', manager: 'All', active: 'All', store: 'All' },
@@ -781,14 +782,7 @@ class Component extends DCLogic {
       const inst = getPgMsalInstance();
       inst.handleRedirectPromise()
         .then((result) => {
-          if (result || inst.getAllAccounts().length) { this.setState({ authed: true }); return; }
-          // Nothing cached here does not mean signed out: MSAL caches per
-          // app registration and per origin, and people arrive from the
-          // Nexus portal already signed in to Microsoft. Reuse that
-          // session rather than showing a sign-in they do not need.
-          return inst.ssoSilent({})
-            .then(() => { if (inst.getAllAccounts().length) this.setState({ authed: true }); })
-            .catch(() => { /* no session to reuse - the sign-in stands */ });
+          if (result || inst.getAllAccounts().length) this.setState({ authed: true });
         })
         .catch((e) => this.setState({ loginError: 'Sign-in failed: ' + e.message }));
     }
@@ -803,7 +797,17 @@ class Component extends DCLogic {
           division: this.DIVISION_OF[r[10]] || 'COASTAL', sourceDivision: r[8],
           days, wks, nd, nw, calls: nd * nw };
       });
-      this.setState({ rows });
+      // Say WHAT this was built from and WHEN. The page sat blank for three
+      // weeks because a stale or unreadable file looks exactly like a working
+      // one from the outside. A date on screen makes that visible.
+      const m = d.meta || {};
+      let src = '';
+      if (m.sourceModified) {
+        const t = new Date(m.sourceModified);
+        src = 'Updated ' + t.toLocaleDateString('en-ZA', { day: 'numeric', month: 'short' }) +
+              ' ' + t.toLocaleTimeString('en-ZA', { hour: '2-digit', minute: '2-digit' });
+      }
+      this.setState({ rows, sourceLine: src });
     }).catch(e => console.error('data load failed', e));
   }
 
@@ -886,7 +890,7 @@ class Component extends DCLogic {
     if (!rows) return { ...auth, loading: true, showDash: false, showRep: false, showStore: false, crumb: '',
       pOverview: false, pDivisions: false, pReps: false, pStores: false,
       pageTitle: 'Overview', pageSub: 'Loading visit plan data', storesInView: '—', rowNote: '—',
-      crumbKind: '', navItems: [], goHome: () => {} };
+      crumbKind: '', navItems: [], goHome: () => {}, sourceLine: this.state.sourceLine };
 
     const goHome = () => this.setState({ view: 'dash', repName: null, storeIdx: null });
     const openRep = name => this.setState({ view: 'rep', repName: name });
@@ -926,6 +930,7 @@ class Component extends DCLogic {
           dot: on ? '#ec6d25' : '#3d5f85',
           onClick: () => this.setState({ page: p.k, view: 'dash', repName: null, storeIdx: null }) };
       }),
+      sourceLine: this.state.sourceLine,
       crumb: this.state.view === 'rep' ? this.state.repName
         : this.state.view === 'store' ? rows[this.state.storeIdx].store : ''
     };
@@ -1305,43 +1310,6 @@ class Component extends DCLogic {
     });
   }
 }
-</script>
-
-<script>
-// "Back to Nexus", shown only when the portal sent you here and said where to
-// return to. The destination is checked against the portal's own URL: taking
-// an arbitrary ?from= on trust is an open redirect waiting to happen.
-(function () {
-  var NEXUS = "https://meridian-group-za.github.io/Meridian-Nexus/portal.html";
-  var from;
-  try { from = new URLSearchParams(window.location.search).get("from"); } catch (e) { return; }
-  if (!from || from.indexOf(NEXUS) !== 0) return;
-
-  function add() {
-    if (document.getElementById("nx-back")) return;
-    var a = document.createElement("a");
-    a.id = "nx-back";
-    a.href = from;
-    a.textContent = "\u2190 Nexus";
-    a.title = "Back to the Meridian Nexus portal";
-    a.style.cssText = [
-      "position:fixed", "top:14px", "left:14px", "z-index:99999",
-      "display:inline-flex", "align-items:center", "gap:6px",
-      "padding:7px 13px", "border-radius:9px",
-      "background:rgba(236,109,37,0.16)", "border:1px solid rgba(236,109,37,0.45)",
-      "color:#f2955c", "font:600 12px/1 Poppins,Segoe UI,system-ui,sans-serif",
-      "text-decoration:none", "cursor:pointer",
-      "backdrop-filter:blur(6px)", "-webkit-backdrop-filter:blur(6px)"
-    ].join(";");
-    document.body.appendChild(a);
-  }
-
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", add);
-  } else {
-    add();
-  }
-})();
 </script>
 </body>
 </html>
