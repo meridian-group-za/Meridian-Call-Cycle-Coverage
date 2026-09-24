@@ -781,7 +781,14 @@ class Component extends DCLogic {
       const inst = getPgMsalInstance();
       inst.handleRedirectPromise()
         .then((result) => {
-          if (result || inst.getAllAccounts().length) this.setState({ authed: true });
+          if (result || inst.getAllAccounts().length) { this.setState({ authed: true }); return; }
+          // Nothing cached here does not mean signed out: MSAL caches per
+          // app registration and per origin, and people arrive from the
+          // Nexus portal already signed in to Microsoft. Reuse that
+          // session rather than showing a sign-in they do not need.
+          return inst.ssoSilent({})
+            .then(() => { if (inst.getAllAccounts().length) this.setState({ authed: true }); })
+            .catch(() => { /* no session to reuse - the sign-in stands */ });
         })
         .catch((e) => this.setState({ loginError: 'Sign-in failed: ' + e.message }));
     }
