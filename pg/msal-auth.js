@@ -27,7 +27,10 @@ function getPgMsalInstance() {
   if (!pgMsalInstance) {
     pgMsalInstance = new msal.PublicClientApplication({
       auth: { clientId: PG_MSAL_CONFIG.clientId, authority: `https://login.microsoftonline.com/${PG_MSAL_CONFIG.tenantId}`, redirectUri: PG_MSAL_CONFIG.redirectUri },
-      cache: { cacheLocation: "sessionStorage" },
+      // localStorage, not sessionStorage: the portal opens this in a new tab,
+      // where sessionStorage is empty by definition, so the sign-in never
+      // carried over and it asked again every time.
+      cache: { cacheLocation: "localStorage" },
     });
   }
   return pgMsalInstance;
